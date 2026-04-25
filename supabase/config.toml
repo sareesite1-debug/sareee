@@ -1,0 +1,7 @@
+project_id = "wngjotlhsntvboutwhxt"
+
+[functions.send-email]
+verify_jwt = false
+
+[functions.shiprocket-create-order]
+verify_jwt = false
