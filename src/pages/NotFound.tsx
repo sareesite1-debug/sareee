@@ -14,14 +14,6 @@ const NotFound = () => {
     <div className="min-h-screen bg-emerald-deep flex items-center justify-center relative overflow-hidden">
       {/* Decorative Background Elements */}
       <div className="absolute inset-0 bg-[radial-gradient(hsl(var(--gold))_1px,transparent_1px)] [background-size:20px_20px] opacity-[0.03]" />
-      <motion.div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-gold/5 rounded-full pointer-events-none"
-        animate={{ rotate: 360 }} transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
-      />
-      <motion.div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-gold/10 rounded-full pointer-events-none"
-        animate={{ rotate: -360 }} transition={{ duration: 80, repeat: Infinity, ease: "linear" }}
-      />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gold/10 rounded-full blur-[100px] pointer-events-none animate-pulse-glow" />
 
       <div className="container mx-auto px-6 relative z-10 text-center">

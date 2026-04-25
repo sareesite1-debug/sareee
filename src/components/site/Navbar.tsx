@@ -28,8 +28,6 @@ const Navbar = () => {
   const springConfig = { damping: 25, stiffness: 700 };
   const cursorXSpring = useSpring(cursorX, springConfig);
   const cursorYSpring = useSpring(cursorY, springConfig);
-  const trailX = useSpring(cursorX, { damping: 50, stiffness: 200 });
-  const trailY = useSpring(cursorY, { damping: 50, stiffness: 200 });
 
   useEffect(() => {
     const move = (e: MouseEvent) => { cursorX.set(e.clientX - 8); cursorY.set(e.clientY - 8); };
@@ -71,24 +69,13 @@ const Navbar = () => {
       >
         <div className="w-4 h-4 bg-white rounded-full" />
       </motion.div>
-      {/* Cursor trail ring */}
-      <motion.div
-        className="fixed top-0 left-0 z-[9998] pointer-events-none hidden lg:block"
-        style={{ x: trailX, y: trailY }}
-      >
-        <div className="w-8 h-8 -translate-x-2 -translate-y-2 border border-gold/40 rounded-full" />
-      </motion.div>
 
       {/* ── Navbar ── */}
       <motion.header
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-        className={`fixed inset-x-0 top-0 z-50 transition-all duration-700 ${
-          scrolled || open
-            ? "bg-ivory/80 backdrop-blur-2xl border-b border-gold/10 shadow-[0_2px_60px_-20px_hsl(var(--emerald-deep)/0.12)]"
-            : "bg-transparent"
-        }`}
+        className="fixed inset-x-0 top-0 z-50 transition-all duration-700 bg-ivory/90 backdrop-blur-2xl border-b border-gold/10 shadow-[0_2px_60px_-20px_hsl(var(--emerald-deep)/0.12)]"
       >
         <div className="container mx-auto px-6 lg:px-10">
           <motion.div

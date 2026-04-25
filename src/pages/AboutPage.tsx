@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight, ArrowDown } from "lucide-react";
+import { ArrowRight, ArrowDown, Sparkles } from "lucide-react";
 import editorialImg from "@/assets/hero-editorial.jpg";
 import craftImg from "@/assets/craft-silks.jpg";
 
@@ -10,10 +10,10 @@ const RevealWords = ({ text, className = "", delay = 0 }: { text: string; classN
   return (
     <span className={className} aria-label={text}>
       {words.map((word, i) => (
-        <span key={i} className="inline-block overflow-hidden">
+        <span key={i} className="inline-block relative">
           <motion.span
             className="inline-block"
-            initial={{ y: "110%", opacity: 0 }}
+            initial={{ y: 20, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.85, delay: delay + i * 0.04, ease: [0.16, 1, 0.3, 1] }}
@@ -45,7 +45,7 @@ const AboutPage = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-transparent to-transparent" />
         </motion.div>
         
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold/10 rounded-full blur-[120px] pointer-events-none animate-pulse-glow" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold/10 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="container mx-auto px-6 lg:px-10 relative z-10 text-center max-w-4xl">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="flex items-center justify-center gap-3 mb-6">

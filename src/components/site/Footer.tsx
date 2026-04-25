@@ -31,10 +31,9 @@ const Footer = () => {
   const iV = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } };
 
   return (
-    <footer className="bg-emerald-deep text-ivory relative overflow-hidden">
-      <motion.div className="absolute -top-32 -right-32 w-96 h-96 border border-gold/5 rounded-full pointer-events-none" animate={{ rotate: 360 }} transition={{ duration: 60, repeat: Infinity, ease: "linear" }} />
-      <motion.div className="absolute -top-16 -right-16 w-64 h-64 border border-gold/5 rounded-full pointer-events-none" animate={{ rotate: -360 }} transition={{ duration: 45, repeat: Infinity, ease: "linear" }} />
-      <div className="absolute bottom-0 left-0 w-72 h-72 bg-gold/[0.02] rounded-full blur-[80px] pointer-events-none animate-float-orb" />
+    <footer className="bg-ink text-ivory relative overflow-hidden pb-10 border-t border-gold/20">
+      <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "radial-gradient(hsl(var(--gold)) 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-gold/5 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="border-b border-ivory/5 overflow-hidden py-3">
         <div className="marquee-track">

@@ -23,10 +23,10 @@ const RevealWords = ({ text, className = "", delay = 0 }: { text: string; classN
   return (
     <span ref={ref} className={className} aria-label={text}>
       {words.map((word, i) => (
-        <span key={i} className="inline-block overflow-hidden">
+        <span key={i} className="inline-block relative">
           <motion.span
             className="inline-block"
-            initial={{ y: "110%", opacity: 0 }}
+            initial={{ y: 20, opacity: 0 }}
             animate={inView ? { y: 0, opacity: 1 } : {}}
             transition={{ duration: 0.85, delay: delay + i * 0.04, ease: [0.16, 1, 0.3, 1] }}
           >
@@ -149,12 +149,10 @@ const HomePage = () => {
       {/* HERO */}
       <section ref={heroRef} onMouseMove={handleHeroMouse} className="relative h-screen min-h-[700px] overflow-hidden flex items-center perspective-1000">
         <motion.div className="absolute inset-0" style={{ scale: heroScale }}>
-          <img src={heroImg} alt="Handwoven silk saree" className="w-full h-full object-cover" />
+          <img src={heroImg} alt="Handwoven silk saree" className="w-full h-full object-cover object-top" />
           <div className="absolute inset-0 bg-gradient-to-r from-emerald-deep/85 via-emerald-deep/50 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/60 via-transparent to-transparent" />
         </motion.div>
-
-        <div className="absolute right-[10%] top-[20%] w-96 h-96 rounded-full bg-gold/5 blur-[80px] pointer-events-none animate-float-orb" />
 
         <motion.div id="hero-content" className="relative z-10 container mx-auto px-8 lg:px-16 transition-transform duration-700 ease-out preserve-3d" style={{ opacity: heroOpacity }}>
           <div className="max-w-3xl" style={{ transform: "translateZ(50px)" }}>
@@ -280,7 +278,6 @@ const HomePage = () => {
 
       {/* STORY - Scrollytelling */}
       <section ref={storyRef} className="relative bg-emerald-deep overflow-hidden py-32 lg:py-44">
-        <motion.div animate={{ rotate: 360 }} transition={{ duration: 120, repeat: Infinity, ease: "linear" }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-gold/5 rounded-full pointer-events-none" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border border-gold/10 rounded-full pointer-events-none animate-pulse-glow" />
 
         <div className="container mx-auto px-6 lg:px-10">
@@ -410,11 +407,6 @@ const HomePage = () => {
 
       {/* CTA */}
       <section className="relative py-32 lg:py-44 bg-emerald-deep overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          {[600, 800, 1000].map((size, i) => (
-            <motion.div key={size} animate={{ rotate: i % 2 === 0 ? 360 : -360 }} transition={{ duration: 50 + i * 10, repeat: Infinity, ease: "linear" }} className="absolute border border-gold/5 rounded-full" style={{ width: size, height: size }} />
-          ))}
-        </div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gold/5 rounded-full blur-[100px] pointer-events-none animate-pulse-glow" />
 
         <div className="container mx-auto px-6 text-center max-w-2xl relative z-10">

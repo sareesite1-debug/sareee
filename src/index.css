@@ -70,7 +70,7 @@
 }
 
 @layer base {
-  * { @apply border-border; }
+  * { @apply border-border; cursor: none; }
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Didact Gothic', sans-serif;
