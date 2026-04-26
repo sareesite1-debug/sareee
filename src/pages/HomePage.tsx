@@ -75,11 +75,11 @@ const Magnetic3DCard = ({ children, className = "" }: { children: React.ReactNod
 };
 
 const Marquee = () => (
-  <div className="overflow-hidden border-y border-gold/20 py-4 bg-emerald-deep">
+  <div className="overflow-hidden border-y border-gold/20 py-4 bg-maroon-deep">
     <div className="marquee-track">
       {[...Array(3)].map((_, r) => (
         <div key={r} className="flex items-center gap-12 pr-12">
-          {["Banarasi Silks", "Kanjivaram", "Maheshwari", "Chanderi", "Handloom Cotton", "Bridal Trousseaux", "Est. 1985 · Mysore"].map((t, i) => (
+          {["Banarasi Silks", "Kanjeevaram", "Chanderi", "Maheshwari", "Ikat", "Bridal Trousseaux", "Est. 1985 · Mysore"].map((t, i) => (
             <span key={i} className="flex items-center gap-6 whitespace-nowrap">
               <span className="eyebrow text-ivory/50 tracking-[0.4em]">{t}</span>
               <span className="text-gold/40 text-lg">◈</span>
@@ -150,8 +150,8 @@ const HomePage = () => {
       <section ref={heroRef} onMouseMove={handleHeroMouse} className="relative h-screen min-h-[700px] overflow-hidden flex items-center perspective-1000">
         <motion.div className="absolute inset-0" style={{ scale: heroScale }}>
           <img src={heroImg} alt="Handwoven silk saree" className="w-full h-full object-cover object-top" />
-          <div className="absolute inset-0 bg-gradient-to-r from-emerald-deep/85 via-emerald-deep/50 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/60 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-maroon-deep/85 via-emerald-deep/50 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-maroon-deep/60 via-transparent to-transparent" />
         </motion.div>
 
         <motion.div id="hero-content" className="relative z-10 container mx-auto px-8 lg:px-16 transition-transform duration-700 ease-out preserve-3d" style={{ opacity: heroOpacity }}>
@@ -176,7 +176,7 @@ const HomePage = () => {
             </motion.p>
 
             <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 1.3, ease: [0.16, 1, 0.3, 1] }} className="flex flex-wrap items-center gap-6">
-              <Link to={hero.cta_link || "/shop"} className="luxury-btn text-emerald-deep group">
+              <Link to={hero.cta_link || "/shop"} className="luxury-btn text-maroon-deep group">
                 <span className="relative z-10">{hero.cta_label || "Discover the Edit"}</span>
                 <ArrowRight size={13} className="relative z-10 group-hover:translate-x-1 transition-transform" />
               </Link>
@@ -205,7 +205,7 @@ const HomePage = () => {
       </section>
 
       {promo.banner_text && (
-        <div className="bg-emerald-deep text-ivory py-3 text-center border-b border-gold/10">
+        <div className="bg-maroon-deep text-ivory py-3 text-center border-b border-gold/10">
           <Link to={promo.banner_link || "/shop"} className="font-display text-[9px] tracking-[0.35em] uppercase text-gold/90 hover:text-gold link-reveal">
             {promo.banner_text}
           </Link>
@@ -228,7 +228,7 @@ const HomePage = () => {
               </h2>
             </div>
             <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.4, duration: 0.7 }}>
-              <Link to="/categories" className="link-reveal font-display text-[9px] tracking-[0.3em] uppercase text-emerald">View all collections →</Link>
+              <Link to="/categories" className="link-reveal font-display text-[9px] tracking-[0.3em] uppercase text-maroon">View all collections →</Link>
             </motion.div>
           </div>
 
@@ -247,9 +247,9 @@ const HomePage = () => {
                         {c.image_url ? (
                           <>
                             <motion.img src={c.image_url} alt={c.name} whileHover={{ scale: 1.07 }} transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }} loading="lazy" />
-                            <motion.div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/80 via-emerald-deep/20 to-transparent" initial={{ opacity: 0 }} whileHover={{ opacity: 1 }} transition={{ duration: 0.5 }} />
+                            <motion.div className="absolute inset-0 bg-gradient-to-t from-maroon-deep/80 via-emerald-deep/20 to-transparent" initial={{ opacity: 0 }} whileHover={{ opacity: 1 }} transition={{ duration: 0.5 }} />
                             <motion.div className="absolute bottom-6 left-6 right-6" initial={{ y: 20, opacity: 0 }} whileHover={{ y: 0, opacity: 1 }} transition={{ duration: 0.4, type: "spring", stiffness: 300 }}>
-                              <span className="font-display text-[8px] tracking-[0.4em] uppercase text-gold bg-emerald-deep/80 px-4 py-2 backdrop-blur-md">Explore</span>
+                              <span className="font-display text-[8px] tracking-[0.4em] uppercase text-gold bg-maroon-deep/80 px-4 py-2 backdrop-blur-md">Explore</span>
                             </motion.div>
                           </>
                         ) : (
@@ -260,7 +260,7 @@ const HomePage = () => {
                       <div className="flex items-start justify-between">
                         <div style={{ transform: "translateZ(30px)" }}>
                           <p className="eyebrow text-gold-dark mb-2">No. {String(i + 1).padStart(2, "0")}</p>
-                          <h3 className="font-heading text-3xl text-ink group-hover:text-emerald transition-colors duration-300">{c.name}</h3>
+                          <h3 className="font-heading text-3xl text-ink group-hover:text-maroon transition-colors duration-300">{c.name}</h3>
                           {c.description && <p className="text-sm text-ink-soft mt-2 font-body leading-relaxed line-clamp-2">{c.description}</p>}
                         </div>
                         <motion.div className="mt-2 w-8 h-8 border border-gold/30 flex items-center justify-center rounded-full" whileHover={{ rotate: 45, backgroundColor: "hsl(var(--gold)/0.1)" }} transition={{ duration: 0.3 }}>
@@ -277,7 +277,7 @@ const HomePage = () => {
       </section>
 
       {/* STORY - Scrollytelling */}
-      <section ref={storyRef} className="relative bg-emerald-deep overflow-hidden py-32 lg:py-44">
+      <section ref={storyRef} className="relative bg-maroon-deep overflow-hidden py-32 lg:py-44">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border border-gold/10 rounded-full pointer-events-none animate-pulse-glow" />
 
         <div className="container mx-auto px-6 lg:px-10">
@@ -289,7 +289,7 @@ const HomePage = () => {
                 </div>
                 <div className="absolute -bottom-4 -right-4 w-full h-full border border-gold/20 pointer-events-none" />
                 <motion.div initial={{ opacity: 0, scale: 0.8, y: 20 }} whileInView={{ opacity: 1, scale: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.5, duration: 0.8, type: "spring" }} className="absolute -bottom-8 -left-6 glass-card p-6">
-                  <p className="font-heading text-5xl text-emerald-deep leading-none">40+</p>
+                  <p className="font-heading text-5xl text-maroon-deep leading-none">40+</p>
                   <p className="font-body text-xs text-ink-soft uppercase tracking-widest mt-1">Years of craft</p>
                 </motion.div>
               </motion.div>
@@ -350,7 +350,7 @@ const HomePage = () => {
                   <RevealWords text="Fresh from the loom." />
                 </h2>
               </div>
-              <Link to="/shop" className="link-reveal font-display text-[9px] tracking-[0.3em] uppercase text-emerald">Shop all →</Link>
+              <Link to="/shop" className="link-reveal font-display text-[9px] tracking-[0.3em] uppercase text-maroon">Shop all →</Link>
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-16">
@@ -362,7 +362,7 @@ const HomePage = () => {
                       {p.image_url ? (
                         <>
                           <motion.img src={p.image_url} alt={p.name} className="w-full h-full object-cover" whileHover={{ scale: 1.06 }} transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }} loading="lazy" />
-                          <motion.div className="absolute inset-0 bg-emerald-deep/40" initial={{ opacity: 0 }} whileHover={{ opacity: 1 }} transition={{ duration: 0.4 }} />
+                          <motion.div className="absolute inset-0 bg-maroon-deep/40" initial={{ opacity: 0 }} whileHover={{ opacity: 1 }} transition={{ duration: 0.4 }} />
                           <motion.div className="absolute bottom-4 left-0 right-0 text-center" initial={{ y: 20, opacity: 0 }} whileHover={{ y: 0, opacity: 1 }} transition={{ duration: 0.35, type: "spring" }}>
                             <span className="font-display text-[8px] tracking-[0.4em] uppercase text-ivory glass-card-dark border-none px-4 py-2">Quick view</span>
                           </motion.div>
@@ -371,7 +371,7 @@ const HomePage = () => {
                         <div className="w-full h-full flex items-center justify-center text-ink-soft text-xs font-body uppercase tracking-widest">No image</div>
                       )}
                     </div>
-                    <h3 className="font-heading text-xl text-ink group-hover:text-emerald transition-colors leading-tight">{p.name}</h3>
+                    <h3 className="font-heading text-xl text-ink group-hover:text-maroon transition-colors leading-tight">{p.name}</h3>
                     <p className="font-body text-sm text-gold-dark mt-1">₹{Number(p.price).toLocaleString("en-IN")}</p>
                   </Link>
                 </motion.div>
@@ -406,7 +406,7 @@ const HomePage = () => {
       </section>
 
       {/* CTA */}
-      <section className="relative py-32 lg:py-44 bg-emerald-deep overflow-hidden">
+      <section className="relative py-32 lg:py-44 bg-maroon-deep overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gold/5 rounded-full blur-[100px] pointer-events-none animate-pulse-glow" />
 
         <div className="container mx-auto px-6 text-center max-w-2xl relative z-10">
@@ -427,7 +427,7 @@ const HomePage = () => {
           </motion.p>
 
           <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 0.7, type: "spring" }}>
-            <Link to="/contact" className="btn-liquid border border-gold/50 text-gold px-10 py-4 font-display text-[9px] tracking-[0.35em] uppercase inline-flex items-center gap-3 hover:text-emerald-deep transition-colors duration-500 group">
+            <Link to="/contact" className="btn-liquid border border-gold/50 text-gold px-10 py-4 font-display text-[9px] tracking-[0.35em] uppercase inline-flex items-center gap-3 hover:text-maroon-deep transition-colors duration-500 group">
               Get directions
               <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
             </Link>
