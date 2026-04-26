@@ -35,6 +35,8 @@ export default {
         accent: { DEFAULT: "hsl(var(--accent))", foreground: "hsl(var(--accent-foreground))" },
         popover: { DEFAULT: "hsl(var(--popover))", foreground: "hsl(var(--popover-foreground))" },
         card: { DEFAULT: "hsl(var(--card))", foreground: "hsl(var(--card-foreground))" },
+        maroon: { DEFAULT: "hsl(var(--maroon))", deep: "hsl(var(--maroon-deep))", light: "hsl(var(--maroon-light))" },
+        rose: { DEFAULT: "hsl(var(--rose))" },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
