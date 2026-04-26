@@ -9,7 +9,6 @@ import {
 } from "framer-motion";
 import { ArrowRight, Sparkles, Shield, Truck, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import heroImg from "@/assets/hero-editorial.jpg";
 import craftImg from "@/assets/craft-silks.jpg";
 
 interface Category { id: string; name: string; slug: string; image_url: string | null; description: string | null; }
@@ -102,6 +101,28 @@ const ScrollProgressLine = () => {
   );
 };
 
+/* ── Animated saree-pattern SVG background ── */
+const PatternBg = () => (
+  <svg className="absolute inset-0 w-full h-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="paisley" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+        <circle cx="40" cy="40" r="18" fill="none" stroke="#C9952A" strokeWidth="0.8"/>
+        <circle cx="40" cy="40" r="10" fill="none" stroke="#C9952A" strokeWidth="0.5"/>
+        <circle cx="40" cy="40" r="3" fill="#C9952A"/>
+        <line x1="40" y1="4" x2="40" y2="22" stroke="#C9952A" strokeWidth="0.5"/>
+        <line x1="40" y1="58" x2="40" y2="76" stroke="#C9952A" strokeWidth="0.5"/>
+        <line x1="4" y1="40" x2="22" y2="40" stroke="#C9952A" strokeWidth="0.5"/>
+        <line x1="58" y1="40" x2="76" y2="40" stroke="#C9952A" strokeWidth="0.5"/>
+        <line x1="12" y1="12" x2="28" y2="28" stroke="#C9952A" strokeWidth="0.4"/>
+        <line x1="52" y1="52" x2="68" y2="68" stroke="#C9952A" strokeWidth="0.4"/>
+        <line x1="68" y1="12" x2="52" y2="28" stroke="#C9952A" strokeWidth="0.4"/>
+        <line x1="28" y1="52" x2="12" y2="68" stroke="#C9952A" strokeWidth="0.4"/>
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#paisley)"/>
+  </svg>
+);
+
 const HomePage = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -109,10 +130,7 @@ const HomePage = () => {
 
   const heroRef = useRef(null);
   const storyRef = useRef(null);
-  const { scrollYProgress: heroScroll } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const { scrollYProgress: storyScroll } = useScroll({ target: storyRef, offset: ["start end", "end start"] });
-  const heroOpacity = useTransform(heroScroll, [0, 0.6], [1, 0]);
-  const heroScale = useTransform(heroScroll, [0, 1], [1, 1.08]);
   const storyImgY = useTransform(storyScroll, [0, 1], ["-8%", "8%"]);
 
   useEffect(() => {
@@ -135,73 +153,185 @@ const HomePage = () => {
   const promo = sections.promotions || {};
   const testimonials = (sections.testimonials?.items || []) as { name: string; quote: string }[];
 
-  const handleHeroMouse = (e: React.MouseEvent) => {
-    const x = (e.clientX / window.innerWidth - 0.5) * 20;
-    const y = (e.clientY / window.innerHeight - 0.5) * 20;
-    const el = document.getElementById("hero-content");
-    if(el) el.style.transform = `translate(${x}px, ${y}px)`;
-  };
-
   return (
     <div className="bg-ivory overflow-x-hidden">
       <ScrollProgressLine />
 
-      {/* HERO */}
-      <section ref={heroRef} onMouseMove={handleHeroMouse} className="relative h-screen min-h-[700px] overflow-hidden flex items-center perspective-1000">
-        <motion.div className="absolute inset-0" style={{ scale: heroScale }}>
-          <img src={heroImg} alt="Handwoven silk saree" className="w-full h-full object-cover object-top" />
-          <div className="absolute inset-0 bg-gradient-to-r from-maroon-deep/85 via-emerald-deep/50 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-maroon-deep/60 via-transparent to-transparent" />
-        </motion.div>
+      {/* ══════════════════════════════════════════
+          HERO — Split editorial layout
+      ══════════════════════════════════════════ */}
+      <section ref={heroRef} className="relative min-h-screen flex flex-col lg:flex-row overflow-hidden">
 
-        <motion.div id="hero-content" className="relative z-10 container mx-auto px-8 lg:px-16 transition-transform duration-700 ease-out preserve-3d" style={{ opacity: heroOpacity }}>
-          <div className="max-w-3xl" style={{ transform: "translateZ(50px)" }}>
-            <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }} className="flex items-center gap-4 mb-8">
-              <div className="w-12 h-px bg-gold" />
-              <span className="eyebrow text-gold">{hero.eyebrow || "Since 1985 · Mysore, Karnataka"}</span>
+        {/* LEFT PANEL — Deep maroon with text */}
+        <div className="relative flex-1 lg:w-[52%] bg-maroon-deep flex items-center justify-center px-10 lg:px-20 py-32 lg:py-0 order-2 lg:order-1">
+          <PatternBg />
+
+          {/* ambient glow */}
+          <div className="absolute top-1/3 left-1/3 w-80 h-80 rounded-full bg-gold/8 blur-[120px] pointer-events-none" />
+
+          <div className="relative z-10 max-w-lg">
+            {/* Eyebrow */}
+            <motion.div
+              initial={{ opacity: 0, x: -24 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="flex items-center gap-4 mb-10"
+            >
+              <div className="w-10 h-px bg-gold/60" />
+              <span className="eyebrow text-gold/80">{hero.eyebrow || "Since 1985 · Mysore, Karnataka"}</span>
             </motion.div>
 
-            <div className="mb-8">
-              <h1 className="text-display text-[clamp(3rem,7vw,6rem)] text-ivory leading-[1.0]">
-                <RevealWords text={hero.heading || "Sarees that hold"} delay={0.4} />
-                <br />
-                <span className="italic"><RevealWords text="a thousand stories." delay={0.6} /></span>
-              </h1>
-            </div>
+            {/* Main headline */}
+            <h1 className="font-heading text-[clamp(3rem,5.5vw,5.5rem)] text-ivory leading-[1.05] mb-8">
+              <motion.span
+                className="block"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              >
+                {hero.heading || "Woven with"}
+              </motion.span>
+              <motion.span
+                className="block italic text-gold"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
+              >
+                memory.
+              </motion.span>
+              <motion.span
+                className="block"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              >
+                Worn with pride.
+              </motion.span>
+            </h1>
 
-            <motion.div initial={{ scaleX: 0, opacity: 0 }} animate={{ scaleX: 1, opacity: 1 }} transition={{ duration: 1.2, delay: 1, ease: [0.76, 0, 0.24, 1] }} className="w-32 h-px bg-gradient-to-r from-gold to-transparent mb-8 origin-left" />
+            {/* Gold rule */}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 1.2, delay: 1, ease: [0.76, 0, 0.24, 1] }}
+              className="h-px bg-gradient-to-r from-gold via-gold/60 to-transparent mb-8 origin-left"
+            />
 
-            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 1.1, ease: [0.16, 1, 0.3, 1] }} className="text-ivory/70 text-lg font-body font-light leading-relaxed max-w-xl mb-12">
+            {/* Subtext */}
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 1.1, ease: [0.16, 1, 0.3, 1] }}
+              className="text-ivory/60 text-base font-body font-light leading-relaxed max-w-md mb-12"
+            >
               {hero.subheading || "Curated heirloom silks, breathable handlooms and bridal creations — each one woven by master artisans across India."}
             </motion.p>
 
-            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 1.3, ease: [0.16, 1, 0.3, 1] }} className="flex flex-wrap items-center gap-6">
-              <Link to={hero.cta_link || "/shop"} className="luxury-btn text-maroon-deep group">
+            {/* CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.9, delay: 1.3, ease: [0.16, 1, 0.3, 1] }}
+              className="flex flex-wrap items-center gap-6"
+            >
+              <Link to={hero.cta_link || "/shop"} className="luxury-btn group">
                 <span className="relative z-10">{hero.cta_label || "Discover the Edit"}</span>
                 <ArrowRight size={13} className="relative z-10 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link to="/categories" className="link-reveal font-display text-[9px] tracking-[0.35em] uppercase text-ivory/80 hover:text-ivory">
-                Explore Collections
+              <Link to="/categories" className="link-reveal font-display text-[9px] tracking-[0.35em] uppercase text-ivory/60 hover:text-gold transition-colors">
+                Browse Collections
               </Link>
             </motion.div>
-          </div>
-        </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 40, rotateX: 15 }} animate={{ opacity: 1, y: 0, rotateX: 0 }} transition={{ duration: 1, delay: 1.6, ease: [0.16, 1, 0.3, 1] }} className="absolute bottom-12 right-8 hidden lg:block perspective-800">
-          <div className="glass-card-dark p-5 max-w-[240px]">
-            <p className="eyebrow text-gold mb-2">Featured Weave</p>
-            <p className="font-heading text-xl text-ivory leading-tight">Banarasi · Emerald & Antique Gold</p>
-            <div className="mt-3 h-px bg-gold/30" />
-            <p className="font-body text-[11px] text-ivory/50 mt-3 uppercase tracking-widest">Handwoven · 6 yards</p>
+            {/* Stats row */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.8, duration: 0.8 }}
+              className="flex gap-10 mt-16 pt-8 border-t border-ivory/10"
+            >
+              {[["40+", "Years"], ["12+", "Regions"], ["5000+", "Sarees"]].map(([n, l]) => (
+                <div key={l}>
+                  <p className="font-heading text-2xl text-gold leading-none">{n}</p>
+                  <p className="font-display text-[8px] tracking-[0.3em] text-ivory/30 uppercase mt-1">{l}</p>
+                </div>
+              ))}
+            </motion.div>
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2 }} className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-          <span className="eyebrow text-ivory/30">Scroll</span>
-          <motion.div animate={{ y: [0, 8, 0], opacity: [1, 0.5, 1] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}>
-            <ChevronDown size={16} className="text-gold/50" />
+        {/* RIGHT PANEL — Ivory with decorative elements */}
+        <div className="relative flex-1 lg:w-[48%] bg-ivory-deep flex items-center justify-center order-1 lg:order-2 min-h-[50vh] lg:min-h-screen overflow-hidden">
+
+          {/* Large decorative mandala / geometric */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, rotate: -15 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ duration: 1.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <svg viewBox="0 0 500 500" className="w-[90%] max-w-[480px] opacity-20" xmlns="http://www.w3.org/2000/svg">
+              <g fill="none" stroke="#6B0F1A" strokeWidth="1">
+                {/* Outer ring */}
+                <circle cx="250" cy="250" r="220"/>
+                <circle cx="250" cy="250" r="200"/>
+                <circle cx="250" cy="250" r="160"/>
+                <circle cx="250" cy="250" r="120"/>
+                <circle cx="250" cy="250" r="80"/>
+                <circle cx="250" cy="250" r="40"/>
+                {/* Radial lines */}
+                {Array.from({length: 24}).map((_, i) => {
+                  const angle = (i * 15 * Math.PI) / 180;
+                  return <line key={i} x1={250 + 40*Math.cos(angle)} y1={250 + 40*Math.sin(angle)} x2={250 + 220*Math.cos(angle)} y2={250 + 220*Math.sin(angle)} strokeWidth="0.6"/>;
+                })}
+                {/* Petal shapes */}
+                {Array.from({length: 8}).map((_, i) => {
+                  const angle = (i * 45 * Math.PI) / 180;
+                  const x = 250 + 130*Math.cos(angle);
+                  const y = 250 + 130*Math.sin(angle);
+                  return <ellipse key={i} cx={x} cy={y} rx="18" ry="35" stroke="#C9952A" strokeWidth="1" transform={`rotate(${i*45+90} ${x} ${y})`}/>;
+                })}
+              </g>
+              {/* Center diamond */}
+              <polygon points="250,225 275,250 250,275 225,250" fill="none" stroke="#C9952A" strokeWidth="1.5"/>
+            </svg>
           </motion.div>
-        </motion.div>
+
+          {/* Floating craft cards */}
+          <motion.div
+            initial={{ opacity: 0, x: 40, y: -20 }}
+            animate={{ opacity: 1, x: 0, y: 0 }}
+            transition={{ duration: 1, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute top-[15%] right-[8%] bg-white/80 backdrop-blur-sm border border-gold/20 p-5 shadow-sm max-w-[200px]"
+          >
+            <p className="eyebrow text-gold-dark mb-2">Featured Craft</p>
+            <p className="font-heading text-xl text-ink leading-tight">Banarasi Silk</p>
+            <p className="font-body text-[11px] text-ink-soft mt-2">Antique gold zari · 6 yards</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, x: -30, y: 30 }}
+            animate={{ opacity: 1, x: 0, y: 0 }}
+            transition={{ duration: 1, delay: 1.5, ease: [0.16, 1, 0.3, 1] }}
+            className="absolute bottom-[15%] left-[8%] bg-maroon/5 border border-maroon/20 p-5 max-w-[180px]"
+          >
+            <p className="font-heading text-3xl text-maroon leading-none">GI</p>
+            <p className="font-display text-[8px] tracking-[0.3em] text-ink-soft uppercase mt-1">Certified weaves</p>
+          </motion.div>
+
+          {/* Scroll indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2 }}
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+          >
+            <span className="eyebrow text-ink-soft/40">Scroll</span>
+            <motion.div animate={{ y: [0, 8, 0], opacity: [1, 0.4, 1] }} transition={{ repeat: Infinity, duration: 2 }}>
+              <ChevronDown size={16} className="text-gold/50" />
+            </motion.div>
+          </motion.div>
+        </div>
       </section>
 
       {promo.banner_text && (
@@ -247,7 +377,7 @@ const HomePage = () => {
                         {c.image_url ? (
                           <>
                             <motion.img src={c.image_url} alt={c.name} whileHover={{ scale: 1.07 }} transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }} loading="lazy" />
-                            <motion.div className="absolute inset-0 bg-gradient-to-t from-maroon-deep/80 via-emerald-deep/20 to-transparent" initial={{ opacity: 0 }} whileHover={{ opacity: 1 }} transition={{ duration: 0.5 }} />
+                            <motion.div className="absolute inset-0 bg-gradient-to-t from-maroon-deep/80 via-maroon/20 to-transparent" initial={{ opacity: 0 }} whileHover={{ opacity: 1 }} transition={{ duration: 0.5 }} />
                             <motion.div className="absolute bottom-6 left-6 right-6" initial={{ y: 20, opacity: 0 }} whileHover={{ y: 0, opacity: 1 }} transition={{ duration: 0.4, type: "spring", stiffness: 300 }}>
                               <span className="font-display text-[8px] tracking-[0.4em] uppercase text-gold bg-maroon-deep/80 px-4 py-2 backdrop-blur-md">Explore</span>
                             </motion.div>
