@@ -75,7 +75,7 @@ const Navbar = () => {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed inset-x-0 top-0 z-50 transition-all duration-700 bg-ivory/90 backdrop-blur-2xl border-b border-gold/10 shadow-[0_2px_60px_-20px_hsl(var(--emerald-deep)/0.12)]"
+        className="fixed inset-x-0 top-0 z-50 transition-all duration-700 bg-ivory/90 backdrop-blur-2xl border-b border-gold/10 shadow-[0_2px_60px_-20px_hsl(var(--maroon-deep)/0.12)]"
       >
         <div className="container mx-auto px-6 lg:px-10">
           <motion.div
@@ -129,7 +129,7 @@ const Navbar = () => {
                     className="relative py-2"
                   >
                     <span className={`font-display text-[9px] tracking-[0.3em] uppercase transition-colors duration-300 ${
-                      location.pathname === l.to ? "text-gold-dark" : "text-ink hover:text-emerald"
+                      location.pathname === l.to ? "text-gold-dark" : "text-ink hover:text-maroon"
                     }`}>
                       {l.label}
                     </span>
@@ -149,11 +149,11 @@ const Navbar = () => {
             <div className="flex items-center gap-1">
               {user ? (
                 <>
-                  <Link to="/orders" className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 font-display text-[8px] tracking-[0.25em] uppercase text-ink hover:text-emerald transition-colors">
+                  <Link to="/orders" className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 font-display text-[8px] tracking-[0.25em] uppercase text-ink hover:text-maroon transition-colors">
                     <Package size={13} strokeWidth={1.5} /> Orders
                   </Link>
                   {isAdmin && (
-                    <Link to="/admin" className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 font-display text-[8px] tracking-[0.25em] uppercase text-gold-dark hover:text-emerald">
+                    <Link to="/admin" className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 font-display text-[8px] tracking-[0.25em] uppercase text-gold-dark hover:text-maroon">
                       <Settings size={13} strokeWidth={1.5} /> Admin
                     </Link>
                   )}
@@ -162,7 +162,7 @@ const Navbar = () => {
                   </button>
                 </>
               ) : (
-                <Link to="/auth" className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 font-display text-[8px] tracking-[0.25em] uppercase text-ink hover:text-emerald">
+                <Link to="/auth" className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 font-display text-[8px] tracking-[0.25em] uppercase text-ink hover:text-maroon">
                   <User size={13} strokeWidth={1.5} /> Sign in
                 </Link>
               )}
@@ -173,14 +173,14 @@ const Navbar = () => {
                 className="relative p-2.5 ml-1 border border-gold/20 hover:border-gold/50 transition-all duration-300 group border-glow"
                 aria-label="Bag"
               >
-                <ShoppingBag size={17} strokeWidth={1.2} className="text-ink group-hover:text-emerald transition-colors" />
+                <ShoppingBag size={17} strokeWidth={1.2} className="text-ink group-hover:text-maroon transition-colors" />
                 <AnimatePresence>
                   {count > 0 && (
                     <motion.span
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       exit={{ scale: 0 }}
-                      className="absolute -top-1.5 -right-1.5 bg-emerald-deep text-ivory font-display text-[8px] rounded-full w-4.5 h-4.5 flex items-center justify-center min-w-[18px] min-h-[18px]"
+                      className="absolute -top-1.5 -right-1.5 bg-maroon-deep text-ivory font-display text-[8px] rounded-full w-4.5 h-4.5 flex items-center justify-center min-w-[18px] min-h-[18px]"
                     >
                       {count}
                     </motion.span>
@@ -245,12 +245,12 @@ const Navbar = () => {
                 >
                   {user ? (
                     <>
-                      <Link to="/orders" onClick={() => setOpen(false)} className="font-body text-sm py-2 text-ink-soft hover:text-emerald transition-colors">My Orders</Link>
-                      {isAdmin && <Link to="/admin" onClick={() => setOpen(false)} className="font-body text-sm py-2 text-gold-dark hover:text-emerald transition-colors">Admin Panel</Link>}
+                      <Link to="/orders" onClick={() => setOpen(false)} className="font-body text-sm py-2 text-ink-soft hover:text-maroon transition-colors">My Orders</Link>
+                      {isAdmin && <Link to="/admin" onClick={() => setOpen(false)} className="font-body text-sm py-2 text-gold-dark hover:text-maroon transition-colors">Admin Panel</Link>}
                       <button onClick={() => { handleSignOut(); setOpen(false); }} className="text-left font-body text-sm py-2 text-ink-soft hover:text-ink transition-colors">Sign Out</button>
                     </>
                   ) : (
-                    <Link to="/auth" onClick={() => setOpen(false)} className="font-body text-sm py-2 text-emerald">Sign In</Link>
+                    <Link to="/auth" onClick={() => setOpen(false)} className="font-body text-sm py-2 text-maroon">Sign In</Link>
                   )}
                 </motion.div>
               </nav>
