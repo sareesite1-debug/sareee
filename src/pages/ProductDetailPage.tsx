@@ -48,7 +48,7 @@ const ProductDetailPage = () => {
   if (!product) return (
     <div className="container mx-auto px-4 py-32 text-center font-body">
       <p className="text-ink-soft mb-4">Piece not found.</p>
-      <Link to="/shop" className="text-emerald link-reveal text-[11px] tracking-[0.25em] uppercase">Back to shop</Link>
+      <Link to="/shop" className="text-maroon link-reveal text-[11px] tracking-[0.25em] uppercase">Back to shop</Link>
     </div>
   );
 
@@ -56,7 +56,7 @@ const ProductDetailPage = () => {
     <div className="bg-ivory min-h-screen">
       <div className="container mx-auto px-6 pt-36 pb-20 max-w-7xl">
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
-          <Link to="/shop" className="inline-flex items-center gap-2 text-[10px] text-ink-soft hover:text-emerald mb-12 font-body uppercase tracking-[0.25em] link-reveal transition-colors">
+          <Link to="/shop" className="inline-flex items-center gap-2 text-[10px] text-ink-soft hover:text-maroon mb-12 font-body uppercase tracking-[0.25em] link-reveal transition-colors">
             <ArrowLeft size={13} /> All pieces
           </Link>
         </motion.div>
@@ -117,7 +117,7 @@ const ProductDetailPage = () => {
               <motion.div variants={{ hidden: { opacity: 0, scaleX: 0 }, visible: { opacity: 1, scaleX: 1 } }} className="hairline w-20 origin-left" />
 
               <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="flex items-baseline gap-4">
-                <p className="text-3xl font-heading text-emerald-deep">₹{Number(product.price).toLocaleString("en-IN")}</p>
+                <p className="text-3xl font-heading text-maroon-deep">₹{Number(product.price).toLocaleString("en-IN")}</p>
                 {product.compare_at_price && product.compare_at_price > product.price && (
                   <p className="text-base text-ink-soft line-through font-body">₹{Number(product.compare_at_price).toLocaleString("en-IN")}</p>
                 )}
@@ -137,14 +137,14 @@ const ProductDetailPage = () => {
                   <input type="number" value={qty} onChange={e => setQty(Math.max(1, Number(e.target.value)))} className="w-14 text-center bg-transparent border-x border-gold/20 font-body h-10 focus:outline-none" />
                   <motion.button whileTap={{ scale: 0.9 }} onClick={() => setQty(qty + 1)} className="w-10 h-10 hover:bg-gold/10 transition-colors text-ink text-lg">+</motion.button>
                 </div>
-                {product.stock != null && product.stock > 0 && <span className="text-xs text-emerald font-body bg-emerald/10 px-3 py-1.5">{product.stock} in stock</span>}
+                {product.stock != null && product.stock > 0 && <span className="text-xs text-maroon font-body bg-maroon/10 px-3 py-1.5">{product.stock} in stock</span>}
               </motion.div>
 
               <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="grid grid-cols-2 gap-4 pt-6">
-                <button onClick={() => addToCart(product.id, qty)} className="btn-outline-emerald border-gold/50 text-ink hover:border-emerald hover:text-ivory py-4">
+                <button onClick={() => addToCart(product.id, qty)} className="btn-outline-emerald border-gold/50 text-ink hover:border-maroon hover:text-ivory py-4">
                   <ShoppingBag size={14} /> Add to bag
                 </button>
-                <button onClick={handleBuyNow} className="btn-liquid btn-emerald py-4 border border-emerald-deep">
+                <button onClick={handleBuyNow} className="btn-liquid btn-emerald py-4 border border-maroon-deep">
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     <Zap size={14} /> Buy now
                   </span>
