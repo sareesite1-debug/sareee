@@ -74,7 +74,7 @@
 }
 
 @layer base {
-  * { @apply border-border; cursor: none; }
+  * { @apply border-border; }
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', sans-serif;
@@ -299,6 +299,8 @@
     align-items: center;
     gap: 10px;
     padding: 16px 40px;
+    background: hsl(var(--gold));
+    color: hsl(var(--maroon-deep));
     font-family: 'Cinzel', serif;
     font-size: 9px;
     letter-spacing: 0.35em;
@@ -309,7 +311,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: hsl(var(--gold) / 0.15);
+    background: hsl(var(--gold-dark));
     transform: translateX(-101%);
     transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
   }
@@ -342,7 +344,7 @@
   }
   .card-3d:hover {
     transform: perspective(800px) rotateX(3deg) translateY(-10px);
-    box-shadow: 0 50px 100px -30px hsl(var(--emerald-deep) / 0.2), 0 0 0 1px hsl(var(--gold) / 0.15);
+    box-shadow: 0 50px 100px -30px hsl(var(--maroon-deep) / 0.2), 0 0 0 1px hsl(var(--gold) / 0.15);
   }
 
   .image-reveal { overflow: hidden; }
@@ -392,7 +394,7 @@
      BUTTON PRESETS
   ═══════════════════════════════════════════ */
   .btn-emerald {
-    @apply inline-flex items-center justify-center gap-2 bg-emerald-deep text-ivory px-6 py-3;
+    @apply inline-flex items-center justify-center gap-2 bg-maroon-deep text-ivory px-6 py-3;
     font-family: 'Cinzel', serif;
     font-size: 9px;
     letter-spacing: 0.3em;
@@ -402,11 +404,11 @@
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .btn-emerald:hover {
-    box-shadow: 0 0 30px hsl(var(--emerald) / 0.3);
+    box-shadow: 0 0 30px hsl(var(--maroon) / 0.3);
     transform: translateY(-1px);
   }
   .btn-outline-emerald {
-    @apply inline-flex items-center justify-center gap-2 border border-emerald text-emerald px-6 py-3;
+    @apply inline-flex items-center justify-center gap-2 border border-maroon text-maroon px-6 py-3;
     font-family: 'Cinzel', serif;
     font-size: 9px;
     letter-spacing: 0.3em;
@@ -416,9 +418,9 @@
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .btn-outline-emerald:hover {
-    background: hsl(var(--emerald));
+    background: hsl(var(--maroon));
     color: hsl(var(--ivory));
-    box-shadow: 0 0 30px hsl(var(--emerald) / 0.2);
+    box-shadow: 0 0 30px hsl(var(--maroon) / 0.2);
   }
 }
 
@@ -483,7 +485,7 @@
   background: linear-gradient(135deg, hsl(var(--gold)), hsl(var(--gold-light)));
 }
 .gradient-maroon {
-  background: linear-gradient(135deg, hsl(var(--emerald-deep)), hsl(var(--emerald)));
+  background: linear-gradient(135deg, hsl(var(--maroon-deep)), hsl(var(--maroon)));
 }
 .bg-maroon-deep {
   background-color: hsl(var(--emerald-deep));
