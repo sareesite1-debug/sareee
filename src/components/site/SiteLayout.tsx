@@ -30,7 +30,7 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
         style={{ top: "30%", left: "20%" }}
       />
       <motion.div
-        className="absolute w-48 h-48 rounded-full bg-emerald/5 blur-[80px]"
+        className="absolute w-48 h-48 rounded-full bg-maroon/10 blur-[80px]"
         animate={{
           x: [0, -40, 30, 0],
           y: [0, 30, -20, 0],
