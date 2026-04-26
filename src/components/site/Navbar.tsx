@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence, useMotionValue, useSpring } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, LogOut, Settings, ShoppingBag, Package, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/hooks/useCart";
@@ -21,19 +21,6 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { count } = useCart();
-
-  // Custom cursor
-  const cursorX = useMotionValue(-100);
-  const cursorY = useMotionValue(-100);
-  const springConfig = { damping: 25, stiffness: 700 };
-  const cursorXSpring = useSpring(cursorX, springConfig);
-  const cursorYSpring = useSpring(cursorY, springConfig);
-
-  useEffect(() => {
-    const move = (e: MouseEvent) => { cursorX.set(e.clientX - 8); cursorY.set(e.clientY - 8); };
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
-  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -62,14 +49,6 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Custom cursor — main dot */}
-      <motion.div
-        className="fixed top-0 left-0 z-[9999] pointer-events-none mix-blend-difference hidden lg:block"
-        style={{ x: cursorXSpring, y: cursorYSpring }}
-      >
-        <div className="w-4 h-4 bg-white rounded-full" />
-      </motion.div>
-
       {/* ── Navbar ── */}
       <motion.header
         initial={{ y: -100, opacity: 0 }}
