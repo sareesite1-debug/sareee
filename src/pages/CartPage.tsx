@@ -25,7 +25,7 @@ const CartPage = () => {
             <ShoppingBag size={32} className="mx-auto text-gold mb-6" strokeWidth={1} />
             <p className="font-heading text-3xl text-ink mb-3">Your bag is empty</p>
             <p className="text-sm text-ink-soft font-body mb-8">Discover our curated collection of handwoven silks.</p>
-            <Link to="/shop" className="btn-liquid border border-emerald text-emerald px-8 py-3 font-display text-[9px] tracking-[0.3em] uppercase hover:text-ivory transition-colors">
+            <Link to="/shop" className="btn-liquid border border-maroon text-maroon px-8 py-3 font-display text-[9px] tracking-[0.3em] uppercase hover:text-ivory transition-colors">
               Explore pieces
             </Link>
           </motion.div>
@@ -54,12 +54,12 @@ const CartPage = () => {
                     <div className="flex-1 flex flex-col min-w-0 py-2">
                       <div className="flex justify-between items-start gap-4">
                         <div>
-                          <Link to={`/shop/${item.product?.slug}`} className="font-heading text-xl text-ink hover:text-emerald transition-colors leading-tight line-clamp-2">
+                          <Link to={`/shop/${item.product?.slug}`} className="font-heading text-xl text-ink hover:text-maroon transition-colors leading-tight line-clamp-2">
                             {item.product?.name}
                           </Link>
                           <p className="text-xs text-ink-soft font-body mt-2">Handwoven</p>
                         </div>
-                        <p className="font-heading text-lg text-emerald-deep whitespace-nowrap">₹{Number(item.product?.price || 0).toLocaleString("en-IN")}</p>
+                        <p className="font-heading text-lg text-maroon-deep whitespace-nowrap">₹{Number(item.product?.price || 0).toLocaleString("en-IN")}</p>
                       </div>
                       
                       <div className="mt-auto pt-4 flex items-center justify-between">
@@ -90,17 +90,17 @@ const CartPage = () => {
                   </div>
                   <div className="flex justify-between text-ink-soft">
                     <span>Shipping</span>
-                    <span className="text-emerald">Complimentary</span>
+                    <span className="text-maroon">Complimentary</span>
                   </div>
                 </div>
 
                 <div className="flex justify-between items-baseline mb-8">
                   <span className="font-heading text-xl text-ink">Total</span>
-                  <span className="font-heading text-3xl text-emerald-deep">₹{total.toLocaleString("en-IN")}</span>
+                  <span className="font-heading text-3xl text-maroon-deep">₹{total.toLocaleString("en-IN")}</span>
                 </div>
                 <p className="text-[10px] text-ink-soft uppercase tracking-widest font-body mb-8 text-center">Taxes included</p>
 
-                <button onClick={() => navigate("/checkout")} className="btn-liquid btn-emerald w-full py-4 mb-4 border border-emerald-deep">
+                <button onClick={() => navigate("/checkout")} className="btn-liquid btn-emerald w-full py-4 mb-4 border border-maroon-deep">
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     Secure Checkout <ArrowRight size={14} />
                   </span>
