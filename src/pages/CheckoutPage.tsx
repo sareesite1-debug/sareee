@@ -87,7 +87,7 @@ const CheckoutPage = () => {
     <div className="mb-4">
       <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft">{label}{req && " *"}</label>
       <input type={type} value={value} onChange={e => setForm({ ...form, [field]: e.target.value })} required={req}
-        className="w-full border-b border-gold/30 bg-transparent px-0 py-3 text-sm font-body text-ink focus:outline-none focus:border-emerald transition-colors placeholder:text-ink-soft/30" placeholder={`Enter ${label.toLowerCase()}`} />
+        className="w-full border-b border-gold/30 bg-transparent px-0 py-3 text-sm font-body text-ink focus:outline-none focus:border-maroon transition-colors placeholder:text-ink-soft/30" placeholder={`Enter ${label.toLowerCase()}`} />
     </div>
   );
 
@@ -107,12 +107,12 @@ const CheckoutPage = () => {
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className={`mb-10 ${activeStep !== 1 && "opacity-50"}`}>
                 <div className="flex items-center justify-between mb-6 border-b border-gold/15 pb-4">
                   <div className="flex items-center gap-4">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-heading text-sm transition-colors ${activeStep >= 1 ? "bg-emerald-deep text-ivory" : "bg-gold/10 text-gold-dark"}`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-heading text-sm transition-colors ${activeStep >= 1 ? "bg-maroon-deep text-ivory" : "bg-gold/10 text-gold-dark"}`}>
                       {activeStep > 1 ? <Check size={14} /> : "1"}
                     </div>
                     <h2 className="font-heading text-2xl text-ink">Contact Details</h2>
                   </div>
-                  {activeStep > 1 && <button type="button" onClick={() => setActiveStep(1)} className="text-[10px] uppercase tracking-widest text-gold hover:text-emerald font-body">Edit</button>}
+                  {activeStep > 1 && <button type="button" onClick={() => setActiveStep(1)} className="text-[10px] uppercase tracking-widest text-gold hover:text-maroon font-body">Edit</button>}
                 </div>
                 
                 <AnimatePresence>
@@ -135,12 +135,12 @@ const CheckoutPage = () => {
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className={`mb-10 ${activeStep !== 2 && "opacity-50"}`}>
                 <div className="flex items-center justify-between mb-6 border-b border-gold/15 pb-4">
                   <div className="flex items-center gap-4">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-heading text-sm transition-colors ${activeStep >= 2 ? "bg-emerald-deep text-ivory" : "border border-gold/30 text-gold-dark"}`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-heading text-sm transition-colors ${activeStep >= 2 ? "bg-maroon-deep text-ivory" : "border border-gold/30 text-gold-dark"}`}>
                       {activeStep > 2 ? <Check size={14} /> : "2"}
                     </div>
                     <h2 className="font-heading text-2xl text-ink">Shipping Address</h2>
                   </div>
-                  {activeStep > 2 && <button type="button" onClick={() => setActiveStep(2)} className="text-[10px] uppercase tracking-widest text-gold hover:text-emerald font-body">Edit</button>}
+                  {activeStep > 2 && <button type="button" onClick={() => setActiveStep(2)} className="text-[10px] uppercase tracking-widest text-gold hover:text-maroon font-body">Edit</button>}
                 </div>
 
                 <AnimatePresence>
@@ -149,20 +149,20 @@ const CheckoutPage = () => {
                       <div className="mb-4">
                         <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft">Complete Address *</label>
                         <textarea value={form.shipping_address} onChange={e => setForm({ ...form, shipping_address: e.target.value })} required rows={3}
-                          className="w-full border border-gold/20 bg-ivory-deep/30 p-4 text-sm font-body focus:outline-none focus:border-emerald transition-colors resize-none placeholder:text-ink-soft/30" placeholder="Street, area, city, pincode" />
+                          className="w-full border border-gold/20 bg-ivory-deep/30 p-4 text-sm font-body focus:outline-none focus:border-maroon transition-colors resize-none placeholder:text-ink-soft/30" placeholder="Street, area, city, pincode" />
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                         <div className="mb-4">
                           <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft">State *</label>
                           <select value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} required
-                            className="w-full border-b border-gold/30 bg-transparent px-0 py-3 text-sm font-body text-ink focus:outline-none focus:border-emerald">
+                            className="w-full border-b border-gold/30 bg-transparent px-0 py-3 text-sm font-body text-ink focus:outline-none focus:border-maroon">
                             {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
                           </select>
                         </div>
                         <div className="mb-4">
                           <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft">Order Notes</label>
                           <input value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })}
-                            className="w-full border-b border-gold/30 bg-transparent px-0 py-3 text-sm font-body text-ink focus:outline-none focus:border-emerald placeholder:text-ink-soft/30" placeholder="Gift wrap, delivery instructions..." />
+                            className="w-full border-b border-gold/30 bg-transparent px-0 py-3 text-sm font-body text-ink focus:outline-none focus:border-maroon placeholder:text-ink-soft/30" placeholder="Gift wrap, delivery instructions..." />
                         </div>
                       </div>
                       <button type="button" onClick={() => validateStep2() ? setActiveStep(3) : toast.error("Please complete address")} className="mt-6 luxury-btn bg-emerald text-ivory">Continue to payment</button>
@@ -174,7 +174,7 @@ const CheckoutPage = () => {
               {/* Step 3: Payment */}
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className={`mb-10 ${activeStep !== 3 && "opacity-50"}`}>
                 <div className="flex items-center gap-4 mb-6 border-b border-gold/15 pb-4">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-heading text-sm transition-colors ${activeStep === 3 ? "bg-emerald-deep text-ivory" : "border border-gold/30 text-gold-dark"}`}>3</div>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-heading text-sm transition-colors ${activeStep === 3 ? "bg-maroon-deep text-ivory" : "border border-gold/30 text-gold-dark"}`}>3</div>
                   <h2 className="font-heading text-2xl text-ink">Payment Method</h2>
                 </div>
 
@@ -189,13 +189,13 @@ const CheckoutPage = () => {
                           key={p.v}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => setForm({ ...form, payment_method: p.v as any })}
-                          className={`cursor-pointer p-6 border transition-all duration-300 relative flex items-start gap-4 ${form.payment_method === p.v ? "border-emerald bg-emerald/5 shadow-[0_0_20px_hsl(var(--emerald)/0.1)]" : "border-gold/20 bg-ivory-deep/20 hover:border-gold/50"}`}
+                          className={`cursor-pointer p-6 border transition-all duration-300 relative flex items-start gap-4 ${form.payment_method === p.v ? "border-maroon bg-emerald/5 shadow-[0_0_20px_hsl(var(--emerald)/0.1)]" : "border-gold/20 bg-ivory-deep/20 hover:border-gold/50"}`}
                         >
-                          <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 ${form.payment_method === p.v ? "border-emerald" : "border-gold/40"}`}>
+                          <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 ${form.payment_method === p.v ? "border-maroon" : "border-gold/40"}`}>
                             {form.payment_method === p.v && <div className="w-2.5 h-2.5 rounded-full bg-emerald" />}
                           </div>
                           <div>
-                            <p className="font-heading text-xl text-ink mb-1 flex items-center gap-2"><p.icon size={16} className={form.payment_method === p.v ? "text-emerald" : "text-gold-dark"} /> {p.t}</p>
+                            <p className="font-heading text-xl text-ink mb-1 flex items-center gap-2"><p.icon size={16} className={form.payment_method === p.v ? "text-maroon" : "text-gold-dark"} /> {p.t}</p>
                             <p className="text-[13px] text-ink-soft font-body">{p.d}</p>
                           </div>
                         </motion.div>
@@ -238,12 +238,12 @@ const CheckoutPage = () => {
                   ) : (
                     <div className="flex justify-between text-ink-soft"><span>IGST 5%</span><span>₹{igst.toLocaleString("en-IN")}</span></div>
                   )}
-                  <div className="flex justify-between text-ink-soft mt-2 pt-2 border-t border-gold/5"><span>Shipping</span><span className="text-emerald">Complimentary</span></div>
+                  <div className="flex justify-between text-ink-soft mt-2 pt-2 border-t border-gold/5"><span>Shipping</span><span className="text-maroon">Complimentary</span></div>
                 </div>
 
                 <div className="flex justify-between items-baseline mb-8">
                   <span className="font-heading text-xl text-ink">Total</span>
-                  <span className="font-heading text-3xl text-emerald-deep">₹{total.toLocaleString("en-IN")}</span>
+                  <span className="font-heading text-3xl text-maroon-deep">₹{total.toLocaleString("en-IN")}</span>
                 </div>
 
                 <button type="submit" form="checkout-form" disabled={submitting || activeStep !== 3} className="btn-liquid btn-emerald w-full py-4 disabled:opacity-50 disabled:cursor-not-allowed">
