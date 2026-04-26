@@ -39,10 +39,10 @@ const AboutPage = () => {
   return (
     <div className="bg-ivory min-h-screen overflow-x-hidden">
       {/* Hero Section */}
-      <section ref={heroRef} className="relative h-screen min-h-[700px] overflow-hidden flex items-center bg-emerald-deep text-ivory">
+      <section ref={heroRef} className="relative h-screen min-h-[700px] overflow-hidden flex items-center bg-maroon-deep text-ivory">
         <motion.div className="absolute inset-0 pointer-events-none" style={{ y, opacity }}>
           <img src={editorialImg} alt="Arpitha Saree Center History" className="w-full h-full object-cover opacity-40 mix-blend-overlay" />
-          <div className="absolute inset-0 bg-gradient-to-t from-emerald-deep via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-maroon-deep via-transparent to-transparent" />
         </motion.div>
         
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gold/10 rounded-full blur-[120px] pointer-events-none" />
@@ -125,7 +125,7 @@ const AboutPage = () => {
                 {/* Dot */}
                 <motion.div 
                   initial={{ scale: 0, opacity: 0 }} whileInView={{ scale: 1, opacity: 1 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.5, type: "spring" }}
-                  className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-emerald-deep rounded-full border-4 border-ivory z-10"
+                  className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-maroon-deep rounded-full border-4 border-ivory z-10"
                 />
                 
                 <div className={`flex-1 text-center md:text-left ${i % 2 === 0 ? "md:text-right" : ""}`}>
@@ -143,7 +143,7 @@ const AboutPage = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-32 bg-emerald-deep text-center relative overflow-hidden">
+      <section className="py-32 bg-maroon-deep text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(hsl(var(--gold))_1px,transparent_1px)] [background-size:20px_20px] opacity-[0.03]" />
         <div className="container mx-auto px-6 relative z-10 max-w-2xl">
           <Sparkles size={24} className="text-gold mx-auto mb-8" strokeWidth={1} />
@@ -152,7 +152,7 @@ const AboutPage = () => {
             We invite you to explore our collections online or visit our boutique in Mysore for a personal viewing.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link to="/shop" className="btn-emerald bg-gold text-emerald-deep border border-gold hover:bg-transparent hover:text-gold transition-colors">
+            <Link to="/shop" className="btn-emerald bg-gold text-maroon-deep border border-gold hover:bg-transparent hover:text-gold transition-colors">
               Explore Collections
             </Link>
             <Link to="/contact" className="btn-outline-emerald border-gold/50 text-gold hover:border-gold hover:bg-gold/10">
