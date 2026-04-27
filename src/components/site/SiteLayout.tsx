@@ -30,7 +30,7 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
         style={{ top: "30%", left: "20%" }}
       />
       <motion.div
-        className="absolute w-48 h-48 rounded-full bg-maroon/10 blur-[80px]"
+        className="absolute w-48 h-48 rounded-full bg-emerald/20 blur-[80px]"
         animate={{
           x: [0, -40, 30, 0],
           y: [0, 30, -20, 0],
@@ -66,7 +66,7 @@ const LoadingScreen = ({ onComplete }: { onComplete: () => void }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
       >
-        Saree Center · Since 1985
+        Kanchipuram Pure Silk · Since 1985
       </motion.div>
 
       {/* Bottom line */}
