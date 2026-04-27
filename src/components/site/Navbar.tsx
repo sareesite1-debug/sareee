@@ -90,7 +90,7 @@ const Navbar = () => {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8, duration: 0.5 }}
               >
-                Kanchipuram · Pure Silk · Since 1985
+                Arpitha Saree Center · Kanchipuram
               </motion.span>
             </Link>
 
