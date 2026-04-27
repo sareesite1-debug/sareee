@@ -41,8 +41,8 @@ const Footer = () => {
             <div key={r} className="flex items-center gap-10 pr-10">
               {["Heirloom Silks", "Handwoven", "Est. 1985", "Mysore, India", "Artisan Crafted", "Ethically Sourced"].map((t, i) => (
                 <span key={i} className="flex items-center gap-6 whitespace-nowrap">
-                  <span className="eyebrow text-ivory/20 tracking-[0.4em]">{t}</span>
-                  <span className="text-gold/20">◈</span>
+                  <span className="eyebrow text-ivory/60 tracking-[0.4em]">{t}</span>
+                  <span className="text-gold/50">◈</span>
                 </span>
               ))}
             </div>
@@ -57,9 +57,9 @@ const Footer = () => {
               <Link to="/" className="block mb-7 group">
                 <span className="font-display text-[9px] tracking-[0.5em] text-gold/60 uppercase">Since 1985</span>
                 <div className="font-heading text-4xl text-ivory font-light tracking-tight leading-none mt-1.5">Arpitha</div>
-                <div className="font-body text-[8px] tracking-[0.4em] text-ivory/30 uppercase mt-1.5">Saree · Center · Mysore</div>
+                <div className="font-body text-[8px] tracking-[0.4em] text-ivory/65 uppercase mt-1.5">Saree Center · Kanchipuram</div>
               </Link>
-              <p className="text-sm text-ivory/40 leading-relaxed font-body font-light max-w-sm mb-8">Quietly curating heirloom silks, breathable handlooms and bridal trousseaus from India's most storied weaving regions.</p>
+              <p className="text-sm text-ivory/80 leading-relaxed font-body font-light max-w-sm mb-8">Pure Kanchipuram silk sarees — GI certified, handwoven by master craftsmen, and delivered to your door since 1985.</p>
               <motion.div className="h-px bg-gold/15 mb-7" initial={{ scaleX: 0 }} animate={inView ? { scaleX: 1 } : {}} transition={{ duration: 1.2, delay: 0.5, ease: [0.76, 0, 0.24, 1] }} style={{ transformOrigin: "left" }} />
               <div className="flex gap-3">
                 {[Globe, PhoneCall, Send].map((Icon, i) => <MagneticIcon key={i} Icon={Icon} href="#" />)}
@@ -71,7 +71,7 @@ const Footer = () => {
               <h4 className="eyebrow text-gold mb-6">Shop</h4>
               <div className="flex flex-col gap-3.5">
                 {[{ to: "/shop", label: "All Sarees" }, { to: "/categories", label: "Collections" }, { to: "/orders", label: "My Orders" }, { to: "/cart", label: "My Bag" }].map(l => (
-                  <Link key={l.to} to={l.to} className="link-reveal text-sm text-ivory/40 hover:text-ivory/80 transition-colors font-body w-fit">{l.label}</Link>
+                  <Link key={l.to} to={l.to} className="link-reveal text-sm text-ivory/75 hover:text-ivory transition-colors font-body w-fit">{l.label}</Link>
                 ))}
               </div>
             </motion.div>
@@ -81,7 +81,7 @@ const Footer = () => {
               <h4 className="eyebrow text-gold mb-6">The House</h4>
               <div className="flex flex-col gap-3.5">
                 {[{ to: "/about", label: "Our Story" }, { to: "/contact", label: "Visit the Boutique" }, { to: "/contact", label: "Bridal Consultation" }, { to: "/contact", label: "Care & Maintenance" }].map(l => (
-                  <Link key={l.label} to={l.to} className="link-reveal text-sm text-ivory/40 hover:text-ivory/80 transition-colors font-body w-fit">{l.label}</Link>
+                  <Link key={l.label} to={l.to} className="link-reveal text-sm text-ivory/75 hover:text-ivory transition-colors font-body w-fit">{l.label}</Link>
                 ))}
               </div>
             </motion.div>
@@ -93,13 +93,13 @@ const Footer = () => {
                 {[{ Icon: MapPin, text: BRAND.address }, { Icon: Phone, text: BRAND.phoneFormatted }, { Icon: Mail, text: BRAND.email }].map(({ Icon, text }, i) => (
                   <div key={i} className="flex items-start gap-3">
                     <div className="w-7 h-7 border border-gold/20 flex items-center justify-center shrink-0 mt-0.5"><Icon size={11} strokeWidth={1.5} className="text-gold/60" /></div>
-                    <p className="text-sm text-ivory/40 font-body leading-relaxed break-all">{text}</p>
+                    <p className="text-sm text-ivory/80 font-body leading-relaxed break-all">{text}</p>
                   </div>
                 ))}
               </div>
               <div className="mt-8 border-t border-ivory/5 pt-6">
-                <p className="eyebrow text-ivory/20 mb-3">Boutique Hours</p>
-                <p className="font-body text-xs text-ivory/30 leading-relaxed">Mon – Sat: 10:00 AM – 8:00 PM<br />Sunday: 11:00 AM – 6:00 PM</p>
+                <p className="eyebrow text-ivory/60 mb-3">Boutique Hours</p>
+                <p className="font-body text-xs text-ivory/70 leading-relaxed">Mon – Sat: 10:00 AM – 8:00 PM<br />Sunday: 11:00 AM – 6:00 PM</p>
               </div>
             </motion.div>
           </div>
@@ -108,9 +108,9 @@ const Footer = () => {
 
       <div className="border-t border-ivory/5 py-6">
         <div className="container mx-auto px-6 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="font-body text-[10px] text-ivory/20 tracking-widest">© {year} {BRAND.name}. Crafted with reverence.</p>
+          <p className="font-body text-[10px] text-ivory/60 tracking-widest">© {year} {BRAND.name}. Crafted with reverence.</p>
           <div className="flex gap-8">
-            {["Privacy", "Terms", "Returns"].map(l => <a key={l} href="#" className="font-body text-[10px] text-ivory/20 hover:text-ivory/50 tracking-widest transition-colors">{l}</a>)}
+            {["Privacy", "Terms", "Returns"].map(l => <a key={l} href="#" className="font-body text-[10px] text-ivory/60 hover:text-ivory tracking-widest transition-colors">{l}</a>)}
           </div>
         </div>
       </div>
