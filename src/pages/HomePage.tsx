@@ -78,9 +78,9 @@ const Marquee = () => (
     <div className="marquee-track">
       {[...Array(3)].map((_, r) => (
         <div key={r} className="flex items-center gap-12 pr-12">
-          {["Kanchipuram Pure Silk", "Bridal Trousseaux", "Zari Weaves", "Temple Borders", "GI Certified", "Handwoven Heritage", "Est. 1985 · Kanchipuram"].map((t, i) => (
+          {["Kanchipuram Pure Silk", "Bridal Sarees", "Zari Weaves", "Temple Borders", "GI Certified", "Arpitha Saree Center", "Est. 1985 · Kanchipuram"].map((t, i) => (
             <span key={i} className="flex items-center gap-6 whitespace-nowrap">
-              <span className="eyebrow text-ivory/50 tracking-[0.4em]">{t}</span>
+              <span className="eyebrow text-ivory/75 tracking-[0.4em]">{t}</span>
               <span className="text-gold/40 text-lg">◈</span>
             </span>
           ))}
@@ -178,7 +178,7 @@ const HomePage = () => {
               className="flex items-center gap-4 mb-10"
             >
               <div className="w-10 h-px bg-gold/60" />
-              <span className="eyebrow text-gold/80">{hero.eyebrow || "Since 1985 · Kanchipuram, Tamil Nadu"}</span>
+              <span className="eyebrow text-gold/80">{hero.eyebrow || "Since 1985 · Arpitha Saree Center"}</span>
             </motion.div>
 
             {/* Main headline */}
@@ -189,7 +189,7 @@ const HomePage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
               >
-                {hero.heading || "Pure Kanchipuram"}
+                {hero.heading || "Woven in"}
               </motion.span>
               <motion.span
                 className="block italic text-gold"
@@ -197,7 +197,7 @@ const HomePage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
               >
-                memory.
+                Kanchipuram.
               </motion.span>
               <motion.span
                 className="block"
@@ -222,9 +222,9 @@ const HomePage = () => {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 1.1, ease: [0.16, 1, 0.3, 1] }}
-              className="text-ivory/60 text-base font-body font-light leading-relaxed max-w-md mb-12"
+              className="text-ivory/90 text-base font-body font-light leading-relaxed max-w-md mb-12"
             >
-              {hero.subheading || "Authentic GI-certified Kanchipuram pure silk sarees — woven by master craftsmen using traditional techniques passed down for generations."}
+              {hero.subheading || "Pure Kanchipuram silk sarees, handwoven by master craftsmen — GI-certified, real zari, and crafted to last a lifetime."}
             </motion.p>
 
             {/* CTAs */}
@@ -238,7 +238,7 @@ const HomePage = () => {
                 <span className="relative z-10">{hero.cta_label || "Discover the Edit"}</span>
                 <ArrowRight size={13} className="relative z-10 group-hover:translate-x-1 transition-transform" />
               </Link>
-              <Link to="/categories" className="link-reveal font-display text-[9px] tracking-[0.35em] uppercase text-ivory/60 hover:text-gold transition-colors">
+              <Link to="/categories" className="link-reveal font-display text-[9px] tracking-[0.35em] uppercase text-ivory/80 hover:text-gold transition-colors">
                 Browse Collections
               </Link>
             </motion.div>
@@ -253,7 +253,7 @@ const HomePage = () => {
               {[["40+", "Years"], ["12+", "Regions"], ["5000+", "Sarees"]].map(([n, l]) => (
                 <div key={l}>
                   <p className="font-heading text-2xl text-gold leading-none">{n}</p>
-                  <p className="font-display text-[8px] tracking-[0.3em] text-ivory/30 uppercase mt-1">{l}</p>
+                  <p className="font-display text-[8px] tracking-[0.3em] text-ivory/55 uppercase mt-1">{l}</p>
                 </div>
               ))}
             </motion.div>
@@ -440,10 +440,10 @@ const HomePage = () => {
               <motion.div initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 1 }} className="h-px bg-gradient-to-r from-gold to-transparent mb-8 origin-left" />
 
               {[
-                "What began as a small Kanchipuram boutique in 1985 is today a trusted destination for women who know that a Kanchipuram silk saree is more than a garment — it's a legacy, a testament of craft, and a piece of Tamil Nadu's living heritage.",
-                "We work directly with master weavers in Kanchipuram, preserving traditional techniques of pure mulberry silk and real zari weaving — paying fairly and honouring the art in every thread.",
+                "What began as a small store in Kanchipuram in 1985, Arpitha Saree Center is today a trusted destination for those who know that a Kanchipuram silk saree is more than a garment — it's a legacy woven in pure mulberry silk and real zari.",
+                "We source directly from master weavers of Kanchipuram, preserving centuries-old techniques — every saree GI-certified, every thread authentic.",
               ].map((para, i) => (
-                <motion.p key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 + i * 0.15, duration: 0.8 }} className="text-ivory/65 font-body leading-relaxed mb-5 text-[15px]">
+                <motion.p key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 + i * 0.15, duration: 0.8 }} className="text-ivory/90 font-body leading-relaxed mb-5 text-[15px]">
                   {para}
                 </motion.p>
               ))}
@@ -453,7 +453,7 @@ const HomePage = () => {
                 {[["1985", "Est."], ["12+", "Weaving regions"], ["5000+", "Sarees curated"]].map(([num, label]) => (
                   <div key={label} className="relative z-10">
                     <p className="font-heading text-3xl text-gold leading-none">{num}</p>
-                    <p className="font-body text-[10px] text-ivory/40 uppercase tracking-widest mt-1">{label}</p>
+                    <p className="font-body text-[10px] text-ivory/65 uppercase tracking-widest mt-1">{label}</p>
                   </div>
                 ))}
               </motion.div>
@@ -542,7 +542,7 @@ const HomePage = () => {
         <div className="container mx-auto px-6 text-center max-w-2xl relative z-10">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="flex items-center justify-center gap-3 mb-6">
             <div className="w-8 h-px bg-gold/40" />
-            <span className="eyebrow text-gold">Visit us in Kanchipuram</span>
+            <span className="eyebrow text-gold">Visit Arpitha Saree Center</span>
             <div className="w-8 h-px bg-gold/40" />
           </motion.div>
 
@@ -552,8 +552,8 @@ const HomePage = () => {
             <span className="italic"><RevealWords text="chosen in person." className="text-gold/90" delay={0.2} /></span>
           </h2>
 
-          <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.5 }} className="text-ivory/60 font-body mb-12 leading-relaxed">
-            Step into our store in the heart of Kanchipuram for a personalised saree consultation, a warm cup of filter coffee, and the joy of choosing your perfect pure silk saree in person.
+          <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.5 }} className="text-ivory/85 font-body mb-12 leading-relaxed">
+            Step into Arpitha Saree Center in Kanchipuram and experience the joy of choosing your pure silk saree in person — feel the zari, touch the silk, and find the one that's truly yours.
           </motion.p>
 
           <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 0.7, type: "spring" }}>
