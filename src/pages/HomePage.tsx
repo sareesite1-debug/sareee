@@ -434,7 +434,7 @@ const HomePage = () => {
               <h2 className="text-display text-4xl md:text-5xl lg:text-6xl text-ivory mb-8 leading-[1.0]">
                 <RevealWords text="Four decades of cloth," className="text-ivory" />
                 <br />
-                <span className="italic"><RevealWords text="conversation & craft." className="text-gold delay={0.2} /></span>
+                <span className="italic"><RevealWords text="conversation & craft." className="text-gold" delay={0.2} /></span>
               </h2>
 
               <motion.div initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 1 }} className="h-px bg-gradient-to-r from-gold to-transparent mb-8 origin-left" />
