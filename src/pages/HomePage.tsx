@@ -81,7 +81,7 @@ const Marquee = () => (
           {["Kanchipuram Pure Silk", "Bridal Sarees", "Zari Weaves", "Temple Borders", "GI Certified", "Arpitha Saree Center", "Est. 1985 · Kanchipuram"].map((t, i) => (
             <span key={i} className="flex items-center gap-6 whitespace-nowrap">
               <span className="eyebrow text-ivory/75 tracking-[0.4em]">{t}</span>
-              <span className="text-gold/40 text-lg">◈</span>
+              <span className="text-gold/70 text-lg">◈</span>
             </span>
           ))}
         </div>
@@ -253,7 +253,7 @@ const HomePage = () => {
               {[["40+", "Years"], ["12+", "Regions"], ["5000+", "Sarees"]].map(([n, l]) => (
                 <div key={l}>
                   <p className="font-heading text-2xl text-gold leading-none">{n}</p>
-                  <p className="font-display text-[8px] tracking-[0.3em] text-ivory/55 uppercase mt-1">{l}</p>
+                  <p className="font-display text-[8px] tracking-[0.3em] text-ivory/75 uppercase mt-1">{l}</p>
                 </div>
               ))}
             </motion.div>
@@ -326,7 +326,7 @@ const HomePage = () => {
             transition={{ delay: 2 }}
             className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
           >
-            <span className="eyebrow text-ink-soft/40">Scroll</span>
+            <span className="eyebrow text-ink-soft/70">Scroll</span>
             <motion.div animate={{ y: [0, 8, 0], opacity: [1, 0.4, 1] }} transition={{ repeat: Infinity, duration: 2 }}>
               <ChevronDown size={16} className="text-gold/50" />
             </motion.div>
@@ -434,7 +434,7 @@ const HomePage = () => {
               <h2 className="text-display text-4xl md:text-5xl lg:text-6xl text-ivory mb-8 leading-[1.0]">
                 <RevealWords text="Four decades of cloth," className="text-ivory" />
                 <br />
-                <span className="italic"><RevealWords text="conversation & craft." className="text-gold/80" delay={0.2} /></span>
+                <span className="italic"><RevealWords text="conversation & craft." className="text-gold delay={0.2} /></span>
               </h2>
 
               <motion.div initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 1 }} className="h-px bg-gradient-to-r from-gold to-transparent mb-8 origin-left" />
