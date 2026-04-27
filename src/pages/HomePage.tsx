@@ -78,7 +78,7 @@ const Marquee = () => (
     <div className="marquee-track">
       {[...Array(3)].map((_, r) => (
         <div key={r} className="flex items-center gap-12 pr-12">
-          {["Banarasi Silks", "Kanjeevaram", "Chanderi", "Maheshwari", "Ikat", "Bridal Trousseaux", "Est. 1985 · Mysore"].map((t, i) => (
+          {["Kanchipuram Pure Silk", "Bridal Trousseaux", "Zari Weaves", "Temple Borders", "GI Certified", "Handwoven Heritage", "Est. 1985 · Kanchipuram"].map((t, i) => (
             <span key={i} className="flex items-center gap-6 whitespace-nowrap">
               <span className="eyebrow text-ivory/50 tracking-[0.4em]">{t}</span>
               <span className="text-gold/40 text-lg">◈</span>
@@ -160,10 +160,10 @@ const HomePage = () => {
       {/* ══════════════════════════════════════════
           HERO — Split editorial layout
       ══════════════════════════════════════════ */}
-      <section ref={heroRef} className="relative min-h-screen flex flex-col lg:flex-row overflow-hidden">
+      <section ref={heroRef} className="relative min-h-screen flex flex-col lg:flex-row overflow-hidden pt-[80px] lg:pt-0">
 
         {/* LEFT PANEL — Deep maroon with text */}
-        <div className="relative flex-1 lg:w-[52%] bg-maroon-deep flex items-center justify-center px-10 lg:px-20 py-32 lg:py-0 order-2 lg:order-1">
+        <div className="relative flex-1 lg:w-[52%] bg-maroon-deep flex items-center justify-center px-10 lg:px-20 py-32 lg:py-24 order-2 lg:order-1 min-h-[60vh] lg:min-h-screen">
           <PatternBg />
 
           {/* ambient glow */}
@@ -178,7 +178,7 @@ const HomePage = () => {
               className="flex items-center gap-4 mb-10"
             >
               <div className="w-10 h-px bg-gold/60" />
-              <span className="eyebrow text-gold/80">{hero.eyebrow || "Since 1985 · Mysore, Karnataka"}</span>
+              <span className="eyebrow text-gold/80">{hero.eyebrow || "Since 1985 · Kanchipuram, Tamil Nadu"}</span>
             </motion.div>
 
             {/* Main headline */}
@@ -189,7 +189,7 @@ const HomePage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
               >
-                {hero.heading || "Woven with"}
+                {hero.heading || "Pure Kanchipuram"}
               </motion.span>
               <motion.span
                 className="block italic text-gold"
@@ -224,7 +224,7 @@ const HomePage = () => {
               transition={{ duration: 0.9, delay: 1.1, ease: [0.16, 1, 0.3, 1] }}
               className="text-ivory/60 text-base font-body font-light leading-relaxed max-w-md mb-12"
             >
-              {hero.subheading || "Curated heirloom silks, breathable handlooms and bridal creations — each one woven by master artisans across India."}
+              {hero.subheading || "Authentic GI-certified Kanchipuram pure silk sarees — woven by master craftsmen using traditional techniques passed down for generations."}
             </motion.p>
 
             {/* CTAs */}
@@ -261,7 +261,7 @@ const HomePage = () => {
         </div>
 
         {/* RIGHT PANEL — Ivory with decorative elements */}
-        <div className="relative flex-1 lg:w-[48%] bg-ivory-deep flex items-center justify-center order-1 lg:order-2 min-h-[50vh] lg:min-h-screen overflow-hidden">
+        <div className="relative flex-1 lg:w-[48%] bg-ivory-deep flex items-center justify-center order-1 lg:order-2 min-h-[55vh] lg:min-h-screen overflow-hidden">
 
           {/* Large decorative mandala / geometric */}
           <motion.div
@@ -305,8 +305,8 @@ const HomePage = () => {
             className="absolute top-[15%] right-[8%] bg-white/80 backdrop-blur-sm border border-gold/20 p-5 shadow-sm max-w-[200px]"
           >
             <p className="eyebrow text-gold-dark mb-2">Featured Craft</p>
-            <p className="font-heading text-xl text-ink leading-tight">Banarasi Silk</p>
-            <p className="font-body text-[11px] text-ink-soft mt-2">Antique gold zari · 6 yards</p>
+            <p className="font-heading text-xl text-ink leading-tight">Kanchipuram Silk</p>
+            <p className="font-body text-[11px] text-ink-soft mt-2">Pure mulberry silk · GI certified</p>
           </motion.div>
 
           <motion.div
@@ -440,8 +440,8 @@ const HomePage = () => {
               <motion.div initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 1 }} className="h-px bg-gradient-to-r from-gold to-transparent mb-8 origin-left" />
 
               {[
-                "What began as a small Mysore boutique in 1985 is today a quiet sanctuary for women who believe a saree is more than a garment — it's an inheritance, a confession of taste, a slow craft worth knowing by name.",
-                "We work directly with weavers in Banaras, Kanchipuram, Maheshwar and beyond — paying fairly, ordering small, and returning year after year.",
+                "What began as a small Kanchipuram boutique in 1985 is today a trusted destination for women who know that a Kanchipuram silk saree is more than a garment — it's a legacy, a testament of craft, and a piece of Tamil Nadu's living heritage.",
+                "We work directly with master weavers in Kanchipuram, preserving traditional techniques of pure mulberry silk and real zari weaving — paying fairly and honouring the art in every thread.",
               ].map((para, i) => (
                 <motion.p key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 + i * 0.15, duration: 0.8 }} className="text-ivory/65 font-body leading-relaxed mb-5 text-[15px]">
                   {para}
@@ -542,7 +542,7 @@ const HomePage = () => {
         <div className="container mx-auto px-6 text-center max-w-2xl relative z-10">
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="flex items-center justify-center gap-3 mb-6">
             <div className="w-8 h-px bg-gold/40" />
-            <span className="eyebrow text-gold">Visit us in Mysore</span>
+            <span className="eyebrow text-gold">Visit us in Kanchipuram</span>
             <div className="w-8 h-px bg-gold/40" />
           </motion.div>
 
@@ -553,7 +553,7 @@ const HomePage = () => {
           </h2>
 
           <motion.p initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.5 }} className="text-ivory/60 font-body mb-12 leading-relaxed">
-            Step into our flagship boutique at Gangotri Layout for a personalised consultation, a cup of filter coffee, and the slow joy of choosing in candlelight.
+            Step into our store in the heart of Kanchipuram for a personalised saree consultation, a warm cup of filter coffee, and the joy of choosing your perfect pure silk saree in person.
           </motion.p>
 
           <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 0.7, type: "spring" }}>
