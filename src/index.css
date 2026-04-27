@@ -105,21 +105,21 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: hsl(144 62% 16%);
+  background: linear-gradient(160deg, hsl(34 60% 94%) 0%, hsl(36 55% 90%) 50%, hsl(30 50% 87%) 100%);
   overflow: hidden;
 }
 .loading-screen::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 50% 50%, hsl(var(--gold) / 0.08) 0%, transparent 70%);
+  background: radial-gradient(ellipse at 50% 40%, hsl(var(--gold) / 0.18) 0%, transparent 65%);
   animation: pulseGlow 3s ease-in-out infinite;
 }
 .loading-brand {
   font-family: 'Cormorant Garamond', serif;
   font-size: clamp(2rem, 6vw, 4.5rem);
   font-weight: 300;
-  color: hsl(var(--ivory));
+  color: hsl(var(--maroon-deep));
   letter-spacing: 0.03em;
   position: relative;
   z-index: 1;
@@ -129,7 +129,7 @@
   font-size: 9px;
   letter-spacing: 0.5em;
   text-transform: uppercase;
-  color: hsl(var(--gold) / 0.6);
+  color: hsl(var(--gold-dark) / 0.8);
   margin-top: 12px;
   position: relative;
   z-index: 1;
@@ -137,7 +137,7 @@
 .loading-line {
   width: 120px;
   height: 1px;
-  background: linear-gradient(90deg, transparent, hsl(var(--gold)), transparent);
+  background: linear-gradient(90deg, transparent, hsl(var(--gold-dark)), transparent);
   margin-top: 24px;
   position: relative;
   z-index: 1;
