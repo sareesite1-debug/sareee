@@ -505,10 +505,10 @@ const HomePage = () => {
                 <motion.div key={p.id} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ delay: i * 0.07, duration: 0.8, type: "spring", stiffness: 100 }}>
                   <Link to={`/shop/${p.slug}`} className="group block relative">
                     <div className="absolute inset-0 bg-gold/5 blur-2xl scale-0 group-hover:scale-110 transition-transform duration-700 pointer-events-none" />
-                    <div className="relative overflow-hidden aspect-[3/4] mb-5 bg-ivory-deep border border-gold/10">
+                    <div className="relative overflow-hidden aspect-[3/4] mb-5 bg-ivory-deep border border-gold/10 img-fit">
                       {p.image_url ? (
                         <>
-                          <motion.img src={p.image_url} alt={p.name} className="w-full h-full object-cover" whileHover={{ scale: 1.06 }} transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }} loading="lazy" />
+                          <motion.img src={p.image_url} alt={p.name} whileHover={{ scale: 1.06 }} transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }} loading="lazy" />
                           <motion.div className="absolute inset-0 bg-maroon-deep/40" initial={{ opacity: 0 }} whileHover={{ opacity: 1 }} transition={{ duration: 0.4 }} />
                           <motion.div className="absolute bottom-4 left-0 right-0 text-center" initial={{ y: 20, opacity: 0 }} whileHover={{ y: 0, opacity: 1 }} transition={{ duration: 0.35, type: "spring" }}>
                             <span className="font-display text-[8px] tracking-[0.4em] uppercase text-ivory glass-card-dark border-none px-4 py-2">Quick view</span>
