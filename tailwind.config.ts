@@ -18,7 +18,7 @@ export default {
     extend: {
       fontFamily: {
         heading: ["'Cormorant Garamond'", "Georgia", "serif"],
-        body: ["'Didact Gothic'", "system-ui", "sans-serif"],
+        body: ["'Inter'", "system-ui", "sans-serif"],
         display: ["'Cinzel'", "serif"],
         editorial: ["'EB Garamond'", "serif"],
       },
@@ -36,6 +36,10 @@ export default {
         popover: { DEFAULT: "hsl(var(--popover))", foreground: "hsl(var(--popover-foreground))" },
         card: { DEFAULT: "hsl(var(--card))", foreground: "hsl(var(--card-foreground))" },
         maroon: { DEFAULT: "hsl(var(--maroon))", deep: "hsl(var(--maroon-deep))", light: "hsl(var(--maroon-light))" },
+        emerald: { DEFAULT: "hsl(var(--emerald))", deep: "hsl(var(--emerald-deep))", light: "hsl(var(--emerald-light))" },
+        gold: { DEFAULT: "hsl(var(--gold))", light: "hsl(var(--gold-light))", dark: "hsl(var(--gold-dark))" },
+        ivory: { DEFAULT: "hsl(var(--ivory))", deep: "hsl(var(--ivory-deep))" },
+        ink: { DEFAULT: "hsl(var(--ink))", soft: "hsl(var(--ink-soft))" },
         rose: { DEFAULT: "hsl(var(--rose))" },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
