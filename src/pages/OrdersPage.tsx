@@ -24,7 +24,7 @@ const OrdersPage = () => {
   return (
     <div className="bg-ivory min-h-screen">
       <div className="container mx-auto px-6 pt-36 pb-24 max-w-5xl">
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="mb-12 border-b border-gold/15 pb-6">
+        <motion.div initial={{ opacity: 1, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="mb-12 border-b border-gold/15 pb-6">
           <p className="eyebrow text-gold-dark mb-3">Account</p>
           <div className="flex items-end justify-between flex-wrap gap-4">
             <h1 className="text-display text-4xl md:text-5xl text-ink">My Orders</h1>
@@ -37,7 +37,7 @@ const OrdersPage = () => {
             {[1, 2, 3].map(i => <div key={i} className="h-24 bg-ivory-deep/50 animate-pulse border border-gold/10" />)}
           </div>
         ) : orders.length === 0 ? (
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-24 glass-card border border-dashed border-gold/30">
+          <motion.div initial={{ opacity: 1, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-24 glass-card border border-dashed border-gold/30">
             <Box size={32} className="mx-auto text-gold mb-6" strokeWidth={1} />
             <p className="font-heading text-3xl text-ink mb-3">No orders yet</p>
             <p className="text-sm text-ink-soft font-body mb-8">When you purchase a saree, it will appear here.</p>
@@ -49,7 +49,7 @@ const OrdersPage = () => {
           <div className="space-y-4">
             <AnimatePresence>
               {orders.map((o, i) => (
-                <motion.div key={o.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05, type: "spring", stiffness: 300, damping: 25 }}>
+                <motion.div key={o.id} initial={{ opacity: 1, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05, type: "spring", stiffness: 300, damping: 25 }}>
                   <Link to={`/orders/${o.id}`} className="block border border-gold/15 bg-ivory-deep/20 p-6 md:p-8 group hover:bg-ivory hover:border-gold/40 hover:shadow-[0_10px_40px_-15px_hsl(var(--emerald-deep)/0.1)] transition-all duration-300 card-3d">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6" style={{ transform: "translateZ(20px)" }}>
                       
@@ -66,7 +66,7 @@ const OrdersPage = () => {
                       <div className="flex items-center gap-6 justify-between md:justify-end border-t border-gold/10 md:border-0 pt-4 md:pt-0">
                         <div className="text-left md:text-right">
                           <span className={`inline-block text-[9px] px-3 py-1.5 font-body uppercase tracking-[0.25em] mb-1 ${
-                            o.status === "cancelled" ? "bg-rose-600/10 text-rose-600 border border-rose-600/20" :
+                            o.status === "cancelled" ? "bg-rose/10 text-rose border border-rose/20" :
                             o.tracking_status === "delivered" ? "bg-emerald/10 text-emerald border border-emerald/20" :
                             "bg-gold/10 text-gold-dark border border-gold/20"
                           }`}>
