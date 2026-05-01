@@ -11,6 +11,7 @@ import { ArrowRight, Sparkles, Shield, Truck, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import craftImg from "@/assets/craft-silks.jpg";
 import heroEditorial from "@/assets/hero-editorial.jpg";
+import heroPattern from "@/assets/hero-pattern.png";
 
 interface Category { id: string; name: string; slug: string; image_url: string | null; description: string | null; }
 interface Product { id: string; name: string; slug: string; price: number; image_url: string | null; }
@@ -104,24 +105,15 @@ const ScrollProgressLine = () => {
 
 /* ── Animated saree-pattern SVG background ── */
 const PatternBg = () => (
-  <svg className="absolute inset-0 w-full h-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <pattern id="paisley" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
-        <circle cx="40" cy="40" r="18" fill="none" stroke="#C9952A" strokeWidth="0.8"/>
-        <circle cx="40" cy="40" r="10" fill="none" stroke="#C9952A" strokeWidth="0.5"/>
-        <circle cx="40" cy="40" r="3" fill="#C9952A"/>
-        <line x1="40" y1="4" x2="40" y2="22" stroke="#C9952A" strokeWidth="0.5"/>
-        <line x1="40" y1="58" x2="40" y2="76" stroke="#C9952A" strokeWidth="0.5"/>
-        <line x1="4" y1="40" x2="22" y2="40" stroke="#C9952A" strokeWidth="0.5"/>
-        <line x1="58" y1="40" x2="76" y2="40" stroke="#C9952A" strokeWidth="0.5"/>
-        <line x1="12" y1="12" x2="28" y2="28" stroke="#C9952A" strokeWidth="0.4"/>
-        <line x1="52" y1="52" x2="68" y2="68" stroke="#C9952A" strokeWidth="0.4"/>
-        <line x1="68" y1="12" x2="52" y2="28" stroke="#C9952A" strokeWidth="0.4"/>
-        <line x1="28" y1="52" x2="12" y2="68" stroke="#C9952A" strokeWidth="0.4"/>
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#paisley)"/>
-  </svg>
+  <div
+    className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.18] mix-blend-screen"
+    style={{
+      backgroundImage: `url(${heroPattern})`,
+      backgroundRepeat: "repeat",
+      backgroundSize: "260px auto",
+    }}
+    aria-hidden="true"
+  />
 );
 
 const HomePage = () => {
