@@ -40,10 +40,10 @@ const ProductCard = ({ product, index, addToCart }: { product: Product; index: n
       className="group card-3d"
     >
       <Link to={`/shop/${product.slug}`} className="block">
-        <div className="relative overflow-hidden aspect-[3/4] mb-5 bg-ivory-deep border border-gold/10">
+        <div className="relative overflow-hidden aspect-[3/4] mb-5 bg-ivory-deep border border-gold/10 img-fit">
           {product.image_url ? (
             <>
-              <motion.img src={product.image_url} alt={product.name} className="w-full h-full object-cover" animate={{ scale: hovered ? 1.08 : 1 }} transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }} loading="lazy" />
+              <motion.img src={product.image_url} alt={product.name} animate={{ scale: hovered ? 1.08 : 1 }} transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }} loading="lazy" />
               <motion.div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/70 via-emerald-deep/20 to-transparent" initial={{ opacity: 0 }} animate={{ opacity: hovered ? 1 : 0 }} transition={{ duration: 0.4 }} />
               <motion.button
                 className="absolute bottom-4 left-4 right-4 glass-card-dark text-gold font-display text-[8px] tracking-[0.3em] uppercase py-3 flex items-center justify-center gap-2 border-gold/20"
@@ -59,7 +59,7 @@ const ProductCard = ({ product, index, addToCart }: { product: Product; index: n
             <div className="w-full h-full flex items-center justify-center text-ink-soft text-xs font-body uppercase tracking-widest"><Sparkles size={20} className="text-gold/30" strokeWidth={1} /></div>
           )}
           {product.compare_at_price && product.compare_at_price > product.price && (
-            <div className="absolute top-3 left-3 bg-rose-600 text-ivory font-display text-[7px] tracking-[0.2em] uppercase px-2 py-1 shadow-md">Sale</div>
+            <div className="absolute top-3 left-3 bg-rose text-ivory font-display text-[7px] tracking-[0.2em] uppercase px-2 py-1 shadow-md">Sale</div>
           )}
         </div>
         <div style={{ transform: "translateZ(20px)" }}>
