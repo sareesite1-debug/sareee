@@ -28,7 +28,7 @@ const Footer = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-100px" });
   const cV = { hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } } };
-  const iV = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } } };
+  const iV = { hidden: { opacity: 1, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } } };
 
   return (
     <footer className="bg-ink text-ivory relative overflow-hidden pb-10 border-t border-gold/20">
