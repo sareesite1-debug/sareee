@@ -43,10 +43,10 @@ const ProductCard = ({ product, index, addToCart }: { product: Product; index: n
     <motion.div initial={{ opacity: 0, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ type: "spring", stiffness: 200, damping: 25, delay: index * 0.05 }}
       onHoverStart={() => setHovered(true)} onHoverEnd={() => setHovered(false)} className="group card-3d">
       <Link to={`/shop/${product.slug}`} className="block">
-        <div className="relative overflow-hidden aspect-[3/4] mb-5 bg-ivory-deep border border-gold/10">
+        <div className="relative overflow-hidden aspect-[3/4] mb-5 bg-ivory-deep border border-gold/10 img-fit">
           {product.image_url ? (
             <>
-              <motion.img src={product.image_url} alt={product.name} className="w-full h-full object-cover" animate={{ scale: hovered ? 1.08 : 1 }} transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }} loading="lazy" />
+              <motion.img src={product.image_url} alt={product.name} animate={{ scale: hovered ? 1.08 : 1 }} transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }} loading="lazy" />
               <motion.div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/70 via-emerald-deep/20 to-transparent" initial={{ opacity: 0 }} animate={{ opacity: hovered ? 1 : 0 }} transition={{ duration: 0.4 }} />
               <motion.button className="absolute bottom-4 left-4 right-4 glass-card-dark text-gold font-display text-[8px] tracking-[0.3em] uppercase py-3 flex items-center justify-center gap-2 border-gold/20"
                 initial={{ y: 20, opacity: 0 }} animate={{ y: hovered ? 0 : 20, opacity: hovered ? 1 : 0 }} transition={{ duration: 0.4, type: "spring" }} onClick={(e) => { e.preventDefault(); addToCart(product.id); }}>
@@ -127,10 +127,10 @@ const CategoriesPage = () => {
                 <motion.div key={c.id} initial={{ opacity: 0, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ delay: i * 0.1, duration: 0.9, type: "spring", stiffness: 100 }}>
                   <Magnetic3DCard className="perspective-1000 h-full">
                     <Link to={`/categories/${c.slug}`} className="group block h-full bg-ivory-deep border border-gold/10 p-4">
-                      <div className="relative overflow-hidden aspect-[4/3] mb-6">
+                      <div className="relative overflow-hidden aspect-[4/3] mb-6 img-fit">
                         {c.image_url ? (
                           <>
-                            <motion.img src={c.image_url} alt={c.name} className="w-full h-full object-cover" whileHover={{ scale: 1.05 }} transition={{ duration: 1.5, ease: [0.23, 1, 0.32, 1] }} loading="lazy" />
+                            <motion.img src={c.image_url} alt={c.name} whileHover={{ scale: 1.05 }} transition={{ duration: 1.5, ease: [0.23, 1, 0.32, 1] }} loading="lazy" />
                             <div className="absolute inset-0 bg-emerald-deep/20 group-hover:bg-transparent transition-colors duration-700" />
                           </>
                         ) : (
