@@ -10,6 +10,7 @@ import {
 import { ArrowRight, Sparkles, Shield, Truck, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import craftImg from "@/assets/craft-silks.jpg";
+import heroEditorial from "@/assets/hero-editorial.jpg";
 
 interface Category { id: string; name: string; slug: string; image_url: string | null; description: string | null; }
 interface Product { id: string; name: string; slug: string; price: number; image_url: string | null; }
@@ -160,7 +161,7 @@ const HomePage = () => {
       {/* ══════════════════════════════════════════
           HERO — Split editorial layout
       ══════════════════════════════════════════ */}
-      <section ref={heroRef} className="relative min-h-screen flex flex-col lg:flex-row overflow-hidden pt-[80px] lg:pt-0">
+      <section ref={heroRef} className="relative min-h-screen flex flex-col lg:flex-row overflow-hidden pt-[80px] lg:pt-0 text-safe">
 
         {/* LEFT PANEL — Deep maroon with text */}
         <div className="relative flex-1 lg:w-[52%] bg-maroon-deep flex items-center justify-center px-10 lg:px-20 py-32 lg:py-24 order-2 lg:order-1 min-h-[60vh] lg:min-h-screen">
@@ -295,6 +296,22 @@ const HomePage = () => {
               {/* Center diamond */}
               <polygon points="250,225 275,250 250,275 225,250" fill="none" stroke="#C9952A" strokeWidth="1.5"/>
             </svg>
+          </motion.div>
+
+          {/* Editorial product image */}
+          <motion.div
+            initial={{ opacity: 1, y: 24, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 1.1, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+            className="relative z-10 w-[58%] max-w-[360px] min-w-[240px]"
+          >
+            <div className="relative aspect-[3/4] border border-gold/25 bg-ivory shadow-[0_32px_90px_-36px_hsl(var(--maroon-deep)/0.45)] p-3">
+              <div className="img-fit h-full w-full bg-ivory-deep">
+                <img src={heroEditorial} alt="Premium silk saree drape from Arpitha Saree Center" />
+              </div>
+              <div className="absolute -inset-3 border border-gold/20 pointer-events-none" />
+              <div className="absolute inset-3 bg-gradient-to-t from-maroon-deep/20 via-transparent to-ivory/10 pointer-events-none" />
+            </div>
           </motion.div>
 
           {/* Floating craft cards */}
