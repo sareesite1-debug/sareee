@@ -1,4 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cinzel:wght@400;500;600;700&display=swap');
+/* ═══════════════════════════════════════════
+   FONTS — loaded non-blocking via index.html <link media="print">
+   Do NOT use @import here — it is render-blocking and tanks FCP/LCP.
+   Font stacks below provide instant fallbacks.
+═══════════════════════════════════════════ */
 
 @tailwind base;
 @tailwind components;
@@ -26,7 +30,7 @@
     --input: 36 25% 86%;
     --ring: 351 79% 23%;
     --radius: 0.25rem;
-    /* Brand tokens — PRD spec */
+    /* Brand tokens */
     --maroon: 351 79% 23%;
     --maroon-deep: 351 82% 16%;
     --maroon-light: 351 50% 40%;
@@ -79,18 +83,41 @@
     scroll-behavior: smooth;
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--gold) / 0.5) transparent;
+    /* Prevent text size adjustment on mobile after orientation change */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', sans-serif;
+    /* System font stack as fallback while webfonts load — prevents FOUT layout shifts */
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     overflow-x: hidden;
     color: hsl(var(--foreground));
+    /* Improve text rendering on mobile */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Better tap highlight on mobile */
+    -webkit-tap-highlight-color: transparent;
   }
   #root { min-height: 100vh; background: hsl(var(--background)); color: hsl(var(--foreground)); }
-  h1, h2, h3, h4, h5, h6 { font-family: 'Cormorant Garamond', serif; letter-spacing: -0.01em; }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    letter-spacing: -0.01em;
+  }
   p, span, a, button, label, input, textarea, select, li, td, th { color: inherit; }
   img { max-width: 100%; height: auto; }
+  /* Improve image rendering quality */
+  img { image-rendering: -webkit-optimize-contrast; }
   ::selection { background: hsl(var(--gold) / 0.35); color: hsl(var(--ink)); }
+
+  /* Mobile: increase minimum touch target sizes */
+  @media (max-width: 1024px) {
+    a, button {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+    }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
@@ -99,56 +126,7 @@
 }
 
 /* ═══════════════════════════════════════════
-   LOADING SCREEN
-═══════════════════════════════════════════ */
-.loading-screen {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(160deg, hsl(34 60% 94%) 0%, hsl(36 55% 90%) 50%, hsl(30 50% 87%) 100%);
-  overflow: hidden;
-}
-.loading-screen::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 50% 40%, hsl(var(--gold) / 0.18) 0%, transparent 65%);
-  animation: pulseGlow 3s ease-in-out infinite;
-}
-.loading-brand {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(2rem, 6vw, 4.5rem);
-  font-weight: 300;
-  color: hsl(var(--maroon-deep));
-  letter-spacing: 0.03em;
-  position: relative;
-  z-index: 1;
-}
-.loading-sub {
-  font-family: 'Cinzel', serif;
-  font-size: 9px;
-  letter-spacing: 0.5em;
-  text-transform: uppercase;
-  color: hsl(var(--gold-dark) / 0.8);
-  margin-top: 12px;
-  position: relative;
-  z-index: 1;
-}
-.loading-line {
-  width: 120px;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, hsl(var(--gold-dark)), transparent);
-  margin-top: 24px;
-  position: relative;
-  z-index: 1;
-}
-
-/* ═══════════════════════════════════════════
-   FILM GRAIN OVERLAY
+   FILM GRAIN OVERLAY (CSS-only, zero JS cost)
 ═══════════════════════════════════════════ */
 .noise-overlay {
   position: fixed;
@@ -160,6 +138,12 @@
   background-repeat: repeat;
   background-size: 128px 128px;
   mix-blend-mode: overlay;
+  /* Don't paint on mobile where it's invisible anyway */
+  content-visibility: auto;
+}
+/* Hide grain on low-end mobile to save paint cost */
+@media (max-width: 768px) {
+  .noise-overlay { display: none; }
 }
 
 /* ═══════════════════════════════════════════
@@ -208,14 +192,14 @@
   /* ═══════════════════════════════════════════
      TYPOGRAPHY
   ═══════════════════════════════════════════ */
-  .font-display { font-family: 'Cinzel', serif; }
-  .font-heading { font-family: 'Cormorant Garamond', serif; }
-  .font-body { font-family: 'Inter', sans-serif; }
-  .font-accent { font-family: 'Libre Baskerville', serif; font-style: italic; }
-  .font-editorial { font-family: 'EB Garamond', serif; }
-  .text-display { font-family: 'Cormorant Garamond', serif; font-weight: 300; letter-spacing: -0.02em; line-height: 1.08; }
+  .font-display { font-family: 'Cinzel', 'Palatino Linotype', serif; }
+  .font-heading { font-family: 'Cormorant Garamond', Georgia, serif; }
+  .font-body { font-family: 'Inter', system-ui, sans-serif; }
+  .font-accent { font-family: 'Libre Baskerville', Georgia, serif; font-style: italic; }
+  .font-editorial { font-family: 'EB Garamond', Georgia, serif; }
+  .text-display { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 300; letter-spacing: -0.02em; line-height: 1.08; }
   .text-cinzel { font-family: 'Cinzel', serif; letter-spacing: 0.08em; }
-  .eyebrow { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.35em; text-transform: uppercase; font-weight: 500; }
+  .eyebrow { font-family: 'Cinzel', 'Palatino Linotype', serif; font-size: 9px; letter-spacing: 0.35em; text-transform: uppercase; font-weight: 500; }
 
   /* ═══════════════════════════════════════════
      DECORATIVE ELEMENTS
@@ -296,7 +280,7 @@
   }
 
   /* ═══════════════════════════════════════════
-     LUXURY BUTTONS
+     LUXURY BUTTONS — mobile-friendly min sizes
   ═══════════════════════════════════════════ */
   .luxury-btn {
     position: relative;
@@ -304,14 +288,18 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    padding: 16px 40px;
+    padding: 14px 28px;
     background: hsl(var(--gold));
     color: hsl(var(--maroon-deep));
-    font-family: 'Cinzel', serif;
+    font-family: 'Cinzel', 'Palatino Linotype', serif;
     font-size: 9px;
     letter-spacing: 0.35em;
     text-transform: uppercase;
     transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    min-height: 48px; /* mobile touch target */
+  }
+  @media (min-width: 640px) {
+    .luxury-btn { padding: 16px 40px; }
   }
   .luxury-btn::before {
     content: '';
@@ -327,6 +315,7 @@
     position: relative;
     overflow: hidden;
     z-index: 1;
+    min-height: 48px; /* mobile touch target */
   }
   .btn-liquid::after {
     content: '';
@@ -342,15 +331,17 @@
   .btn-liquid:hover::after { height: 100%; }
 
   /* ═══════════════════════════════════════════
-     3D CARD HOVER
+     3D CARD HOVER — disabled on mobile
   ═══════════════════════════════════════════ */
   .card-3d {
     transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.5s cubic-bezier(0.23, 1, 0.32, 1);
     transform-origin: center bottom;
   }
-  .card-3d:hover {
-    transform: perspective(800px) rotateX(3deg) translateY(-10px);
-    box-shadow: 0 50px 100px -30px hsl(var(--maroon-deep) / 0.2), 0 0 0 1px hsl(var(--gold) / 0.15);
+  @media (min-width: 1024px) {
+    .card-3d:hover {
+      transform: perspective(800px) rotateX(3deg) translateY(-10px);
+      box-shadow: 0 50px 100px -30px hsl(var(--maroon-deep) / 0.2), 0 0 0 1px hsl(var(--gold) / 0.15);
+    }
   }
 
   .image-reveal { overflow: hidden; }
@@ -369,12 +360,8 @@
     pointer-events: none;
     opacity: 0.5;
   }
-  .ambient-orb-gold {
-    background: hsl(var(--gold) / 0.08);
-  }
-  .ambient-orb-emerald {
-    background: hsl(var(--emerald) / 0.06);
-  }
+  .ambient-orb-gold { background: hsl(var(--gold) / 0.08); }
+  .ambient-orb-emerald { background: hsl(var(--emerald) / 0.06); }
 
   .text-stroke-gold {
     -webkit-text-stroke: 1px hsl(var(--gold) / 0.6);
@@ -413,6 +400,7 @@
     position: relative;
     overflow: hidden;
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    min-height: 48px;
   }
   .btn-emerald:hover {
     box-shadow: 0 0 30px hsl(var(--maroon) / 0.3);
@@ -427,6 +415,7 @@
     position: relative;
     overflow: hidden;
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    min-height: 48px;
   }
   .btn-outline-emerald:hover {
     background: hsl(var(--maroon));
@@ -443,6 +432,10 @@
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 .marquee-track { display: flex; width: max-content; animation: marquee 30s linear infinite; }
 .marquee-track:hover { animation-play-state: paused; }
+/* Pause marquee on mobile to save battery */
+@media (max-width: 640px) {
+  .marquee-track { animation-duration: 20s; }
+}
 
 @keyframes float { 0%, 100% { transform: translateY(0px) rotate(-0.5deg); } 50% { transform: translateY(-14px) rotate(0.5deg); } }
 .animate-float { animation: float 7s ease-in-out infinite; }
@@ -457,6 +450,7 @@
   0%, 100% { opacity: 0.4; transform: scale(1); }
   50% { opacity: 0.8; transform: scale(1.05); }
 }
+.animate-pulse-glow { animation: pulseGlow 4s ease-in-out infinite; }
 
 @keyframes floatOrb {
   0%, 100% { transform: translate(0, 0) scale(1); }
@@ -490,7 +484,7 @@
 ::-webkit-scrollbar-thumb:hover { background: hsl(var(--gold) / 0.7); }
 
 /* ═══════════════════════════════════════════
-   GRADIENT UTILITIES (used in old code refs)
+   GRADIENT UTILITIES
 ═══════════════════════════════════════════ */
 .gradient-gold {
   background: linear-gradient(135deg, hsl(var(--gold)), hsl(var(--gold-light)));
@@ -499,7 +493,6 @@
   background: linear-gradient(135deg, hsl(var(--maroon-deep)), hsl(var(--maroon)));
 }
 
-
 /* ═══════════════════════════════════════════
    REVEAL SAFE (prefers-reduced-motion)
 ═══════════════════════════════════════════ */
@@ -507,7 +500,7 @@
   .reveal-safe { opacity: 1 !important; transform: none !important; }
 }
 
-/* Text visibility guard: entrance effects must never leave copy invisible. */
+/* Text visibility guard */
 .text-safe,
 .text-safe *,
 .reveal-safe,
@@ -516,6 +509,29 @@
   visibility: visible !important;
 }
 
+/* ═══════════════════════════════════════════
+   MOBILE OPTIMIZATIONS
+═══════════════════════════════════════════ */
 @media (max-width: 768px) {
   html { scroll-padding-top: 88px; }
+
+  /* Better text legibility on small screens */
+  body { font-size: 16px; } /* Prevent iOS zoom on inputs */
+
+  /* Prevent 3D transforms on mobile (GPU cost) */
+  .card-3d { transform: none !important; }
+  .preserve-3d { transform-style: flat !important; }
+
+  /* Reduce blur cost on mobile */
+  .glass-card,
+  .glass-card-dark {
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+}
+
+/* Safe area insets for notched phones */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+  .pt-safe { padding-top: env(safe-area-inset-top); }
 }
