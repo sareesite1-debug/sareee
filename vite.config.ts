@@ -6,21 +6,6 @@ import path from "path";
 export default defineConfig(({ mode }) => {
   const plugins = [react()];
 
-  // Only load lovable-tagger in development to avoid Vercel build failures
-  if (mode === "development") {
-    try {
-      import("lovable-tagger")
-        .then(({ componentTagger }) => {
-          plugins.push(componentTagger());
-        })
-        .catch(() => {
-          // lovable-tagger not available, skip
-        });
-    } catch {
-      // lovable-tagger not available, skip
-    }
-  }
-
   return {
     server: {
       host: "::",
@@ -46,29 +31,20 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: "dist",
       sourcemap: false,
-      // Target modern browsers for smaller output
       target: "es2020",
-      // Increase chunk warning threshold
       chunkSizeWarningLimit: 600,
       rollupOptions: {
         output: {
-          // Split vendor chunks to improve caching & parallel loading
           manualChunks: {
-            // React core — tiny, changes rarely
             "vendor-react": ["react", "react-dom", "react-router-dom"],
-            // Animation library — large, isolate so pages load fast
             "vendor-motion": ["framer-motion"],
-            // Query & supabase
             "vendor-query": ["@tanstack/react-query"],
-            // Icons
             "vendor-icons": ["lucide-react"],
           },
-          // Consistent hash-based file names for long-lived caching
           chunkFileNames: "assets/[name]-[hash].js",
           assetFileNames: "assets/[name]-[hash][extname]",
         },
       },
-      // Minification
       minify: "terser",
       terserOptions: {
         compress: {
@@ -80,7 +56,6 @@ export default defineConfig(({ mode }) => {
           comments: false,
         },
       },
-      // CSS code splitting
       cssCodeSplit: true,
     },
   };
