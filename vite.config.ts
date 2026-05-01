@@ -9,8 +9,13 @@ export default defineConfig(({ mode }) => {
   // Only load lovable-tagger in development to avoid Vercel build failures
   if (mode === "development") {
     try {
-      const { componentTagger } = require("lovable-tagger");
-      plugins.push(componentTagger());
+      import("lovable-tagger")
+        .then(({ componentTagger }) => {
+          plugins.push(componentTagger());
+        })
+        .catch(() => {
+          // lovable-tagger not available, skip
+        });
     } catch {
       // lovable-tagger not available, skip
     }
