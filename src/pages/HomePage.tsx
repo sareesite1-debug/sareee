@@ -319,7 +319,7 @@ const HomePage = () => {
             initial={{ opacity: 1, x: 40, y: -20 }}
             animate={{ opacity: 1, x: 0, y: 0 }}
             transition={{ duration: 1, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute top-[15%] right-[8%] bg-white/80 backdrop-blur-sm border border-gold/20 p-5 shadow-sm max-w-[200px]"
+            className="absolute top-[15%] right-[8%] bg-ivory/90 backdrop-blur-sm border border-gold/20 p-5 shadow-sm max-w-[200px]"
           >
             <p className="eyebrow text-gold-dark mb-2">Featured Craft</p>
             <p className="font-heading text-xl text-ink leading-tight">Kanchipuram Silk</p>
