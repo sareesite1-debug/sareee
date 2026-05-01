@@ -506,3 +506,16 @@
 @media (prefers-reduced-motion: reduce) {
   .reveal-safe { opacity: 1 !important; transform: none !important; }
 }
+
+/* Text visibility guard: entrance effects must never leave copy invisible. */
+.text-safe,
+.text-safe *,
+.reveal-safe,
+.reveal-safe * {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+@media (max-width: 768px) {
+  html { scroll-padding-top: 88px; }
+}
