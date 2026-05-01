@@ -75,18 +75,22 @@
 
 @layer base {
   * { @apply border-border; }
-  body {
-    @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', sans-serif;
-    overflow-x: hidden;
-  }
-  h1, h2, h3, h4, h5, h6 { font-family: 'Cormorant Garamond', serif; letter-spacing: -0.01em; }
-  ::selection { background: hsl(var(--gold) / 0.35); color: hsl(var(--ink)); }
   html {
     scroll-behavior: smooth;
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--gold) / 0.5) transparent;
   }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    color: hsl(var(--foreground));
+  }
+  #root { min-height: 100vh; background: hsl(var(--background)); color: hsl(var(--foreground)); }
+  h1, h2, h3, h4, h5, h6 { font-family: 'Cormorant Garamond', serif; letter-spacing: -0.01em; }
+  p, span, a, button, label, input, textarea, select, li, td, th { color: inherit; }
+  img { max-width: 100%; height: auto; }
+  ::selection { background: hsl(var(--gold) / 0.35); color: hsl(var(--ink)); }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
