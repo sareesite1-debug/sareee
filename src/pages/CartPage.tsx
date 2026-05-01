@@ -5,7 +5,7 @@ import { useCart } from "@/hooks/useCart";
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const { items, total, loading, updateQuantity, removeFromCart } = useCart();
+  const { items, total, loading, updateQty, removeItem } = useCart();
 
   if (loading) return <div className="container mx-auto px-6 py-32 font-body text-ink-soft">Loading...</div>;
 
@@ -44,7 +44,7 @@ const CartPage = () => {
                     transition={{ delay: i * 0.05, type: "spring", stiffness: 300, damping: 25 }}
                     className="flex gap-6 p-4 bg-ivory-deep/30 border border-gold/10 group hover:border-gold/30 transition-colors"
                   >
-                    <Link to={`/shop/${item.product?.slug}`} className="w-24 md:w-32 aspect-[3/4] shrink-0 bg-ivory overflow-hidden block">
+                    <Link to={item.product?.slug ? `/shop/${item.product.slug}` : "/shop"} className="w-24 md:w-32 aspect-[3/4] shrink-0 bg-ivory overflow-hidden block img-fit">
                       {item.product?.image_url ? (
                         <img src={item.product.image_url} alt={item.product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
                       ) : (
@@ -54,7 +54,7 @@ const CartPage = () => {
                     <div className="flex-1 flex flex-col min-w-0 py-2">
                       <div className="flex justify-between items-start gap-4">
                         <div>
-                          <Link to={`/shop/${item.product?.slug}`} className="font-heading text-xl text-ink hover:text-maroon transition-colors leading-tight line-clamp-2">
+                          <Link to={item.product?.slug ? `/shop/${item.product.slug}` : "/shop"} className="font-heading text-xl text-ink hover:text-maroon transition-colors leading-tight line-clamp-2">
                             {item.product?.name}
                           </Link>
                           <p className="text-xs text-ink-soft font-body mt-2">Handwoven</p>
@@ -64,11 +64,11 @@ const CartPage = () => {
                       
                       <div className="mt-auto pt-4 flex items-center justify-between">
                         <div className="inline-flex items-center border border-gold/20 bg-ivory">
-                          <button onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))} className="w-8 h-8 hover:bg-gold/10 transition-colors text-ink text-lg">−</button>
+                          <button onClick={() => updateQty(item.id, Math.max(1, item.quantity - 1))} className="w-8 h-8 hover:bg-gold/10 transition-colors text-ink text-lg">−</button>
                           <span className="w-10 text-center font-body text-sm text-ink">{item.quantity}</span>
-                          <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="w-8 h-8 hover:bg-gold/10 transition-colors text-ink text-lg">+</button>
+                          <button onClick={() => updateQty(item.id, item.quantity + 1)} className="w-8 h-8 hover:bg-gold/10 transition-colors text-ink text-lg">+</button>
                         </div>
-                        <button onClick={() => removeFromCart(item.id)} className="text-[9px] uppercase tracking-[0.2em] font-body text-rose hover:text-rose-600 inline-flex items-center gap-1.5 transition-colors">
+                        <button onClick={() => removeItem(item.id)} className="text-[9px] uppercase tracking-[0.2em] font-body text-rose hover:text-maroon inline-flex items-center gap-1.5 transition-colors">
                           <Trash2 size={11} /> Remove
                         </button>
                       </div>

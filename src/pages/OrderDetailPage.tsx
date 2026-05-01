@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Check, Package, Truck, Home, ArrowLeft, XCircle, MapPin, CreditCard } from "lucide-react";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 
 const trackingSteps = [
@@ -60,8 +60,8 @@ const OrderDetailPage = () => {
     } catch {}
   };
 
-  const containerVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
-  const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 25 } } };
+  const containerVariants: Variants = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
+  const itemVariants: Variants = { hidden: { opacity: 1, y: 14 }, visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 25 } } };
 
   return (
     <div className="bg-ivory min-h-screen">
@@ -82,12 +82,12 @@ const OrderDetailPage = () => {
             </div>
             <div className="flex flex-col items-end gap-3">
               <span className={`text-[10px] px-4 py-2 font-body uppercase tracking-[0.25em] border ${
-                order.status === "cancelled" ? "bg-rose-600/10 text-rose-600 border-rose-600/20" :
+                order.status === "cancelled" ? "bg-rose/10 text-rose border-rose/20" :
                 order.status === "paid" || order.status === "completed" ? "bg-emerald/10 text-emerald border-emerald/20" :
                 "bg-gold/10 text-gold-dark border-gold/20"
               }`}>{order.status}</span>
               {canCancel && (
-                <button onClick={cancelOrder} className="inline-flex items-center gap-2 text-[10px] text-ink-soft hover:text-rose-600 transition-colors font-body uppercase tracking-[0.2em]">
+                <button onClick={cancelOrder} className="inline-flex items-center gap-2 text-[10px] text-ink-soft hover:text-rose transition-colors font-body uppercase tracking-[0.2em]">
                   <XCircle size={12} /> Cancel Order
                 </button>
               )}
@@ -137,8 +137,8 @@ const OrderDetailPage = () => {
             </div>
             {order.status === "cancelled" && (
               <div className="absolute inset-0 bg-ivory/60 backdrop-blur-[2px] flex items-center justify-center z-20">
-                <div className="bg-white px-6 py-3 border border-rose-600/20 shadow-xl">
-                  <p className="font-display text-[10px] uppercase tracking-widest text-rose-600">Order Cancelled</p>
+                <div className="bg-ivory px-6 py-3 border border-rose/20 shadow-xl">
+                  <p className="font-display text-[10px] uppercase tracking-widest text-rose">Order Cancelled</p>
                 </div>
               </div>
             )}

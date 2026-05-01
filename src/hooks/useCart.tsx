@@ -6,7 +6,7 @@ export interface CartItem {
   id: string;
   product_id: string;
   quantity: number;
-  product?: { id: string; name: string; price: number; image_url: string | null; stock: number | null };
+  product?: { id: string; name: string; slug: string | null; price: number; image_url: string | null; stock: number | null };
 }
 
 interface CartContextValue {
@@ -33,7 +33,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     const { data, error } = await (supabase
       .from("cart_items") as any)
-      .select("id, product_id, quantity, product:products(id, name, price, image_url, stock)")
+      .select("id, product_id, quantity, product:products(id, name, slug, price, image_url, stock)")
       .eq("user_id", userId);
     if (!error) setItems(data || []);
     setLoading(false);
