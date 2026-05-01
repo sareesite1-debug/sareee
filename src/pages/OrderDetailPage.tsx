@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Check, Package, Truck, Home, ArrowLeft, XCircle, MapPin, CreditCard } from "lucide-react";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 
 const trackingSteps = [
@@ -60,8 +60,8 @@ const OrderDetailPage = () => {
     } catch {}
   };
 
-  const containerVariants = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
-  const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 25 } } };
+  const containerVariants: Variants = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
+  const itemVariants: Variants = { hidden: { opacity: 1, y: 14 }, visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 25 } } };
 
   return (
     <div className="bg-ivory min-h-screen">
