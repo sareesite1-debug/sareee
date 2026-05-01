@@ -262,6 +262,7 @@
     background-size: 300% 100%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    color: hsl(var(--gold));
     background-clip: text;
     animation: shimmer 5s ease-in-out infinite;
   }
@@ -269,6 +270,7 @@
     background: linear-gradient(135deg, hsl(var(--gold-dark)), hsl(var(--gold)), hsl(var(--gold-light)));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    color: hsl(var(--gold));
     background-clip: text;
   }
 
@@ -393,6 +395,10 @@
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+  .text-safe, .reveal-safe,
+  [data-framer-name], [style*="opacity: 0"], [style*="opacity:0"] {
+    visibility: visible !important;
   }
 
   /* ═══════════════════════════════════════════
