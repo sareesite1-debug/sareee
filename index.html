@@ -44,6 +44,19 @@
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
     <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
 
+    <!--
+      PERFORMANCE: Preload the LCP hero image so the browser fetches it
+      immediately alongside CSS/JS instead of waiting for React to paint.
+      The hash in the filename is set by Vite at build time — update this
+      if the image file changes.
+    -->
+    <link
+      rel="preload"
+      as="image"
+      href="/src/assets/hero-editorial.jpg"
+      fetchpriority="high"
+    />
+
     <!-- Google Fonts — non-render-blocking via media trick, then swap -->
     <link
       rel="stylesheet"
