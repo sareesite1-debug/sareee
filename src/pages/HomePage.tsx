@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import {
   motion,
@@ -27,9 +27,9 @@ const RevealWords = ({ text, className = "", delay = 0 }: { text: string; classN
         <span key={i} className="inline-block relative">
           <motion.span
             className="inline-block"
-            initial={{ y: 20, opacity: 1 }}
+            initial={{ y: 16, opacity: 0 }}
             animate={inView ? { y: 0, opacity: 1 } : {}}
-            transition={{ duration: 0.85, delay: delay + i * 0.04, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.6, delay: delay + i * 0.04, ease: [0.16, 1, 0.3, 1] }}
           >
             {word}&nbsp;
           </motion.span>
@@ -39,14 +39,22 @@ const RevealWords = ({ text, className = "", delay = 0 }: { text: string; classN
   );
 };
 
+/* Magnetic 3D card — disabled on mobile to avoid touch event conflicts */
 const Magnetic3DCard = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
   const ref = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(true);
+
+  useEffect(() => {
+    setIsMobile(window.matchMedia("(max-width: 1024px)").matches);
+  }, []);
+
   const x = useSpring(0, { stiffness: 150, damping: 20 });
   const y = useSpring(0, { stiffness: 150, damping: 20 });
   const rotateX = useSpring(0, { stiffness: 150, damping: 20 });
   const rotateY = useSpring(0, { stiffness: 150, damping: 20 });
 
   const handleMouse = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (isMobile) return;
     const el = ref.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
@@ -67,7 +75,7 @@ const Magnetic3DCard = ({ children, className = "" }: { children: React.ReactNod
       ref={ref}
       onMouseMove={handleMouse}
       onMouseLeave={reset}
-      style={{ x, y, rotateX, rotateY, transformStyle: "preserve-3d" }}
+      style={isMobile ? {} : { x, y, rotateX, rotateY, transformStyle: "preserve-3d" }}
       className={`${className} card-3d`}
     >
       {children}
@@ -77,13 +85,13 @@ const Magnetic3DCard = ({ children, className = "" }: { children: React.ReactNod
 
 const Marquee = () => (
   <div className="overflow-hidden border-y border-gold/20 py-4 bg-maroon-deep">
-    <div className="marquee-track">
+    <div className="marquee-track" aria-hidden="true">
       {[...Array(3)].map((_, r) => (
         <div key={r} className="flex items-center gap-12 pr-12">
           {["Kanchipuram Pure Silk", "Bridal Sarees", "Zari Weaves", "Temple Borders", "GI Certified", "Arpitha Saree Center", "Est. 1985 · Kanchipuram"].map((t, i) => (
             <span key={i} className="flex items-center gap-6 whitespace-nowrap">
               <span className="eyebrow text-ivory/75 tracking-[0.4em]">{t}</span>
-              <span className="text-gold/70 text-lg">◈</span>
+              <span className="text-gold/70 text-lg" aria-hidden="true">◈</span>
             </span>
           ))}
         </div>
@@ -99,11 +107,12 @@ const ScrollProgressLine = () => {
     <motion.div
       className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-gold-dark via-gold to-gold-light z-[100] origin-left"
       style={{ scaleX }}
+      aria-hidden="true"
     />
   );
 };
 
-/* ── Animated saree-pattern SVG background ── */
+/* ── Saree-pattern SVG background ── */
 const PatternBg = () => (
   <div
     className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.18] mix-blend-screen"
@@ -153,193 +162,140 @@ const HomePage = () => {
       {/* ══════════════════════════════════════════
           HERO — Split editorial layout
       ══════════════════════════════════════════ */}
-      <section ref={heroRef} className="relative min-h-screen flex flex-col lg:flex-row overflow-hidden pt-[80px] lg:pt-0 text-safe">
-
+      <section
+        ref={heroRef}
+        className="relative min-h-screen flex flex-col lg:flex-row overflow-hidden pt-[80px] lg:pt-0 text-safe"
+        aria-label="Hero section"
+      >
         {/* LEFT PANEL — Deep maroon with text */}
-        <div className="relative flex-1 lg:w-[52%] bg-maroon-deep flex items-center justify-center px-10 lg:px-20 py-32 lg:py-24 order-2 lg:order-1 min-h-[60vh] lg:min-h-screen">
+        <div className="relative flex-1 lg:w-[52%] bg-maroon-deep flex items-center justify-center px-6 sm:px-10 lg:px-20 py-16 lg:py-24 order-2 lg:order-1 min-h-[60vh] lg:min-h-screen">
           <PatternBg />
 
           {/* ambient glow */}
-          <div className="absolute top-1/3 left-1/3 w-80 h-80 rounded-full bg-gold/8 blur-[120px] pointer-events-none" />
+          <div className="absolute top-1/3 left-1/3 w-80 h-80 rounded-full bg-gold/8 blur-[120px] pointer-events-none" aria-hidden="true" />
 
-          <div className="relative z-10 max-w-lg">
+          <div className="relative z-10 max-w-lg w-full">
             {/* Eyebrow */}
             <motion.div
-              initial={{ opacity: 1, x: -24 }}
+              initial={{ opacity: 0, x: -24 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.9, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="flex items-center gap-4 mb-10"
+              transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+              className="flex items-center gap-4 mb-8 sm:mb-10"
             >
-              <div className="w-10 h-px bg-gold/60" />
+              <div className="w-10 h-px bg-gold/60" aria-hidden="true" />
               <span className="eyebrow text-gold/80">{hero.eyebrow || "Since 1985 · Arpitha Saree Center"}</span>
             </motion.div>
 
-            {/* Main headline */}
-            <h1 className="font-heading text-[clamp(3rem,5.5vw,5.5rem)] text-ivory leading-[1.05] mb-8">
-              <motion.span
-                className="block"
-                initial={{ opacity: 1, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              >
-                {hero.heading || "Woven in"}
-              </motion.span>
-              <motion.span
-                className="block italic text-gold"
-                initial={{ opacity: 1, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.65, ease: [0.16, 1, 0.3, 1] }}
-              >
-                Kanchipuram.
-              </motion.span>
-              <motion.span
-                className="block"
-                initial={{ opacity: 1, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              >
-                Worn with pride.
-              </motion.span>
+            {/* Main headline — LCP element: no animation delay on first word */}
+            <h1 className="font-heading text-[clamp(2.5rem,5.5vw,5.5rem)] text-ivory leading-[1.05] mb-6 sm:mb-8">
+              <span className="block">{hero.heading || "Woven in"}</span>
+              <span className="block italic text-gold">Kanchipuram.</span>
+              <span className="block">Worn with pride.</span>
             </h1>
 
             {/* Gold rule */}
             <motion.div
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
-              transition={{ duration: 1.2, delay: 1, ease: [0.76, 0, 0.24, 1] }}
-              className="h-px bg-gradient-to-r from-gold via-gold/60 to-transparent mb-8 origin-left"
+              transition={{ duration: 1, delay: 0.4, ease: [0.76, 0, 0.24, 1] }}
+              className="h-px bg-gradient-to-r from-gold via-gold/60 to-transparent mb-6 sm:mb-8 origin-left"
+              aria-hidden="true"
             />
 
             {/* Subtext */}
-            <motion.p
-              initial={{ opacity: 1, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 1.1, ease: [0.16, 1, 0.3, 1] }}
-              className="text-ivory/90 text-base font-body font-light leading-relaxed max-w-md mb-12"
-            >
+            <p className="text-ivory/90 text-base font-body font-light leading-relaxed max-w-md mb-10 sm:mb-12">
               {hero.subheading || "Pure Kanchipuram silk sarees, handwoven by master craftsmen — GI-certified, real zari, and crafted to last a lifetime."}
-            </motion.p>
+            </p>
 
             {/* CTAs */}
-            <motion.div
-              initial={{ opacity: 1, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 1.3, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-wrap items-center gap-6"
-            >
+            <div className="flex flex-wrap items-center gap-4 sm:gap-6">
               <Link to={hero.cta_link || "/shop"} className="luxury-btn group">
                 <span className="relative z-10">{hero.cta_label || "Discover the Edit"}</span>
-                <ArrowRight size={13} className="relative z-10 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight size={13} className="relative z-10 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
               </Link>
               <Link to="/categories" className="link-reveal font-display text-[9px] tracking-[0.35em] uppercase text-ivory/80 hover:text-gold transition-colors">
                 Browse Collections
               </Link>
-            </motion.div>
+            </div>
 
             {/* Stats row */}
-            <motion.div
-              initial={{ opacity: 1 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.8, duration: 0.8 }}
-              className="flex gap-10 mt-16 pt-8 border-t border-ivory/10"
-            >
+            <div className="flex gap-8 sm:gap-10 mt-12 sm:mt-16 pt-8 border-t border-ivory/10">
               {[["40+", "Years"], ["12+", "Regions"], ["5000+", "Sarees"]].map(([n, l]) => (
                 <div key={l}>
                   <p className="font-heading text-2xl text-gold leading-none">{n}</p>
                   <p className="font-display text-[8px] tracking-[0.3em] text-ivory/75 uppercase mt-1">{l}</p>
                 </div>
               ))}
-            </motion.div>
+            </div>
           </div>
         </div>
 
         {/* RIGHT PANEL — Ivory with decorative elements */}
         <div className="relative flex-1 lg:w-[48%] bg-ivory-deep flex items-center justify-center order-1 lg:order-2 min-h-[55vh] lg:min-h-screen overflow-hidden">
 
-          {/* Large decorative mandala / geometric */}
-          <motion.div
-            initial={{ opacity: 1, scale: 0.8, rotate: -15 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ duration: 1.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            <svg viewBox="0 0 500 500" className="w-[90%] max-w-[480px] opacity-20" xmlns="http://www.w3.org/2000/svg">
+          {/* Large decorative mandala */}
+          <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
+            <svg viewBox="0 0 500 500" className="w-[90%] max-w-[480px] opacity-20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <g fill="none" stroke="#6B0F1A" strokeWidth="1">
-                {/* Outer ring */}
-                <circle cx="250" cy="250" r="220"/>
-                <circle cx="250" cy="250" r="200"/>
-                <circle cx="250" cy="250" r="160"/>
-                <circle cx="250" cy="250" r="120"/>
-                <circle cx="250" cy="250" r="80"/>
-                <circle cx="250" cy="250" r="40"/>
-                {/* Radial lines */}
-                {Array.from({length: 24}).map((_, i) => {
+                <circle cx="250" cy="250" r="220" />
+                <circle cx="250" cy="250" r="200" />
+                <circle cx="250" cy="250" r="160" />
+                <circle cx="250" cy="250" r="120" />
+                <circle cx="250" cy="250" r="80" />
+                <circle cx="250" cy="250" r="40" />
+                {Array.from({ length: 24 }).map((_, i) => {
                   const angle = (i * 15 * Math.PI) / 180;
-                  return <line key={i} x1={250 + 40*Math.cos(angle)} y1={250 + 40*Math.sin(angle)} x2={250 + 220*Math.cos(angle)} y2={250 + 220*Math.sin(angle)} strokeWidth="0.6"/>;
+                  return <line key={i} x1={250 + 40 * Math.cos(angle)} y1={250 + 40 * Math.sin(angle)} x2={250 + 220 * Math.cos(angle)} y2={250 + 220 * Math.sin(angle)} strokeWidth="0.6" />;
                 })}
-                {/* Petal shapes */}
-                {Array.from({length: 8}).map((_, i) => {
+                {Array.from({ length: 8 }).map((_, i) => {
                   const angle = (i * 45 * Math.PI) / 180;
-                  const x = 250 + 130*Math.cos(angle);
-                  const y = 250 + 130*Math.sin(angle);
-                  return <ellipse key={i} cx={x} cy={y} rx="18" ry="35" stroke="#C9952A" strokeWidth="1" transform={`rotate(${i*45+90} ${x} ${y})`}/>;
+                  const x = 250 + 130 * Math.cos(angle);
+                  const y = 250 + 130 * Math.sin(angle);
+                  return <ellipse key={i} cx={x} cy={y} rx="18" ry="35" stroke="#C9952A" strokeWidth="1" transform={`rotate(${i * 45 + 90} ${x} ${y})`} />;
                 })}
               </g>
-              {/* Center diamond */}
-              <polygon points="250,225 275,250 250,275 225,250" fill="none" stroke="#C9952A" strokeWidth="1.5"/>
+              <polygon points="250,225 275,250 250,275 225,250" fill="none" stroke="#C9952A" strokeWidth="1.5" />
             </svg>
-          </motion.div>
+          </div>
 
-          {/* Editorial product image */}
-          <motion.div
-            initial={{ opacity: 1, y: 24, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 1.1, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
-            className="relative z-10 w-[58%] max-w-[360px] min-w-[240px]"
-          >
+          {/* Editorial product image — LCP: eager load, explicit dimensions */}
+          <div className="relative z-10 w-[58%] max-w-[360px] min-w-[240px]">
             <div className="relative aspect-[3/4] border border-gold/25 bg-ivory shadow-[0_32px_90px_-36px_hsl(var(--maroon-deep)/0.45)] p-3">
               <div className="img-fit h-full w-full bg-ivory-deep">
-                <img src={heroEditorial} alt="Premium silk saree drape from Arpitha Saree Center" />
+                <img
+                  src={heroEditorial}
+                  alt="Premium silk saree drape from Arpitha Saree Center, Kanchipuram"
+                  width="360"
+                  height="480"
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
+                />
               </div>
-              <div className="absolute -inset-3 border border-gold/20 pointer-events-none" />
-              <div className="absolute inset-3 bg-gradient-to-t from-maroon-deep/20 via-transparent to-ivory/10 pointer-events-none" />
+              <div className="absolute -inset-3 border border-gold/20 pointer-events-none" aria-hidden="true" />
+              <div className="absolute inset-3 bg-gradient-to-t from-maroon-deep/20 via-transparent to-ivory/10 pointer-events-none" aria-hidden="true" />
             </div>
-          </motion.div>
+          </div>
 
           {/* Floating craft cards */}
-          <motion.div
-            initial={{ opacity: 1, x: 40, y: -20 }}
-            animate={{ opacity: 1, x: 0, y: 0 }}
-            transition={{ duration: 1, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute top-[15%] right-[8%] bg-ivory/90 backdrop-blur-sm border border-gold/20 p-5 shadow-sm max-w-[200px]"
-          >
+          <div className="absolute top-[15%] right-[5%] sm:right-[8%] bg-ivory/90 backdrop-blur-sm border border-gold/20 p-4 sm:p-5 shadow-sm max-w-[180px] sm:max-w-[200px]">
             <p className="eyebrow text-gold-dark mb-2">Featured Craft</p>
-            <p className="font-heading text-xl text-ink leading-tight">Kanchipuram Silk</p>
+            <p className="font-heading text-lg sm:text-xl text-ink leading-tight">Kanchipuram Silk</p>
             <p className="font-body text-[11px] text-ink-soft mt-2">Pure mulberry silk · GI certified</p>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 1, x: -30, y: 30 }}
-            animate={{ opacity: 1, x: 0, y: 0 }}
-            transition={{ duration: 1, delay: 1.5, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute bottom-[15%] left-[8%] bg-maroon/5 border border-maroon/20 p-5 max-w-[180px]"
-          >
+          <div className="absolute bottom-[15%] left-[5%] sm:left-[8%] bg-maroon/5 border border-maroon/20 p-4 sm:p-5 max-w-[160px] sm:max-w-[180px]">
             <p className="font-heading text-3xl text-maroon leading-none">GI</p>
             <p className="font-display text-[8px] tracking-[0.3em] text-ink-soft uppercase mt-1">Certified weaves</p>
-          </motion.div>
+          </div>
 
           {/* Scroll indicator */}
-          <motion.div
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 2 }}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-          >
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2" aria-hidden="true">
             <span className="eyebrow text-ink-soft/70">Scroll</span>
             <motion.div animate={{ y: [0, 8, 0], opacity: [1, 0.4, 1] }} transition={{ repeat: Infinity, duration: 2 }}>
               <ChevronDown size={16} className="text-gold/50" />
             </motion.div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -354,57 +310,63 @@ const HomePage = () => {
       <Marquee />
 
       {/* COLLECTIONS GRID */}
-      <section className="py-32 lg:py-44 bg-ivory">
-        <div className="container mx-auto px-6 lg:px-10">
-          <div className="flex items-end justify-between mb-16 gap-6 flex-wrap">
+      <section className="py-20 sm:py-32 lg:py-44 bg-ivory" aria-labelledby="collections-heading">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10">
+          <div className="flex items-end justify-between mb-12 sm:mb-16 gap-6 flex-wrap">
             <div>
-              <motion.div initial={{ opacity: 1, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} className="flex items-center gap-3 mb-5">
-                <div className="w-8 h-px bg-gold-dark" />
+              <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="flex items-center gap-3 mb-5">
+                <div className="w-8 h-px bg-gold-dark" aria-hidden="true" />
                 <span className="eyebrow text-gold-dark">{featured.eyebrow || "The Collections"}</span>
               </motion.div>
-              <h2 className="text-display text-5xl md:text-6xl text-ink max-w-xl">
+              <h2 id="collections-heading" className="text-display text-4xl sm:text-5xl md:text-6xl text-ink max-w-xl">
                 <RevealWords text={featured.heading || "Each weave, a region's signature."} />
               </h2>
             </div>
-            <motion.div initial={{ opacity: 1 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.4, duration: 0.7 }}>
+            <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3, duration: 0.6 }}>
               <Link to="/categories" className="link-reveal font-display text-[9px] tracking-[0.3em] uppercase text-maroon">View all collections →</Link>
             </motion.div>
           </div>
 
           {categories.length === 0 ? (
-            <div className="border border-dashed border-gold/30 py-24 text-center">
-              <p className="font-heading text-3xl text-ink mb-2">Collections coming soon</p>
+            <div className="border border-dashed border-gold/30 py-16 sm:py-24 text-center">
+              <p className="font-heading text-2xl sm:text-3xl text-ink mb-2">Collections coming soon</p>
               <p className="text-sm text-ink-soft font-body">Add your first category from the admin panel.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 sm:gap-x-6 gap-y-12 sm:gap-y-16">
               {categories.map((c, i) => (
-                <motion.div key={c.id} initial={{ opacity: 1, y: 50 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ delay: i * 0.1, duration: 0.9, type: "spring", stiffness: 100 }}>
+                <motion.div key={c.id} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ delay: i * 0.08, duration: 0.7, type: "spring", stiffness: 120 }}>
                   <Magnetic3DCard className="perspective-1000">
                     <Link to={`/categories/${c.slug}`} className="group block">
-                      <div className="relative overflow-hidden aspect-[4/5] mb-6 bg-ivory-deep img-fit">
+                      <div className="relative overflow-hidden aspect-[4/5] mb-5 sm:mb-6 bg-ivory-deep img-fit">
                         {c.image_url ? (
                           <>
-                            <motion.img src={c.image_url} alt={c.name} whileHover={{ scale: 1.07 }} transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }} loading="lazy" />
-                            <motion.div className="absolute inset-0 bg-gradient-to-t from-maroon-deep/80 via-maroon/20 to-transparent" initial={{ opacity: 1 }} whileHover={{ opacity: 1 }} transition={{ duration: 0.5 }} />
-                            <motion.div className="absolute bottom-6 left-6 right-6" initial={{ y: 20, opacity: 1 }} whileHover={{ y: 0, opacity: 1 }} transition={{ duration: 0.4, type: "spring", stiffness: 300 }}>
+                            <img
+                              src={c.image_url}
+                              alt={`${c.name} saree collection`}
+                              loading="lazy"
+                              decoding="async"
+                              className="w-full h-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.07]"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-maroon-deep/80 via-maroon/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+                            <div className="absolute bottom-6 left-6 right-6 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-400">
                               <span className="font-display text-[8px] tracking-[0.4em] uppercase text-gold bg-maroon-deep/80 px-4 py-2 backdrop-blur-md">Explore</span>
-                            </motion.div>
+                            </div>
                           </>
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-ink-soft text-xs font-body uppercase tracking-widest">No image</div>
                         )}
-                        <div className="absolute inset-0 border border-gold/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 m-4 pointer-events-none" />
+                        <div className="absolute inset-0 border border-gold/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 m-4 pointer-events-none" aria-hidden="true" />
                       </div>
                       <div className="flex items-start justify-between">
-                        <div style={{ transform: "translateZ(30px)" }}>
+                        <div>
                           <p className="eyebrow text-gold-dark mb-2">No. {String(i + 1).padStart(2, "0")}</p>
-                          <h3 className="font-heading text-3xl text-ink group-hover:text-maroon transition-colors duration-300">{c.name}</h3>
+                          <h3 className="font-heading text-2xl sm:text-3xl text-ink group-hover:text-maroon transition-colors duration-300">{c.name}</h3>
                           {c.description && <p className="text-sm text-ink-soft mt-2 font-body leading-relaxed line-clamp-2">{c.description}</p>}
                         </div>
-                        <motion.div className="mt-2 w-8 h-8 border border-gold/30 flex items-center justify-center rounded-full" whileHover={{ rotate: 45, backgroundColor: "hsl(var(--gold)/0.1)" }} transition={{ duration: 0.3 }}>
+                        <div className="mt-2 w-8 h-8 border border-gold/30 flex items-center justify-center rounded-full group-hover:bg-gold/10 group-hover:border-gold transition-all duration-300" aria-hidden="true">
                           <ArrowRight size={12} className="text-gold-dark" />
-                        </motion.div>
+                        </div>
                       </div>
                     </Link>
                   </Magnetic3DCard>
@@ -416,58 +378,66 @@ const HomePage = () => {
       </section>
 
       {/* STORY - Scrollytelling */}
-      <section ref={storyRef} className="relative bg-maroon-deep overflow-hidden py-32 lg:py-44">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border border-gold/10 rounded-full pointer-events-none animate-pulse-glow" />
+      <section ref={storyRef} className="relative bg-maroon-deep overflow-hidden py-20 sm:py-32 lg:py-44" aria-labelledby="story-heading">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border border-gold/10 rounded-full pointer-events-none animate-pulse-glow" aria-hidden="true" />
 
-        <div className="container mx-auto px-6 lg:px-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
             <div className="lg:col-span-5 overflow-hidden">
               <motion.div style={{ y: storyImgY }} className="relative">
                 <div className="aspect-[4/5] overflow-hidden rounded-sm">
-                  <img src={craftImg} alt="Folded silk sarees" className="w-full h-full object-cover scale-110" loading="lazy" />
+                  <img
+                    src={craftImg}
+                    alt="Folded handwoven silk sarees at Arpitha Saree Center"
+                    className="w-full h-full object-cover scale-110"
+                    loading="lazy"
+                    decoding="async"
+                    width="480"
+                    height="600"
+                  />
                 </div>
-                <div className="absolute -bottom-4 -right-4 w-full h-full border border-gold/20 pointer-events-none" />
-                <motion.div initial={{ opacity: 1, scale: 0.8, y: 20 }} whileInView={{ opacity: 1, scale: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.5, duration: 0.8, type: "spring" }} className="absolute -bottom-8 -left-6 glass-card p-6">
-                  <p className="font-heading text-5xl text-maroon-deep leading-none">40+</p>
+                <div className="absolute -bottom-4 -right-4 w-full h-full border border-gold/20 pointer-events-none" aria-hidden="true" />
+                <motion.div initial={{ opacity: 0, scale: 0.8, y: 20 }} whileInView={{ opacity: 1, scale: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4, duration: 0.7, type: "spring" }} className="absolute -bottom-8 -left-4 sm:-left-6 glass-card p-5 sm:p-6">
+                  <p className="font-heading text-4xl sm:text-5xl text-maroon-deep leading-none">40+</p>
                   <p className="font-body text-xs text-ink-soft uppercase tracking-widest mt-1">Years of craft</p>
                 </motion.div>
               </motion.div>
             </div>
 
-            <div className="lg:col-span-6 lg:col-start-7">
-              <motion.div initial={{ opacity: 1, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-px bg-gold" />
+            <div className="lg:col-span-6 lg:col-start-7 mt-12 lg:mt-0">
+              <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} className="flex items-center gap-3 mb-6">
+                <div className="w-8 h-px bg-gold" aria-hidden="true" />
                 <span className="eyebrow text-gold">Our Story</span>
               </motion.div>
 
-              <h2 className="text-display text-4xl md:text-5xl lg:text-6xl text-ivory mb-8 leading-[1.0]">
+              <h2 id="story-heading" className="text-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-ivory mb-8 leading-[1.0]">
                 <RevealWords text="Four decades of cloth," className="text-ivory" />
                 <br />
                 <span className="italic"><RevealWords text="conversation & craft." className="text-gold" delay={0.2} /></span>
               </h2>
 
-              <motion.div initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 1 }} className="h-px bg-gradient-to-r from-gold to-transparent mb-8 origin-left" />
+              <motion.div initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 0.9 }} className="h-px bg-gradient-to-r from-gold to-transparent mb-8 origin-left" aria-hidden="true" />
 
               {[
                 "What began as a small store in Kanchipuram in 1985, Arpitha Saree Center is today a trusted destination for those who know that a Kanchipuram silk saree is more than a garment — it's a legacy woven in pure mulberry silk and real zari.",
                 "We source directly from master weavers of Kanchipuram, preserving centuries-old techniques — every saree GI-certified, every thread authentic.",
               ].map((para, i) => (
-                <motion.p key={i} initial={{ opacity: 1, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 + i * 0.15, duration: 0.8 }} className="text-ivory/90 font-body leading-relaxed mb-5 text-[15px]">
+                <motion.p key={i} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.15 + i * 0.12, duration: 0.7 }} className="text-ivory/90 font-body leading-relaxed mb-5 text-[15px]">
                   {para}
                 </motion.p>
               ))}
 
-               <motion.div initial={{ opacity: 1, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.5, duration: 0.8 }} className="grid grid-cols-3 gap-6 my-10 border-t border-b border-ivory/10 py-8 relative">
-                <div className="absolute inset-0 bg-gold/5 blur-xl pointer-events-none" />
+              <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4, duration: 0.7 }} className="grid grid-cols-3 gap-4 sm:gap-6 my-8 sm:my-10 border-t border-b border-ivory/10 py-6 sm:py-8 relative">
+                <div className="absolute inset-0 bg-gold/5 blur-xl pointer-events-none" aria-hidden="true" />
                 {[["1985", "Est."], ["12+", "Weaving regions"], ["5000+", "Sarees curated"]].map(([num, label]) => (
                   <div key={label} className="relative z-10">
-                    <p className="font-heading text-3xl text-gold leading-none">{num}</p>
+                    <p className="font-heading text-2xl sm:text-3xl text-gold leading-none">{num}</p>
                     <p className="font-body text-[10px] text-ivory/65 uppercase tracking-widest mt-1">{label}</p>
                   </div>
                 ))}
               </motion.div>
 
-              <motion.div initial={{ opacity: 1 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.7 }}>
+              <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.6 }}>
                 <Link to="/about" className="link-reveal font-display text-[9px] tracking-[0.35em] uppercase text-gold">Read the full story →</Link>
               </motion.div>
             </div>
@@ -477,40 +447,45 @@ const HomePage = () => {
 
       {/* FEATURED PRODUCTS */}
       {featuredProducts.length > 0 && (
-        <section className="py-32 lg:py-44 bg-ivory">
-          <div className="container mx-auto px-6 lg:px-10">
-            <div className="flex items-end justify-between mb-16 gap-6 flex-wrap">
+        <section className="py-20 sm:py-32 lg:py-44 bg-ivory" aria-labelledby="products-heading">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-10">
+            <div className="flex items-end justify-between mb-12 sm:mb-16 gap-6 flex-wrap">
               <div>
-                <motion.div initial={{ opacity: 1, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="flex items-center gap-3 mb-5">
-                  <div className="w-8 h-px bg-gold-dark" />
+                <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="flex items-center gap-3 mb-5">
+                  <div className="w-8 h-px bg-gold-dark" aria-hidden="true" />
                   <span className="eyebrow text-gold-dark">New In</span>
                 </motion.div>
-                <h2 className="text-display text-5xl md:text-6xl text-ink">
+                <h2 id="products-heading" className="text-display text-4xl sm:text-5xl md:text-6xl text-ink">
                   <RevealWords text="Fresh from the loom." />
                 </h2>
               </div>
               <Link to="/shop" className="link-reveal font-display text-[9px] tracking-[0.3em] uppercase text-maroon">Shop all →</Link>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-16">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 sm:gap-x-5 gap-y-10 sm:gap-y-16">
               {featuredProducts.map((p, i) => (
-                <motion.div key={p.id} initial={{ opacity: 1, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ delay: i * 0.07, duration: 0.8, type: "spring", stiffness: 100 }}>
+                <motion.div key={p.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ delay: i * 0.06, duration: 0.6, type: "spring", stiffness: 120 }}>
                   <Link to={`/shop/${p.slug}`} className="group block relative">
-                    <div className="absolute inset-0 bg-gold/5 blur-2xl scale-0 group-hover:scale-110 transition-transform duration-700 pointer-events-none" />
-                    <div className="relative overflow-hidden aspect-[3/4] mb-5 bg-ivory-deep border border-gold/10 img-fit">
+                    <div className="relative overflow-hidden aspect-[3/4] mb-4 sm:mb-5 bg-ivory-deep border border-gold/10 img-fit">
                       {p.image_url ? (
                         <>
-                          <motion.img src={p.image_url} alt={p.name} whileHover={{ scale: 1.06 }} transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }} loading="lazy" />
-                          <motion.div className="absolute inset-0 bg-maroon-deep/40" initial={{ opacity: 1 }} whileHover={{ opacity: 1 }} transition={{ duration: 0.4 }} />
-                          <motion.div className="absolute bottom-4 left-0 right-0 text-center" initial={{ y: 20, opacity: 1 }} whileHover={{ y: 0, opacity: 1 }} transition={{ duration: 0.35, type: "spring" }}>
+                          <img
+                            src={p.image_url}
+                            alt={`${p.name} - Buy saree online`}
+                            loading="lazy"
+                            decoding="async"
+                            className="w-full h-full object-cover transition-transform duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.06]"
+                          />
+                          <div className="absolute inset-0 bg-maroon-deep/40 opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+                          <div className="absolute bottom-4 left-0 right-0 text-center translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-350">
                             <span className="font-display text-[8px] tracking-[0.4em] uppercase text-ivory glass-card-dark border-none px-4 py-2">Quick view</span>
-                          </motion.div>
+                          </div>
                         </>
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-ink-soft text-xs font-body uppercase tracking-widest">No image</div>
                       )}
                     </div>
-                    <h3 className="font-heading text-xl text-ink group-hover:text-maroon transition-colors leading-tight">{p.name}</h3>
+                    <h3 className="font-heading text-lg sm:text-xl text-ink group-hover:text-maroon transition-colors leading-tight">{p.name}</h3>
                     <p className="font-body text-sm text-gold-dark mt-1">₹{Number(p.price).toLocaleString("en-IN")}</p>
                   </Link>
                 </motion.div>
@@ -521,21 +496,21 @@ const HomePage = () => {
       )}
 
       {/* TRUST STRIP */}
-      <section className="bg-ivory-deep py-20 border-y border-gold/15 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(hsl(var(--gold))_1px,transparent_1px)] [background-size:16px_16px]" />
-        <div className="container mx-auto px-6 relative z-10">
+      <section className="bg-ivory-deep py-16 sm:py-20 border-y border-gold/15 relative overflow-hidden" aria-label="Why shop with us">
+        <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(hsl(var(--gold))_1px,transparent_1px)] [background-size:16px_16px]" aria-hidden="true" />
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-gold/15">
             {[
               { icon: Sparkles, title: "Handwoven & sourced", desc: "Direct from master weavers, ethically priced and fairly traded." },
               { icon: Shield, title: "Authenticity, certified", desc: "Each piece verified by our in-house textile team before listing." },
               { icon: Truck, title: "Insured, tracked delivery", desc: "Pan-India shipping with care. Free above ₹5,000." },
             ].map((t, i) => (
-              <motion.div key={t.title} initial={{ opacity: 1, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.7, type: "spring" }} className="flex items-start gap-5 px-10 py-8 group">
-                <motion.div whileHover={{ rotate: 15, scale: 1.1 }} className="w-10 h-10 border border-gold/30 flex items-center justify-center shrink-0 mt-1 bg-ivory rounded-full group-hover:border-gold transition-colors">
+              <motion.div key={t.title} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.6, type: "spring" }} className="flex items-start gap-4 sm:gap-5 px-6 sm:px-10 py-7 sm:py-8 group">
+                <div className="w-10 h-10 border border-gold/30 flex items-center justify-center shrink-0 mt-1 bg-ivory rounded-full group-hover:border-gold transition-colors" aria-hidden="true">
                   <t.icon size={16} className="text-gold-dark" strokeWidth={1.2} />
-                </motion.div>
+                </div>
                 <div>
-                  <h3 className="font-heading text-xl text-ink mb-1.5">{t.title}</h3>
+                  <h3 className="font-heading text-lg sm:text-xl text-ink mb-1.5">{t.title}</h3>
                   <p className="text-sm text-ink-soft font-body leading-relaxed">{t.desc}</p>
                 </div>
               </motion.div>
@@ -545,30 +520,30 @@ const HomePage = () => {
       </section>
 
       {/* CTA */}
-      <section className="relative py-32 lg:py-44 bg-maroon-deep overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gold/5 rounded-full blur-[100px] pointer-events-none animate-pulse-glow" />
+      <section className="relative py-20 sm:py-32 lg:py-44 bg-maroon-deep overflow-hidden" aria-labelledby="cta-heading">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gold/5 rounded-full blur-[100px] pointer-events-none animate-pulse-glow" aria-hidden="true" />
 
-        <div className="container mx-auto px-6 text-center max-w-2xl relative z-10">
-          <motion.div initial={{ opacity: 1 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="flex items-center justify-center gap-3 mb-6">
-            <div className="w-8 h-px bg-gold/40" />
+        <div className="container mx-auto px-4 sm:px-6 text-center max-w-2xl relative z-10">
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="flex items-center justify-center gap-3 mb-6">
+            <div className="w-8 h-px bg-gold/40" aria-hidden="true" />
             <span className="eyebrow text-gold">Visit Arpitha Saree Center</span>
-            <div className="w-8 h-px bg-gold/40" />
+            <div className="w-8 h-px bg-gold/40" aria-hidden="true" />
           </motion.div>
 
-          <h2 className="text-display text-4xl md:text-6xl text-ivory mb-8 leading-[1.0]">
+          <h2 id="cta-heading" className="text-display text-3xl sm:text-4xl md:text-6xl text-ivory mb-8 leading-[1.0]">
             <RevealWords text="A saree is best" className="text-ivory" />
             <br />
             <span className="italic"><RevealWords text="chosen in person." className="text-gold/90" delay={0.2} /></span>
           </h2>
 
-          <motion.p initial={{ opacity: 1, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.5 }} className="text-ivory/85 font-body mb-12 leading-relaxed">
+          <motion.p initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4 }} className="text-ivory/85 font-body mb-10 sm:mb-12 leading-relaxed text-sm sm:text-base">
             Step into Arpitha Saree Center in Kanchipuram and experience the joy of choosing your pure silk saree in person — feel the zari, touch the silk, and find the one that's truly yours.
           </motion.p>
 
-          <motion.div initial={{ opacity: 1, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 0.7, type: "spring" }}>
-            <Link to="/contact" className="btn-liquid border border-gold/50 text-gold px-10 py-4 font-display text-[9px] tracking-[0.35em] uppercase inline-flex items-center gap-3 hover:text-maroon-deep transition-colors duration-500 group">
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 0.6, type: "spring" }}>
+            <Link to="/contact" className="btn-liquid border border-gold/50 text-gold px-8 sm:px-10 py-4 font-display text-[9px] tracking-[0.35em] uppercase inline-flex items-center gap-3 hover:text-maroon-deep transition-colors duration-500 group">
               Get directions
-              <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
+              <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" aria-hidden="true" />
             </Link>
           </motion.div>
         </div>
