@@ -13,4 +13,4 @@ User-agent: Bingbot
 Allow: /
 
 # Sitemap location
-Sitemap: https://arpithasarees.com/sitemap.xml
+Sitemap: https://arpithasareecenter.vercel.app/sitemap.xml
