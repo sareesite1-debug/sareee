@@ -77,12 +77,11 @@ const ProductDetailPage = () => {
                 style={{ rotateX: y, rotateY: x, transformStyle: "preserve-3d" }}
                 className="relative bg-ivory-deep border border-gold/15 p-4 rounded-sm shadow-2xl"
               >
-                <div className="relative overflow-hidden aspect-[3/4] group" style={{ transform: "translateZ(30px)" }}>
+                <div className="relative overflow-hidden aspect-[3/4] group img-fit" style={{ transform: "translateZ(30px)" }}>
                   {product.image_url ? (
                     <motion.img
                       src={product.image_url}
                       alt={product.name}
-                      className="w-full h-full object-cover"
                       whileHover={{ scale: 1.15 }}
                       transition={{ duration: 1.5, ease: [0.23, 1, 0.32, 1] }}
                     />
