@@ -5,7 +5,7 @@ import { motion, useSpring } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/hooks/useCart";
 
-interface Product { id: string; name: string; description: string | null; price: number; compare_at_price: number | null; image_url: string | null; stock: number | null; category_id: string | null; }
+interface Product { id: string; name: string; description: string | null; price: number; compare_at_price: number | null; image_url: string | null; stock: number | null; status: string; category_id: string | null; }
 
 const ProductDetailPage = () => {
   const { slug } = useParams();
@@ -130,20 +130,28 @@ const ProductDetailPage = () => {
               )}
 
               <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="flex items-center gap-6 pt-2">
-                <label className="text-[10px] uppercase tracking-[0.25em] font-body text-ink-soft">Quantity</label>
-                <div className="inline-flex items-center border border-gold/20 bg-card">
-                  <motion.button whileTap={{ scale: 0.9 }} onClick={() => setQty(Math.max(1, qty - 1))} className="w-10 h-10 hover:bg-gold/10 transition-colors text-ink text-lg">−</motion.button>
-                  <input type="number" value={qty} onChange={e => setQty(Math.max(1, Number(e.target.value)))} className="w-14 text-center bg-transparent border-x border-gold/20 font-body h-10 focus:outline-none" />
-                  <motion.button whileTap={{ scale: 0.9 }} onClick={() => setQty(qty + 1)} className="w-10 h-10 hover:bg-gold/10 transition-colors text-ink text-lg">+</motion.button>
-                </div>
-                {product.stock != null && product.stock > 0 && <span className="text-xs text-maroon font-body bg-maroon/10 px-3 py-1.5">{product.stock} in stock</span>}
+                {product.status === 'out_of_stock' ? (
+                  <span className="inline-flex items-center gap-2 px-4 py-2 bg-ink/5 border border-ink/10 text-ink-soft font-body text-xs uppercase tracking-[0.25em]">
+                    Out of Stock
+                  </span>
+                ) : (
+                  <>
+                    <label className="text-[10px] uppercase tracking-[0.25em] font-body text-ink-soft">Quantity</label>
+                    <div className="inline-flex items-center border border-gold/20 bg-card">
+                      <motion.button whileTap={{ scale: 0.9 }} onClick={() => setQty(Math.max(1, qty - 1))} className="w-10 h-10 hover:bg-gold/10 transition-colors text-ink text-lg">−</motion.button>
+                      <input type="number" value={qty} onChange={e => setQty(Math.max(1, Math.min(product.stock ?? 999, Number(e.target.value))))} className="w-14 text-center bg-transparent border-x border-gold/20 font-body h-10 focus:outline-none" />
+                      <motion.button whileTap={{ scale: 0.9 }} onClick={() => setQty(Math.min(product.stock ?? 999, qty + 1))} className="w-10 h-10 hover:bg-gold/10 transition-colors text-ink text-lg">+</motion.button>
+                    </div>
+                    {product.stock != null && product.stock > 0 && <span className="text-xs text-maroon font-body bg-maroon/10 px-3 py-1.5">{product.stock} in stock</span>}
+                  </>
+                )}
               </motion.div>
 
               <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="grid grid-cols-2 gap-4 pt-6">
-                <button onClick={() => addToCart(product.id, qty)} className="btn-outline-emerald border-gold/50 text-ink hover:border-maroon hover:text-ivory py-4">
+                <button onClick={() => addToCart(product.id, qty)} disabled={product.status === 'out_of_stock'} className="btn-outline-emerald border-gold/50 text-ink hover:border-maroon hover:text-ivory py-4 disabled:opacity-40 disabled:cursor-not-allowed">
                   <ShoppingBag size={14} /> Add to bag
                 </button>
-                <button onClick={handleBuyNow} className="btn-liquid btn-emerald py-4 border border-maroon-deep">
+                <button onClick={handleBuyNow} disabled={product.status === 'out_of_stock'} className="btn-liquid btn-emerald py-4 border border-maroon-deep disabled:opacity-40 disabled:cursor-not-allowed">
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     <Zap size={14} /> Buy now
                   </span>
