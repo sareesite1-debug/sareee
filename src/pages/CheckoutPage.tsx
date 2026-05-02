@@ -148,7 +148,7 @@ const CheckoutPage = () => {
                     <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                       <div className="mb-4">
                         <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft">Complete Address *</label>
-                        <textarea value={form.shipping_address} onChange={e => setForm({ ...form, shipping_address: e.target.value })} required rows={3}
+                        <textarea value={form.shipping_address} onChange={e => { const v = e.target.value; setForm(f => ({ ...f, shipping_address: v })); }} required rows={3}
                           className="w-full border border-gold/20 bg-ivory-deep/30 p-4 text-sm font-body focus:outline-none focus:border-maroon transition-colors resize-none placeholder:text-ink-soft/30" placeholder="Street, area, city, pincode" />
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
@@ -198,7 +198,7 @@ const CheckoutPage = () => {
                         <motion.div
                           key={p.v}
                           whileTap={{ scale: 0.98 }}
-                          onClick={() => setForm({ ...form, payment_method: p.v as any })}
+                          onClick={() => setForm(f => ({ ...f, payment_method: p.v as any }))}
                           className={`cursor-pointer p-6 border transition-all duration-300 relative flex items-start gap-4 ${form.payment_method === p.v ? "border-maroon bg-emerald/5 shadow-[0_0_20px_hsl(var(--emerald)/0.1)]" : "border-gold/20 bg-ivory-deep/20 hover:border-gold/50"}`}
                         >
                           <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 mt-0.5 ${form.payment_method === p.v ? "border-maroon" : "border-gold/40"}`}>
