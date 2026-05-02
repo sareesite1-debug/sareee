@@ -1,13 +1,7 @@
-import { useEffect, useState, useRef, lazy, Suspense } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useSpring,
-  useInView,
-} from "framer-motion";
-import { ArrowRight, Sparkles, Shield, Truck, ChevronDown } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowRight, Sparkles, Shield, Truck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import craftImg from "@/assets/craft-silks.jpg";
 import heroEditorial from "@/assets/hero-editorial.jpg";
@@ -17,71 +11,26 @@ interface Category { id: string; name: string; slug: string; image_url: string |
 interface Product { id: string; name: string; slug: string; price: number; image_url: string | null; }
 interface Section { section_key: string; content: any; }
 
-const RevealWords = ({ text, className = "", delay = 0 }: { text: string; className?: string; delay?: number }) => {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-  const words = text.split(" ");
-  return (
-    <span ref={ref} className={className} aria-label={text}>
-      {words.map((word, i) => (
-        <span key={i} className="inline-block relative">
-          <motion.span
-            className="inline-block"
-            initial={{ y: 16, opacity: 0 }}
-            animate={inView ? { y: 0, opacity: 1 } : {}}
-            transition={{ duration: 0.6, delay: delay + i * 0.04, ease: [0.16, 1, 0.3, 1] }}
-          >
-            {word}&nbsp;
-          </motion.span>
-        </span>
-      ))}
-    </span>
-  );
-};
-
-/* Magnetic 3D card — disabled on mobile to avoid touch event conflicts */
-const Magnetic3DCard = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const [isMobile, setIsMobile] = useState(true);
-
-  useEffect(() => {
-    setIsMobile(window.matchMedia("(max-width: 1024px)").matches);
-  }, []);
-
-  const x = useSpring(0, { stiffness: 150, damping: 20 });
-  const y = useSpring(0, { stiffness: 150, damping: 20 });
-  const rotateX = useSpring(0, { stiffness: 150, damping: 20 });
-  const rotateY = useSpring(0, { stiffness: 150, damping: 20 });
-
-  const handleMouse = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isMobile) return;
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = (e.clientX - cx) / (rect.width / 2);
-    const dy = (e.clientY - cy) / (rect.height / 2);
-    rotateX.set(-dy * 8);
-    rotateY.set(dx * 8);
-    x.set(dx * 6);
-    y.set(dy * 6);
-  };
-
-  const reset = () => { x.set(0); y.set(0); rotateX.set(0); rotateY.set(0); };
-
-  return (
-    <motion.div
-      ref={ref}
-      onMouseMove={handleMouse}
-      onMouseLeave={reset}
-      style={isMobile ? {} : { x, y, rotateX, rotateY, transformStyle: "preserve-3d" }}
-      className={`${className} card-3d`}
-    >
-      {children}
-    </motion.div>
-  );
-};
+/* Lightweight CSS-only fade-up — no JS work per element, no scroll listeners. */
+const FadeUp = ({
+  children,
+  className = "",
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+}) => (
+  <motion.div
+    initial={{ opacity: 0, y: 16 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, margin: "-40px" }}
+    transition={{ duration: 0.5, delay, ease: "easeOut" }}
+    className={className}
+  >
+    {children}
+  </motion.div>
+);
 
 const Marquee = () => (
   <div className="overflow-hidden border-y border-gold/20 py-4 bg-maroon-deep">
@@ -100,19 +49,6 @@ const Marquee = () => (
   </div>
 );
 
-const ScrollProgressLine = () => {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
-  return (
-    <motion.div
-      className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-gold-dark via-gold to-gold-light z-[100] origin-left"
-      style={{ scaleX }}
-      aria-hidden="true"
-    />
-  );
-};
-
-/* ── Saree-pattern SVG background ── */
 const PatternBg = () => (
   <div
     className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.18] mix-blend-screen"
@@ -129,11 +65,6 @@ const HomePage = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [sections, setSections] = useState<Record<string, any>>({});
-
-  const heroRef = useRef(null);
-  const storyRef = useRef(null);
-  const { scrollYProgress: storyScroll } = useScroll({ target: storyRef, offset: ["start end", "end start"] });
-  const storyImgY = useTransform(storyScroll, [0, 1], ["-8%", "8%"]);
 
   useEffect(() => {
     (async () => {
@@ -153,61 +84,37 @@ const HomePage = () => {
   const hero = sections.hero || {};
   const featured = sections.featured_collections || {};
   const promo = sections.promotions || {};
-  const testimonials = (sections.testimonials?.items || []) as { name: string; quote: string }[];
 
   return (
     <div className="bg-ivory overflow-x-hidden">
-      <ScrollProgressLine />
-
-      {/* ══════════════════════════════════════════
-          HERO — Split editorial layout
-      ══════════════════════════════════════════ */}
+      {/* HERO */}
       <section
-        ref={heroRef}
         className="relative min-h-screen flex flex-col lg:flex-row overflow-hidden pt-[80px] lg:pt-0 text-safe"
         aria-label="Hero section"
       >
-        {/* LEFT PANEL — Deep maroon with text */}
+        {/* LEFT PANEL */}
         <div className="relative flex-1 lg:w-[52%] bg-maroon-deep flex items-center justify-center px-6 sm:px-10 lg:px-20 py-16 lg:py-24 order-2 lg:order-1 min-h-[60vh] lg:min-h-screen">
           <PatternBg />
-
-          {/* ambient glow */}
           <div className="absolute top-1/3 left-1/3 w-80 h-80 rounded-full bg-gold/8 blur-[120px] pointer-events-none" aria-hidden="true" />
 
           <div className="relative z-10 max-w-lg w-full">
-            {/* Eyebrow */}
-            <motion.div
-              initial={{ opacity: 0, x: -24 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.7, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="flex items-center gap-4 mb-8 sm:mb-10"
-            >
+            <div className="flex items-center gap-4 mb-8 sm:mb-10">
               <div className="w-10 h-px bg-gold/60" aria-hidden="true" />
               <span className="eyebrow text-gold/80">{hero.eyebrow || "Since 1985 · Arpitha Saree Center"}</span>
-            </motion.div>
+            </div>
 
-            {/* Main headline — LCP element: no animation delay on first word */}
             <h1 className="font-heading text-[clamp(2.5rem,5.5vw,5.5rem)] text-ivory leading-[1.05] mb-6 sm:mb-8">
               <span className="block">{hero.heading || "Woven in"}</span>
               <span className="block italic text-gold">Kanchipuram.</span>
               <span className="block">Worn with pride.</span>
             </h1>
 
-            {/* Gold rule */}
-            <motion.div
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              transition={{ duration: 1, delay: 0.4, ease: [0.76, 0, 0.24, 1] }}
-              className="h-px bg-gradient-to-r from-gold via-gold/60 to-transparent mb-6 sm:mb-8 origin-left"
-              aria-hidden="true"
-            />
+            <div className="h-px bg-gradient-to-r from-gold via-gold/60 to-transparent mb-6 sm:mb-8" aria-hidden="true" />
 
-            {/* Subtext */}
             <p className="text-ivory/90 text-base font-body font-light leading-relaxed max-w-md mb-10 sm:mb-12">
               {hero.subheading || "Pure Kanchipuram silk sarees, handwoven by master craftsmen — GI-certified, real zari, and crafted to last a lifetime."}
             </p>
 
-            {/* CTAs */}
             <div className="flex flex-wrap items-center gap-4 sm:gap-6">
               <Link to={hero.cta_link || "/shop"} className="luxury-btn group">
                 <span className="relative z-10">{hero.cta_label || "Discover the Edit"}</span>
@@ -218,7 +125,6 @@ const HomePage = () => {
               </Link>
             </div>
 
-            {/* Stats row */}
             <div className="flex gap-8 sm:gap-10 mt-12 sm:mt-16 pt-8 border-t border-ivory/10">
               {[["40+", "Years"], ["12+", "Regions"], ["5000+", "Sarees"]].map(([n, l]) => (
                 <div key={l}>
@@ -230,10 +136,8 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* RIGHT PANEL — Ivory with decorative elements */}
+        {/* RIGHT PANEL */}
         <div className="relative flex-1 lg:w-[48%] bg-ivory-deep flex items-center justify-center order-1 lg:order-2 min-h-[55vh] lg:min-h-screen overflow-hidden">
-
-          {/* Large decorative mandala */}
           <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
             <svg viewBox="0 0 500 500" className="w-[90%] max-w-[480px] opacity-20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <g fill="none" stroke="#6B0F1A" strokeWidth="1">
@@ -258,7 +162,6 @@ const HomePage = () => {
             </svg>
           </div>
 
-          {/* Editorial product image — LCP: eager load, explicit dimensions */}
           <div className="relative z-10 w-[58%] max-w-[360px] min-w-[240px]">
             <div className="relative aspect-[3/4] border border-gold/25 bg-ivory shadow-[0_32px_90px_-36px_hsl(var(--maroon-deep)/0.45)] p-3">
               <div className="img-fit h-full w-full bg-ivory-deep">
@@ -277,7 +180,6 @@ const HomePage = () => {
             </div>
           </div>
 
-          {/* Floating craft cards */}
           <div className="absolute top-[15%] right-[5%] sm:right-[8%] bg-ivory/90 backdrop-blur-sm border border-gold/20 p-4 sm:p-5 shadow-sm max-w-[180px] sm:max-w-[200px]">
             <p className="eyebrow text-gold-dark mb-2">Featured Craft</p>
             <p className="font-heading text-lg sm:text-xl text-ink leading-tight">Kanchipuram Silk</p>
@@ -287,14 +189,6 @@ const HomePage = () => {
           <div className="absolute bottom-[15%] left-[5%] sm:left-[8%] bg-maroon/5 border border-maroon/20 p-4 sm:p-5 max-w-[160px] sm:max-w-[180px]">
             <p className="font-heading text-3xl text-maroon leading-none">GI</p>
             <p className="font-display text-[8px] tracking-[0.3em] text-ink-soft uppercase mt-1">Certified weaves</p>
-          </div>
-
-          {/* Scroll indicator */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2" aria-hidden="true">
-            <span className="eyebrow text-ink-soft/70">Scroll</span>
-            <motion.div animate={{ y: [0, 8, 0], opacity: [1, 0.4, 1] }} transition={{ repeat: Infinity, duration: 2 }}>
-              <ChevronDown size={16} className="text-gold/50" />
-            </motion.div>
           </div>
         </div>
       </section>
@@ -314,17 +208,15 @@ const HomePage = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-10">
           <div className="flex items-end justify-between mb-12 sm:mb-16 gap-6 flex-wrap">
             <div>
-              <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="flex items-center gap-3 mb-5">
+              <div className="flex items-center gap-3 mb-5">
                 <div className="w-8 h-px bg-gold-dark" aria-hidden="true" />
                 <span className="eyebrow text-gold-dark">{featured.eyebrow || "The Collections"}</span>
-              </motion.div>
+              </div>
               <h2 id="collections-heading" className="text-display text-4xl sm:text-5xl md:text-6xl text-ink max-w-xl">
-                <RevealWords text={featured.heading || "Each weave, a region's signature."} />
+                {featured.heading || "Each weave, a region's signature."}
               </h2>
             </div>
-            <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.3, duration: 0.6 }}>
-              <Link to="/categories" className="link-reveal font-display text-[9px] tracking-[0.3em] uppercase text-maroon">View all collections →</Link>
-            </motion.div>
+            <Link to="/categories" className="link-reveal font-display text-[9px] tracking-[0.3em] uppercase text-maroon">View all collections →</Link>
           </div>
 
           {categories.length === 0 ? (
@@ -335,61 +227,53 @@ const HomePage = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 sm:gap-x-6 gap-y-12 sm:gap-y-16">
               {categories.map((c, i) => (
-                <motion.div key={c.id} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ delay: i * 0.08, duration: 0.7, type: "spring", stiffness: 120 }}>
-                  <Magnetic3DCard className="perspective-1000">
-                    <Link to={`/categories/${c.slug}`} className="group block">
-                      <div className="relative overflow-hidden aspect-[4/5] mb-5 sm:mb-6 bg-ivory-deep img-fit">
-                        {c.image_url ? (
-                          <>
-                            <img
-                              src={c.image_url}
-                              alt={`${c.name} saree collection`}
-                              loading="lazy"
-                              decoding="async"
-                              className="w-full h-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.07]"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-maroon-deep/80 via-maroon/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
-                            <div className="absolute bottom-6 left-6 right-6 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-400">
-                              <span className="font-display text-[8px] tracking-[0.4em] uppercase text-gold bg-maroon-deep/80 px-4 py-2 backdrop-blur-md">Explore</span>
-                            </div>
-                          </>
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-ink-soft text-xs font-body uppercase tracking-widest">No image</div>
-                        )}
-                        <div className="absolute inset-0 border border-gold/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 m-4 pointer-events-none" aria-hidden="true" />
+                <FadeUp key={c.id} delay={Math.min(i * 0.05, 0.2)}>
+                  <Link to={`/categories/${c.slug}`} className="group block">
+                    <div className="relative overflow-hidden aspect-[4/5] mb-5 sm:mb-6 bg-ivory-deep img-fit">
+                      {c.image_url ? (
+                        <>
+                          <img
+                            src={c.image_url}
+                            alt={`${c.name} saree collection`}
+                            loading="lazy"
+                            decoding="async"
+                            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-maroon-deep/80 via-maroon/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
+                        </>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-ink-soft text-xs font-body uppercase tracking-widest">No image</div>
+                      )}
+                    </div>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="eyebrow text-gold-dark mb-2">No. {String(i + 1).padStart(2, "0")}</p>
+                        <h3 className="font-heading text-2xl sm:text-3xl text-ink group-hover:text-maroon transition-colors duration-300">{c.name}</h3>
+                        {c.description && <p className="text-sm text-ink-soft mt-2 font-body leading-relaxed line-clamp-2">{c.description}</p>}
                       </div>
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <p className="eyebrow text-gold-dark mb-2">No. {String(i + 1).padStart(2, "0")}</p>
-                          <h3 className="font-heading text-2xl sm:text-3xl text-ink group-hover:text-maroon transition-colors duration-300">{c.name}</h3>
-                          {c.description && <p className="text-sm text-ink-soft mt-2 font-body leading-relaxed line-clamp-2">{c.description}</p>}
-                        </div>
-                        <div className="mt-2 w-8 h-8 border border-gold/30 flex items-center justify-center rounded-full group-hover:bg-gold/10 group-hover:border-gold transition-all duration-300" aria-hidden="true">
-                          <ArrowRight size={12} className="text-gold-dark" />
-                        </div>
+                      <div className="mt-2 w-8 h-8 border border-gold/30 flex items-center justify-center rounded-full group-hover:bg-gold/10 group-hover:border-gold transition-all duration-300" aria-hidden="true">
+                        <ArrowRight size={12} className="text-gold-dark" />
                       </div>
-                    </Link>
-                  </Magnetic3DCard>
-                </motion.div>
+                    </div>
+                  </Link>
+                </FadeUp>
               ))}
             </div>
           )}
         </div>
       </section>
 
-      {/* STORY - Scrollytelling */}
-      <section ref={storyRef} className="relative bg-maroon-deep overflow-hidden py-20 sm:py-32 lg:py-44" aria-labelledby="story-heading">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border border-gold/10 rounded-full pointer-events-none animate-pulse-glow" aria-hidden="true" />
-
+      {/* STORY */}
+      <section className="relative bg-maroon-deep overflow-hidden py-20 sm:py-32 lg:py-44" aria-labelledby="story-heading">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-            <div className="lg:col-span-5 overflow-hidden">
-              <motion.div style={{ y: storyImgY }} className="relative">
+            <div className="lg:col-span-5">
+              <div className="relative">
                 <div className="aspect-[4/5] overflow-hidden rounded-sm">
                   <img
                     src={craftImg}
                     alt="Folded handwoven silk sarees at Arpitha Saree Center"
-                    className="w-full h-full object-cover scale-110"
+                    className="w-full h-full object-cover"
                     loading="lazy"
                     decoding="async"
                     width="480"
@@ -397,49 +281,46 @@ const HomePage = () => {
                   />
                 </div>
                 <div className="absolute -bottom-4 -right-4 w-full h-full border border-gold/20 pointer-events-none" aria-hidden="true" />
-                <motion.div initial={{ opacity: 0, scale: 0.8, y: 20 }} whileInView={{ opacity: 1, scale: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4, duration: 0.7, type: "spring" }} className="absolute -bottom-8 -left-4 sm:-left-6 glass-card p-5 sm:p-6">
+                <div className="absolute -bottom-8 -left-4 sm:-left-6 glass-card p-5 sm:p-6">
                   <p className="font-heading text-4xl sm:text-5xl text-maroon-deep leading-none">40+</p>
                   <p className="font-body text-xs text-ink-soft uppercase tracking-widest mt-1">Years of craft</p>
-                </motion.div>
-              </motion.div>
+                </div>
+              </div>
             </div>
 
             <div className="lg:col-span-6 lg:col-start-7 mt-12 lg:mt-0">
-              <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }} className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-3 mb-6">
                 <div className="w-8 h-px bg-gold" aria-hidden="true" />
                 <span className="eyebrow text-gold">Our Story</span>
-              </motion.div>
+              </div>
 
               <h2 id="story-heading" className="text-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-ivory mb-8 leading-[1.0]">
-                <RevealWords text="Four decades of cloth," className="text-ivory" />
+                Four decades of cloth,
                 <br />
-                <span className="italic"><RevealWords text="conversation & craft." className="text-gold" delay={0.2} /></span>
+                <span className="italic text-gold">conversation & craft.</span>
               </h2>
 
-              <motion.div initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 0.9 }} className="h-px bg-gradient-to-r from-gold to-transparent mb-8 origin-left" aria-hidden="true" />
+              <div className="h-px bg-gradient-to-r from-gold to-transparent mb-8" aria-hidden="true" />
 
               {[
                 "What began as a small store in Kanchipuram in 1985, Arpitha Saree Center is today a trusted destination for those who know that a Kanchipuram silk saree is more than a garment — it's a legacy woven in pure mulberry silk and real zari.",
                 "We source directly from master weavers of Kanchipuram, preserving centuries-old techniques — every saree GI-certified, every thread authentic.",
               ].map((para, i) => (
-                <motion.p key={i} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.15 + i * 0.12, duration: 0.7 }} className="text-ivory/90 font-body leading-relaxed mb-5 text-[15px]">
+                <p key={i} className="text-ivory/90 font-body leading-relaxed mb-5 text-[15px]">
                   {para}
-                </motion.p>
+                </p>
               ))}
 
-              <motion.div initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4, duration: 0.7 }} className="grid grid-cols-3 gap-4 sm:gap-6 my-8 sm:my-10 border-t border-b border-ivory/10 py-6 sm:py-8 relative">
-                <div className="absolute inset-0 bg-gold/5 blur-xl pointer-events-none" aria-hidden="true" />
+              <div className="grid grid-cols-3 gap-4 sm:gap-6 my-8 sm:my-10 border-t border-b border-ivory/10 py-6 sm:py-8 relative">
                 {[["1985", "Est."], ["12+", "Weaving regions"], ["5000+", "Sarees curated"]].map(([num, label]) => (
                   <div key={label} className="relative z-10">
                     <p className="font-heading text-2xl sm:text-3xl text-gold leading-none">{num}</p>
                     <p className="font-body text-[10px] text-ivory/65 uppercase tracking-widest mt-1">{label}</p>
                   </div>
                 ))}
-              </motion.div>
+              </div>
 
-              <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.6 }}>
-                <Link to="/about" className="link-reveal font-display text-[9px] tracking-[0.35em] uppercase text-gold">Read the full story →</Link>
-              </motion.div>
+              <Link to="/about" className="link-reveal font-display text-[9px] tracking-[0.35em] uppercase text-gold">Read the full story →</Link>
             </div>
           </div>
         </div>
@@ -451,12 +332,12 @@ const HomePage = () => {
           <div className="container mx-auto px-4 sm:px-6 lg:px-10">
             <div className="flex items-end justify-between mb-12 sm:mb-16 gap-6 flex-wrap">
               <div>
-                <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="flex items-center gap-3 mb-5">
+                <div className="flex items-center gap-3 mb-5">
                   <div className="w-8 h-px bg-gold-dark" aria-hidden="true" />
                   <span className="eyebrow text-gold-dark">New In</span>
-                </motion.div>
+                </div>
                 <h2 id="products-heading" className="text-display text-4xl sm:text-5xl md:text-6xl text-ink">
-                  <RevealWords text="Fresh from the loom." />
+                  Fresh from the loom.
                 </h2>
               </div>
               <Link to="/shop" className="link-reveal font-display text-[9px] tracking-[0.3em] uppercase text-maroon">Shop all →</Link>
@@ -464,23 +345,17 @@ const HomePage = () => {
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 sm:gap-x-5 gap-y-10 sm:gap-y-16">
               {featuredProducts.map((p, i) => (
-                <motion.div key={p.id} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ delay: i * 0.06, duration: 0.6, type: "spring", stiffness: 120 }}>
+                <FadeUp key={p.id} delay={Math.min(i * 0.04, 0.16)}>
                   <Link to={`/shop/${p.slug}`} className="group block relative">
                     <div className="relative overflow-hidden aspect-[3/4] mb-4 sm:mb-5 bg-ivory-deep border border-gold/10 img-fit">
                       {p.image_url ? (
-                        <>
-                          <img
-                            src={p.image_url}
-                            alt={`${p.name} - Buy saree online`}
-                            loading="lazy"
-                            decoding="async"
-                            className="w-full h-full object-cover transition-transform duration-1000 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.06]"
-                          />
-                          <div className="absolute inset-0 bg-maroon-deep/40 opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
-                          <div className="absolute bottom-4 left-0 right-0 text-center translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-350">
-                            <span className="font-display text-[8px] tracking-[0.4em] uppercase text-ivory glass-card-dark border-none px-4 py-2">Quick view</span>
-                          </div>
-                        </>
+                        <img
+                          src={p.image_url}
+                          alt={`${p.name} - Buy saree online`}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-ink-soft text-xs font-body uppercase tracking-widest">No image</div>
                       )}
@@ -488,7 +363,7 @@ const HomePage = () => {
                     <h3 className="font-heading text-lg sm:text-xl text-ink group-hover:text-maroon transition-colors leading-tight">{p.name}</h3>
                     <p className="font-body text-sm text-gold-dark mt-1">₹{Number(p.price).toLocaleString("en-IN")}</p>
                   </Link>
-                </motion.div>
+                </FadeUp>
               ))}
             </div>
           </div>
@@ -497,15 +372,14 @@ const HomePage = () => {
 
       {/* TRUST STRIP */}
       <section className="bg-ivory-deep py-16 sm:py-20 border-y border-gold/15 relative overflow-hidden" aria-label="Why shop with us">
-        <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(hsl(var(--gold))_1px,transparent_1px)] [background-size:16px_16px]" aria-hidden="true" />
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-gold/15">
             {[
               { icon: Sparkles, title: "Handwoven & sourced", desc: "Direct from master weavers, ethically priced and fairly traded." },
               { icon: Shield, title: "Authenticity, certified", desc: "Each piece verified by our in-house textile team before listing." },
               { icon: Truck, title: "Insured, tracked delivery", desc: "Pan-India shipping with care. Free above ₹5,000." },
-            ].map((t, i) => (
-              <motion.div key={t.title} initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08, duration: 0.6, type: "spring" }} className="flex items-start gap-4 sm:gap-5 px-6 sm:px-10 py-7 sm:py-8 group">
+            ].map((t) => (
+              <div key={t.title} className="flex items-start gap-4 sm:gap-5 px-6 sm:px-10 py-7 sm:py-8 group">
                 <div className="w-10 h-10 border border-gold/30 flex items-center justify-center shrink-0 mt-1 bg-ivory rounded-full group-hover:border-gold transition-colors" aria-hidden="true">
                   <t.icon size={16} className="text-gold-dark" strokeWidth={1.2} />
                 </div>
@@ -513,7 +387,7 @@ const HomePage = () => {
                   <h3 className="font-heading text-lg sm:text-xl text-ink mb-1.5">{t.title}</h3>
                   <p className="text-sm text-ink-soft font-body leading-relaxed">{t.desc}</p>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
         </div>
@@ -521,31 +395,29 @@ const HomePage = () => {
 
       {/* CTA */}
       <section className="relative py-20 sm:py-32 lg:py-44 bg-maroon-deep overflow-hidden" aria-labelledby="cta-heading">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gold/5 rounded-full blur-[100px] pointer-events-none animate-pulse-glow" aria-hidden="true" />
-
         <div className="container mx-auto px-4 sm:px-6 text-center max-w-2xl relative z-10">
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="flex items-center justify-center gap-3 mb-6">
+          <div className="flex items-center justify-center gap-3 mb-6">
             <div className="w-8 h-px bg-gold/40" aria-hidden="true" />
             <span className="eyebrow text-gold">Visit Arpitha Saree Center</span>
             <div className="w-8 h-px bg-gold/40" aria-hidden="true" />
-          </motion.div>
+          </div>
 
           <h2 id="cta-heading" className="text-display text-3xl sm:text-4xl md:text-6xl text-ivory mb-8 leading-[1.0]">
-            <RevealWords text="A saree is best" className="text-ivory" />
+            A saree is best
             <br />
-            <span className="italic"><RevealWords text="chosen in person." className="text-gold/90" delay={0.2} /></span>
+            <span className="italic text-gold/90">chosen in person.</span>
           </h2>
 
-          <motion.p initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4 }} className="text-ivory/85 font-body mb-10 sm:mb-12 leading-relaxed text-sm sm:text-base">
+          <p className="text-ivory/85 font-body mb-10 sm:mb-12 leading-relaxed text-sm sm:text-base">
             Step into Arpitha Saree Center in Kanchipuram and experience the joy of choosing your pure silk saree in person — feel the zari, touch the silk, and find the one that's truly yours.
-          </motion.p>
+          </p>
 
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: 0.6, type: "spring" }}>
+          <div>
             <Link to="/contact" className="btn-liquid border border-gold/50 text-gold px-8 sm:px-10 py-4 font-display text-[9px] tracking-[0.35em] uppercase inline-flex items-center gap-3 hover:text-maroon-deep transition-colors duration-500 group">
               Get directions
               <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" aria-hidden="true" />
             </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>
