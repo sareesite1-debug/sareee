@@ -66,7 +66,11 @@ const CartPage = () => {
                         <div className="inline-flex items-center border border-gold/20 bg-ivory">
                           <button onClick={() => updateQty(item.id, Math.max(1, item.quantity - 1))} className="w-8 h-8 hover:bg-gold/10 transition-colors text-ink text-lg">−</button>
                           <span className="w-10 text-center font-body text-sm text-ink">{item.quantity}</span>
-                          <button onClick={() => updateQty(item.id, item.quantity + 1)} className="w-8 h-8 hover:bg-gold/10 transition-colors text-ink text-lg">+</button>
+                          <button
+                            onClick={() => updateQty(item.id, item.quantity + 1)}
+                            disabled={item.product?.stock != null && item.quantity >= item.product.stock}
+                            className="w-8 h-8 hover:bg-gold/10 transition-colors text-ink text-lg disabled:opacity-30 disabled:cursor-not-allowed"
+                          >+</button>
                         </div>
                         <button onClick={() => removeItem(item.id)} className="text-[9px] uppercase tracking-[0.2em] font-body text-rose hover:text-maroon inline-flex items-center gap-1.5 transition-colors">
                           <Trash2 size={11} /> Remove
