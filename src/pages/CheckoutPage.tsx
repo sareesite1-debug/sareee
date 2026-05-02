@@ -19,7 +19,7 @@ const CheckoutPage = () => {
   const [user, setUser] = useState<any>(null);
   const [form, setForm] = useState({
     customer_name: "", customer_email: "", customer_phone: "",
-    shipping_address: "", state: "Karnataka", notes: "",
+    shipping_address: "", city: "", zip_code: "", state: "Karnataka", notes: "",
     payment_method: "cod" as "cod" | "online",
   });
   const [submitting, setSubmitting] = useState(false);
@@ -44,7 +44,7 @@ const CheckoutPage = () => {
   const igst = isKarnataka ? 0 : gstAmt;
 
   const validateStep1 = () => form.customer_name && form.customer_phone;
-  const validateStep2 = () => form.shipping_address && form.state;
+  const validateStep2 = () => form.shipping_address && form.city && form.zip_code && form.state;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,7 +86,7 @@ const CheckoutPage = () => {
   const InputField = ({ label, value, field, req = true, type = "text" }: any) => (
     <div className="mb-4">
       <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft">{label}{req && " *"}</label>
-      <input type={type} value={value} onChange={e => setForm({ ...form, [field]: e.target.value })} required={req}
+      <input type={type} value={value} onChange={e => { const v = e.target.value; setForm(f => ({ ...f, [field]: v })); }} required={req}
         className="w-full border-b border-gold/30 bg-transparent px-0 py-3 text-sm font-body text-ink focus:outline-none focus:border-maroon transition-colors placeholder:text-ink-soft/30" placeholder={`Enter ${label.toLowerCase()}`} />
     </div>
   );
@@ -154,14 +154,24 @@ const CheckoutPage = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                         <div className="mb-4">
                           <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft">State *</label>
-                          <select value={form.state} onChange={e => setForm({ ...form, state: e.target.value })} required
+                          <select value={form.state} onChange={e => { const v = e.target.value; setForm(f => ({ ...f, state: v })); }} required
                             className="w-full border-b border-gold/30 bg-transparent px-0 py-3 text-sm font-body text-ink focus:outline-none focus:border-maroon">
                             {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
                           </select>
                         </div>
                         <div className="mb-4">
+                          <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft">City *</label>
+                          <input value={form.city} onChange={e => { const v = e.target.value; setForm(f => ({ ...f, city: v })); }} required
+                            className="w-full border-b border-gold/30 bg-transparent px-0 py-3 text-sm font-body text-ink focus:outline-none focus:border-maroon placeholder:text-ink-soft/30" placeholder="Enter city" />
+                        </div>
+                        <div className="mb-4">
+                          <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft">ZIP / Pincode *</label>
+                          <input value={form.zip_code} onChange={e => { const v = e.target.value; setForm(f => ({ ...f, zip_code: v })); }} required
+                            className="w-full border-b border-gold/30 bg-transparent px-0 py-3 text-sm font-body text-ink focus:outline-none focus:border-maroon placeholder:text-ink-soft/30" placeholder="Enter pincode" />
+                        </div>
+                        <div className="mb-4 md:col-span-2">
                           <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft">Order Notes</label>
-                          <input value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })}
+                          <input value={form.notes} onChange={e => { const v = e.target.value; setForm(f => ({ ...f, notes: v })); }}
                             className="w-full border-b border-gold/30 bg-transparent px-0 py-3 text-sm font-body text-ink focus:outline-none focus:border-maroon placeholder:text-ink-soft/30" placeholder="Gift wrap, delivery instructions..." />
                         </div>
                       </div>
