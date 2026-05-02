@@ -42,8 +42,9 @@ const AdminLayout = () => {
                 key={item.to}
                 to={item.to}
                 className={`flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors font-body ${
-                  active ? "bg-gold/10 text-gold" : "text-warm-white/50 hover:text-warm-white hover:bg-warm-white/5"
+                  active ? "bg-gold/10 text-gold" : "hover:bg-white/5"
                 }`}
+                style={active ? {} : { color: "hsl(36 67% 97% / 0.65)" }}
               >
                 <item.icon size={18} />
                 {item.label}
@@ -52,7 +53,7 @@ const AdminLayout = () => {
           })}
         </nav>
         <div className="p-4 border-t border-gold/10">
-          <Link to="/" className="flex items-center gap-2 text-sm text-warm-white/40 hover:text-warm-white transition-colors font-body">
+          <Link to="/" className="flex items-center gap-2 text-sm transition-colors font-body" style={{ color: "hsl(36 67% 97% / 0.5)" }}>
             <LogOut size={16} /> Back to Site
           </Link>
         </div>
@@ -68,12 +69,13 @@ const AdminLayout = () => {
             </div>
             <nav className="flex-1 py-4 space-y-0.5 px-3 overflow-y-auto">
               {adminNav.map(item => {
-                const active = location.pathname === item.to;
+                const active = location.pathname === item.to || (item.to !== "/admin" && location.pathname.startsWith(item.to));
                 return (
                   <Link key={item.to} to={item.to} onClick={() => setSidebarOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 text-sm rounded-md transition-colors font-body ${
-                      active ? "bg-gold/10 text-gold" : "text-warm-white/50 hover:text-warm-white"
-                    }`}>
+                      active ? "bg-gold/10 text-gold" : "hover:bg-white/5"
+                    }`}
+                    style={active ? {} : { color: "hsl(36 67% 97% / 0.65)" }}>
                     <item.icon size={18} />{item.label}
                   </Link>
                 );
