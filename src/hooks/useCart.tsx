@@ -51,10 +51,21 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const addToCart = async (productId: string, quantity = 1) => {
     if (!userId) { toast.error("Please sign in to add items to cart."); return false; }
+    // Fetch latest stock from DB
+    const { data: productData } = await (supabase.from("products") as any).select("stock").eq("id", productId).single();
+    const stock: number | null = productData?.stock ?? null;
     // Upsert: if exists increment, else insert
     const existing = items.find(i => i.product_id === productId);
+    const currentQty = existing?.quantity ?? 0;
+    const newQty = currentQty + quantity;
+    if (stock !== null && newQty > stock) {
+      if (stock === 0) { toast.error("This item is out of stock."); return false; }
+      if (currentQty >= stock) { toast.error(`Only ${stock} in stock — you already have the maximum in your cart.`); return false; }
+      toast.error(`Only ${stock} in stock. You can add ${stock - currentQty} more.`);
+      return false;
+    }
     if (existing) {
-      const { error } = await (supabase.from("cart_items") as any).update({ quantity: existing.quantity + quantity }).eq("id", existing.id);
+      const { error } = await (supabase.from("cart_items") as any).update({ quantity: newQty }).eq("id", existing.id);
       if (error) { toast.error(error.message); return false; }
     } else {
       const { error } = await (supabase.from("cart_items") as any).insert({ user_id: userId, product_id: productId, quantity });
@@ -67,6 +78,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const updateQty = async (itemId: string, quantity: number) => {
     if (quantity <= 0) return removeItem(itemId);
+    const item = items.find(i => i.id === itemId);
+    const stock = item?.product?.stock ?? null;
+    if (stock !== null && quantity > stock) {
+      toast.error(`Only ${stock} in stock.`);
+      return;
+    }
     await (supabase.from("cart_items") as any).update({ quantity }).eq("id", itemId);
     refresh();
   };
