@@ -5,6 +5,43 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Lock, User, ArrowRight } from "lucide-react";
 
+/* Defined OUTSIDE the page component so it isn't remounted on every keystroke
+   (that was causing the input to lose focus after each character). */
+const InputField = ({
+  label,
+  icon: Icon,
+  type,
+  value,
+  onChange,
+  autoComplete,
+}: {
+  label: string;
+  icon: any;
+  type: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  autoComplete?: string;
+}) => (
+  <div className="relative group mb-6">
+    <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft transition-colors group-focus-within:text-emerald">
+      {label}
+    </label>
+    <div className="relative">
+      <div className="absolute left-0 top-1/2 -translate-y-1/2 text-gold-dark/60 group-focus-within:text-emerald transition-colors">
+        <Icon size={14} />
+      </div>
+      <input
+        type={type}
+        required
+        value={value}
+        onChange={onChange}
+        autoComplete={autoComplete}
+        className="w-full bg-transparent border-b border-gold/30 pl-7 pr-0 py-2 text-ink font-body focus:outline-none focus:border-emerald transition-colors"
+      />
+    </div>
+  </div>
+);
+
 const AuthPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -44,25 +81,13 @@ const AuthPage = () => {
     }
   };
 
-  const InputField = ({ label, icon: Icon, type, value, onChange }: any) => (
-    <div className="relative group mb-6">
-      <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft transition-colors group-focus-within:text-emerald">{label}</label>
-      <div className="relative">
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 text-gold-dark/60 group-focus-within:text-emerald transition-colors"><Icon size={14} /></div>
-        <input type={type} required value={value} onChange={onChange}
-          className="w-full bg-transparent border-b border-gold/30 pl-7 pr-0 py-2 text-ink font-body focus:outline-none focus:border-emerald transition-colors" />
-        <motion.div className="absolute bottom-0 left-0 h-px bg-emerald origin-left" initial={{ scaleX: 0 }} whileInView={{ scaleX: 0 }} />
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-ivory flex">
       {/* Left split - Image/Brand */}
       <div className="hidden lg:flex w-1/2 bg-emerald-deep relative flex-col justify-between p-16 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(hsl(var(--gold))_1px,transparent_1px)] [background-size:20px_20px] opacity-[0.03]" />
         <motion.div className="absolute top-1/4 -right-20 w-96 h-96 bg-gold/10 rounded-full blur-[100px] pointer-events-none" animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }} transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }} />
-        
+
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-8 h-px bg-gold" />
@@ -97,13 +122,13 @@ const AuthPage = () => {
             <AnimatePresence mode="wait">
               {isSignUp && (
                 <motion.div key="name" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.3 }}>
-                  <InputField label="Full Name" icon={User} type="text" value={name} onChange={(e: any) => setName(e.target.value)} />
+                  <InputField label="Full Name" icon={User} type="text" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <InputField label="Email Address" icon={Mail} type="email" value={email} onChange={(e: any) => setEmail(e.target.value)} />
-            <InputField label="Password" icon={Lock} type="password" value={password} onChange={(e: any) => setPassword(e.target.value)} />
+            <InputField label="Email Address" icon={Mail} type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
+            <InputField label="Password" icon={Lock} type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={isSignUp ? "new-password" : "current-password"} />
 
             <button type="submit" disabled={loading} className="btn-liquid btn-emerald w-full py-4 mt-6">
               <span className="relative z-10 flex items-center justify-center gap-2">
