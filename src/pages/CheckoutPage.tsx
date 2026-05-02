@@ -13,6 +13,14 @@ const INDIAN_STATES = [
   "Uttar Pradesh","Uttarakhand","West Bengal","Delhi","Jammu and Kashmir","Ladakh","Puducherry","Chandigarh",
 ];
 
+const InputField = ({ label, value, onChange, req = true, type = "text" }: { label: string; value: string; onChange: (v: string) => void; req?: boolean; type?: string }) => (
+  <div className="mb-4">
+    <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft">{label}{req && " *"}</label>
+    <input type={type} value={value} onChange={e => onChange(e.target.value)} required={req}
+      className="w-full border-b border-gold/30 bg-transparent px-0 py-3 text-sm font-body text-ink focus:outline-none focus:border-maroon transition-colors placeholder:text-ink-soft/30" placeholder={`Enter ${label.toLowerCase()}`} />
+  </div>
+);
+
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { items, total, clearCart } = useCart();
@@ -83,14 +91,6 @@ const CheckoutPage = () => {
     navigate(`/orders/${order.id}`);
   };
 
-  const InputField = ({ label, value, field, req = true, type = "text" }: any) => (
-    <div className="mb-4">
-      <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft">{label}{req && " *"}</label>
-      <input type={type} value={value} onChange={e => { const v = e.target.value; setForm(f => ({ ...f, [field]: v })); }} required={req}
-        className="w-full border-b border-gold/30 bg-transparent px-0 py-3 text-sm font-body text-ink focus:outline-none focus:border-maroon transition-colors placeholder:text-ink-soft/30" placeholder={`Enter ${label.toLowerCase()}`} />
-    </div>
-  );
-
   return (
     <div className="bg-ivory min-h-screen">
       <div className="container mx-auto px-6 pt-36 pb-24 max-w-6xl">
@@ -119,10 +119,10 @@ const CheckoutPage = () => {
                   {activeStep === 1 && (
                     <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                        <InputField label="Full Name" value={form.customer_name} field="customer_name" />
-                        <InputField label="Phone Number" value={form.customer_phone} field="customer_phone" type="tel" />
+                        <InputField label="Full Name" value={form.customer_name} onChange={v => setForm(f => ({ ...f, customer_name: v }))} />
+                        <InputField label="Phone Number" value={form.customer_phone} onChange={v => setForm(f => ({ ...f, customer_phone: v }))} type="tel" />
                         <div className="md:col-span-2">
-                          <InputField label="Email Address" value={form.customer_email} field="customer_email" req={false} type="email" />
+                          <InputField label="Email Address" value={form.customer_email} onChange={v => setForm(f => ({ ...f, customer_email: v }))} req={false} type="email" />
                         </div>
                       </div>
                       <button type="button" onClick={() => validateStep1() ? setActiveStep(2) : toast.error("Please fill required fields")} className="mt-6 luxury-btn bg-emerald text-ivory">Continue to shipping</button>
@@ -248,7 +248,7 @@ const CheckoutPage = () => {
                   ) : (
                     <div className="flex justify-between text-ink-soft"><span>IGST 5%</span><span>₹{igst.toLocaleString("en-IN")}</span></div>
                   )}
-                  <div className="flex justify-between text-ink-soft mt-2 pt-2 border-t border-gold/5"><span>Shipping</span><span className="text-maroon">Complimentary</span></div>
+                  <div className="flex justify-between text-ink-soft mt-2 pt-2 border-t border-gold/5"><span>Shipping</span><span className="text-maroon">Free</span></div>
                 </div>
 
                 <div className="flex justify-between items-baseline mb-8">
