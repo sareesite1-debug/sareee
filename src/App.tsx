@@ -7,6 +7,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import ScrollToTop from "@/components/ScrollToTop";
 import SiteLayout from "@/components/site/SiteLayout";
 import { CartProvider } from "@/hooks/useCart";
+import ProtectedRoute from "@/components/admin/ProtectedRoute";
+import AdminLayout from "@/components/admin/AdminLayout";
 
 // Eagerly load only what renders on first paint
 import HomePage from "@/pages/HomePage";
@@ -25,8 +27,6 @@ const OrderDetailPage  = lazy(() => import("@/pages/OrderDetailPage"));
 const NotFound         = lazy(() => import("@/pages/NotFound"));
 
 // Admin — fully lazy, never loaded for regular visitors
-const AdminLayout          = lazy(() => import("@/components/admin/AdminLayout"));
-const ProtectedRoute       = lazy(() => import("@/components/admin/ProtectedRoute"));
 const AdminDashboard       = lazy(() => import("@/pages/admin/AdminDashboard"));
 const AdminClients         = lazy(() => import("@/pages/admin/AdminClients"));
 const AdminPortfolio       = lazy(() => import("@/pages/admin/AdminPortfolio"));
