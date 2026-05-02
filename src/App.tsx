@@ -43,10 +43,11 @@ const AdminCustomerOrders  = lazy(() => import("@/pages/admin/AdminCustomerOrder
 
 const queryClient = new QueryClient();
 
-// Minimal spinner shown while lazy chunks load
+// Branded spinner shown while lazy chunks load
 const PageLoader = () => (
-  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh" }}>
-    <div style={{ width: 32, height: 32, border: "3px solid #e5e7eb", borderTopColor: "#6B0F1A", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "70vh", background: "#FBF7F0" }}>
+    <div style={{ width: 38, height: 38, border: "2px solid rgba(107,15,26,0.15)", borderTopColor: "#6B0F1A", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+    <div style={{ marginTop: 16, fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 13, letterSpacing: "0.35em", textTransform: "uppercase", color: "#6B0F1A" }}>Arpitha</div>
     <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
   </div>
 );
