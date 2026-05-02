@@ -54,11 +54,14 @@ const AdminProducts = () => {
   };
   const submitP = async (e: React.FormEvent) => {
     e.preventDefault();
+    const stockNum = Number(pForm.stock) || 0;
+    // Auto-restore to active if admin restocks an out_of_stock product
+    const resolvedStatus = pForm.status === "out_of_stock" && stockNum > 0 ? "active" : pForm.status;
     const payload: any = {
       category_id: pForm.category_id || null, name: pForm.name, description: pForm.description,
       price: Number(pForm.price) || 0,
       compare_at_price: pForm.compare_at_price ? Number(pForm.compare_at_price) : null,
-      image_url: pForm.image_url || null, stock: Number(pForm.stock) || 0, status: pForm.status,
+      image_url: pForm.image_url || null, stock: stockNum, status: resolvedStatus,
     };
     if (!editingP) payload.slug = slugify(pForm.name);
     const { error } = editingP
@@ -136,7 +139,7 @@ const AdminProducts = () => {
                   <td className="px-4 py-3 text-sm font-body">{catName(p.category_id)}</td>
                   <td className="px-4 py-3 text-sm text-gold font-medium font-body">₹{Number(p.price).toLocaleString()}</td>
                   <td className="px-4 py-3 text-sm font-body">{p.stock}</td>
-                  <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded-full font-body ${p.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-secondary'}`}>{p.status}</span></td>
+                  <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded-full font-body ${p.status === 'active' ? 'bg-green-100 text-green-700' : p.status === 'out_of_stock' ? 'bg-red-100 text-red-600' : 'bg-secondary text-muted-foreground'}`}>{p.status === 'out_of_stock' ? 'Out of Stock' : p.status}</span></td>
                   <td className="px-4 py-3"><div className="flex gap-2">
                     <button onClick={() => openEditP(p)} className="text-muted-foreground hover:text-foreground"><Pencil size={14} /></button>
                     <button onClick={() => setPDel(p.id)} className="text-muted-foreground hover:text-destructive"><Trash2 size={14} /></button>
@@ -185,8 +188,17 @@ const AdminProducts = () => {
           </div>
           <ImageUploader value={pForm.image_url} onChange={v => setPForm({ ...pForm, image_url: v })} folder="products" label="Product Image" />
           <div className="grid grid-cols-2 gap-3">
-            <FormField label="Stock" value={pForm.stock} onChange={v => setPForm({ ...pForm, stock: v })} type="number" />
-            <FormField label="Status" value={pForm.status} onChange={v => setPForm({ ...pForm, status: v })} options={[{ value: "active", label: "Active" }, { value: "draft", label: "Draft" }]} />
+            <FormField label="Stock" value={pForm.stock} onChange={v => {
+              const stockNum = Number(v) || 0;
+              // Auto-restore active when admin adds stock back
+              const newStatus = pForm.status === "out_of_stock" && stockNum > 0 ? "active" : pForm.status;
+              setPForm(f => ({ ...f, stock: v, status: newStatus }));
+            }} type="number" />
+            <FormField label="Status" value={pForm.status} onChange={v => setPForm(f => ({ ...f, status: v }))} options={[
+              { value: "active", label: "Active" },
+              { value: "out_of_stock", label: "Out of Stock" },
+              { value: "inactive", label: "Inactive" },
+            ]} />
           </div>
           <button type="submit" className="w-full gradient-gold text-maroon-deep py-2.5 text-xs font-body font-semibold uppercase tracking-[0.2em] rounded-md">
             {editingP ? "Update" : "Create"}
