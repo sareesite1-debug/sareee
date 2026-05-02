@@ -149,7 +149,7 @@ const CheckoutPage = () => {
                       <div className="mb-4">
                         <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft">Complete Address *</label>
                         <textarea value={form.shipping_address} onChange={e => { const v = e.target.value; setForm(f => ({ ...f, shipping_address: v })); }} required rows={3}
-                          className="w-full border border-gold/20 bg-ivory-deep/30 p-4 text-sm font-body focus:outline-none focus:border-maroon transition-colors resize-none placeholder:text-ink-soft/30" placeholder="Street, area, city, pincode" />
+                          className="w-full border border-gold/20 bg-ivory-deep/30 p-4 text-sm font-body focus:outline-none focus:border-maroon transition-colors resize-none placeholder:text-ink-soft/30" placeholder="Street, area," />
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                         <div className="mb-4">
