@@ -94,7 +94,7 @@ const CartPage = () => {
                   </div>
                   <div className="flex justify-between text-ink-soft">
                     <span>Shipping</span>
-                    <span className="text-maroon">Complimentary</span>
+                    <span className="text-maroon">Free</span>
                   </div>
                 </div>
 
