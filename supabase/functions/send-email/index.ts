@@ -75,6 +75,7 @@ async function sendEmail(to: string, toName: string, subject: string, html: stri
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = buildCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
