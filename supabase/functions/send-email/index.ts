@@ -1,10 +1,6 @@
 // Send order-related emails to customer + owner via Brevo API
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { buildCorsHeaders } from "../_shared/cors.ts";
 
 const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY")!;
 const FROM_EMAIL = "sareesite1@gmail.com";
