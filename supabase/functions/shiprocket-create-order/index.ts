@@ -20,6 +20,7 @@ async function getToken(): Promise<string> {
 }
 
 Deno.serve(async (req) => {
+  const corsHeaders = buildCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
     if (!SR_EMAIL || !SR_PASSWORD) {
