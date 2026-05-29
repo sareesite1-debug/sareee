@@ -22,7 +22,7 @@ const AdminProducts = () => {
   const [pDialog, setPDialog] = useState(false);
   const [editingP, setEditingP] = useState<Product | null>(null);
   const [pDel, setPDel] = useState<string | null>(null);
-  const blankP = { category_id: "", name: "", description: "", price: "", compare_at_price: "", image_url: "", stock: "0", status: "active" };
+  const blankP = { category_id: "", name: "", description: "", price: "", compare_at_price: "", image_url: "", stock: "0", status: "active", color: "" };
   const [pForm, setPForm] = useState(blankP);
 
   // Category dialog
