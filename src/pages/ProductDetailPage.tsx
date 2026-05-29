@@ -5,7 +5,7 @@ import { motion, useSpring } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/hooks/useCart";
 
-interface Product { id: string; name: string; description: string | null; price: number; compare_at_price: number | null; image_url: string | null; stock: number | null; status: string; category_id: string | null; }
+interface Product { id: string; name: string; description: string | null; price: number; compare_at_price: number | null; image_url: string | null; stock: number | null; status: string; category_id: string | null; color: string | null; }
 
 const ProductDetailPage = () => {
   const { slug } = useParams();
