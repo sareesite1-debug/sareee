@@ -8,7 +8,7 @@ import DeleteConfirm from "@/components/admin/DeleteConfirm";
 import ImageUploader from "@/components/admin/ImageUploader";
 
 interface Category { id: string; name: string; slug: string; sort_order: number | null; }
-interface Product { id: string; category_id: string | null; name: string; slug: string; description: string | null; price: number; compare_at_price: number | null; image_url: string | null; stock: number | null; status: string; }
+interface Product { id: string; category_id: string | null; name: string; slug: string; description: string | null; price: number; compare_at_price: number | null; image_url: string | null; stock: number | null; status: string; color: string | null; }
 
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + Math.random().toString(36).slice(2, 6);
 
