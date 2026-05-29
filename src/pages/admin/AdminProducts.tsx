@@ -196,6 +196,20 @@ const AdminProducts = () => {
             <FormField label="Compare-at price (₹)" value={pForm.compare_at_price} onChange={v => setPForm({ ...pForm, compare_at_price: v })} type="number" />
           </div>
           <ImageUploader value={pForm.image_url} onChange={v => setPForm({ ...pForm, image_url: v })} folder="products" label="Product Image" />
+          <div>
+            <label className="block text-xs font-body font-medium uppercase tracking-wider mb-1.5">Color</label>
+            <div className="flex items-center gap-2">
+              <input type="color" value={/^#[0-9a-fA-F]{6}$/.test(pForm.color) ? pForm.color : "#8b1e3f"}
+                onChange={e => setPForm({ ...pForm, color: e.target.value })}
+                className="h-10 w-14 border border-border rounded-md bg-background cursor-pointer p-1" />
+              <input type="text" value={pForm.color} onChange={e => setPForm({ ...pForm, color: e.target.value })}
+                placeholder="e.g. Maroon, Emerald, #c9a84c"
+                className="flex-1 border border-border bg-background px-4 py-2.5 text-sm font-body rounded-md" />
+              {pForm.color && (
+                <button type="button" onClick={() => setPForm({ ...pForm, color: "" })} className="text-xs text-muted-foreground hover:text-destructive px-2">Clear</button>
+              )}
+            </div>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <FormField label="Stock" value={pForm.stock} onChange={v => {
               const stockNum = Number(v) || 0;
