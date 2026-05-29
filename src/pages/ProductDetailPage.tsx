@@ -129,6 +129,16 @@ const ProductDetailPage = () => {
                 </motion.div>
               )}
 
+              {product.color && (
+                <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="flex items-center gap-3 pb-2">
+                  <span className="text-[10px] uppercase tracking-[0.25em] font-body text-ink-soft">Color</span>
+                  <span className="inline-flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full border border-gold/30 shadow-sm" style={{ background: product.color }} />
+                    <span className="text-sm font-body text-ink capitalize">{product.color}</span>
+                  </span>
+                </motion.div>
+              )}
+
               <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="flex items-center gap-6 pt-2">
                 {product.status === 'out_of_stock' ? (
                   <span className="inline-flex items-center gap-2 px-4 py-2 bg-ink/5 border border-ink/10 text-ink-soft font-body text-xs uppercase tracking-[0.25em]">
