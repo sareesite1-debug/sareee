@@ -48,7 +48,7 @@ const AdminProducts = () => {
     setPForm({
       category_id: p.category_id || "", name: p.name, description: p.description || "",
       price: String(p.price), compare_at_price: p.compare_at_price ? String(p.compare_at_price) : "",
-      image_url: p.image_url || "", stock: String(p.stock ?? 0), status: p.status,
+      image_url: p.image_url || "", stock: String(p.stock ?? 0), status: p.status, color: p.color || "",
     });
     setPDialog(true);
   };
@@ -62,6 +62,7 @@ const AdminProducts = () => {
       price: Number(pForm.price) || 0,
       compare_at_price: pForm.compare_at_price ? Number(pForm.compare_at_price) : null,
       image_url: pForm.image_url || null, stock: stockNum, status: resolvedStatus,
+      color: pForm.color || null,
     };
     if (!editingP) payload.slug = slugify(pForm.name);
     const { error } = editingP
