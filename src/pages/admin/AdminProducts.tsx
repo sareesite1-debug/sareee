@@ -126,7 +126,7 @@ const AdminProducts = () => {
         <div className="border border-border rounded-lg overflow-hidden">
           <table className="w-full">
             <thead className="bg-secondary"><tr>
-              {["Image", "Name", "Category", "Price", "Stock", "Status", "Actions"].map(h => (
+              {["Image", "Name", "Category", "Color", "Price", "Stock", "Status", "Actions"].map(h => (
                 <th key={h} className="text-left px-4 py-3 text-xs font-medium uppercase tracking-wider font-body">{h}</th>
               ))}
             </tr></thead>
