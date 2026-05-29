@@ -132,12 +132,20 @@ const AdminProducts = () => {
             </tr></thead>
             <tbody>
               {products.length === 0 ? (
-                <tr><td colSpan={7} className="px-4 py-8 text-center text-sm text-muted-foreground font-body">No products yet.</td></tr>
+                <tr><td colSpan={8} className="px-4 py-8 text-center text-sm text-muted-foreground font-body">No products yet.</td></tr>
               ) : products.map(p => (
                 <tr key={p.id} className="border-t border-border hover:bg-muted/50">
                   <td className="px-4 py-3"><div className="w-12 h-12 bg-secondary rounded overflow-hidden">{p.image_url && <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />}</div></td>
                   <td className="px-4 py-3 text-sm font-medium font-body">{p.name}</td>
                   <td className="px-4 py-3 text-sm font-body">{catName(p.category_id)}</td>
+                  <td className="px-4 py-3 text-sm font-body">
+                    {p.color ? (
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className="w-3 h-3 rounded-full border border-border" style={{ background: p.color }} />
+                        <span className="capitalize">{p.color}</span>
+                      </span>
+                    ) : <span className="text-muted-foreground">—</span>}
+                  </td>
                   <td className="px-4 py-3 text-sm text-gold font-medium font-body">₹{Number(p.price).toLocaleString()}</td>
                   <td className="px-4 py-3 text-sm font-body">{p.stock}</td>
                   <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded-full font-body ${p.status === 'active' ? 'bg-green-100 text-green-700' : p.status === 'out_of_stock' ? 'bg-red-100 text-red-600' : 'bg-secondary text-muted-foreground'}`}>{p.status === 'out_of_stock' ? 'Out of Stock' : p.status}</span></td>
