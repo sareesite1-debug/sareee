@@ -13,6 +13,7 @@ const statusOptions = ["pending", "processing", "completed", "cancelled"];
 
 const AdminCustomerOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [orderItems, setOrderItems] = useState<Record<string, Item[]>>({});
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<Order | null>(null);
   const [items, setItems] = useState<Item[]>([]);
@@ -21,7 +22,16 @@ const AdminCustomerOrders = () => {
   const refresh = async () => {
     setLoading(true);
     const { data } = await (supabase.from("customer_orders") as any).select("*").order("created_at", { ascending: false });
-    setOrders(data || []); setLoading(false);
+    const orderList: Order[] = data || [];
+    setOrders(orderList);
+    if (orderList.length) {
+      const ids = orderList.map(o => o.id);
+      const { data: allItems } = await (supabase.from("customer_order_items") as any).select("*").in("order_id", ids);
+      const map: Record<string, Item[]> = {};
+      (allItems || []).forEach((it: any) => { (map[it.order_id] = map[it.order_id] || []).push(it); });
+      setOrderItems(map);
+    } else setOrderItems({});
+    setLoading(false);
   };
   useEffect(() => { refresh(); }, []);
 
