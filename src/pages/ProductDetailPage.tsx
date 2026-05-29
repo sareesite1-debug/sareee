@@ -5,7 +5,7 @@ import { motion, useSpring } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/hooks/useCart";
 
-interface Product { id: string; name: string; description: string | null; price: number; compare_at_price: number | null; image_url: string | null; stock: number | null; status: string; category_id: string | null; }
+interface Product { id: string; name: string; description: string | null; price: number; compare_at_price: number | null; image_url: string | null; stock: number | null; status: string; category_id: string | null; color: string | null; }
 
 const ProductDetailPage = () => {
   const { slug } = useParams();
@@ -126,6 +126,16 @@ const ProductDetailPage = () => {
               {product.description && (
                 <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="pt-4 pb-6">
                   <p className="text-ink-soft font-body leading-relaxed text-[15px]">{product.description}</p>
+                </motion.div>
+              )}
+
+              {product.color && (
+                <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="flex items-center gap-3 pb-2">
+                  <span className="text-[10px] uppercase tracking-[0.25em] font-body text-ink-soft">Color</span>
+                  <span className="inline-flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full border border-gold/30 shadow-sm" style={{ background: product.color }} />
+                    <span className="text-sm font-body text-ink capitalize">{product.color}</span>
+                  </span>
                 </motion.div>
               )}
 

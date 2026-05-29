@@ -13,6 +13,7 @@ const statusOptions = ["pending", "processing", "completed", "cancelled"];
 
 const AdminCustomerOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [orderItems, setOrderItems] = useState<Record<string, Item[]>>({});
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<Order | null>(null);
   const [items, setItems] = useState<Item[]>([]);
@@ -21,7 +22,16 @@ const AdminCustomerOrders = () => {
   const refresh = async () => {
     setLoading(true);
     const { data } = await (supabase.from("customer_orders") as any).select("*").order("created_at", { ascending: false });
-    setOrders(data || []); setLoading(false);
+    const orderList: Order[] = data || [];
+    setOrders(orderList);
+    if (orderList.length) {
+      const ids = orderList.map(o => o.id);
+      const { data: allItems } = await (supabase.from("customer_order_items") as any).select("*").in("order_id", ids);
+      const map: Record<string, Item[]> = {};
+      (allItems || []).forEach((it: any) => { (map[it.order_id] = map[it.order_id] || []).push(it); });
+      setOrderItems(map);
+    } else setOrderItems({});
+    setLoading(false);
   };
   useEffect(() => { refresh(); }, []);
 
@@ -90,7 +100,7 @@ const AdminCustomerOrders = () => {
         <div className="border border-border rounded-lg overflow-hidden">
           <table className="w-full">
             <thead className="bg-secondary"><tr>
-              {["Order #", "Customer", "Total", "Status", "Tracking", "Date", "Actions"].map(h => (
+              {["Order #", "Customer", "Products", "Total", "Status", "Tracking", "Date", "Actions"].map(h => (
                 <th key={h} className="text-left px-4 py-3 text-xs font-medium uppercase tracking-wider font-body">{h}</th>
               ))}
             </tr></thead>
@@ -103,6 +113,20 @@ const AdminCustomerOrders = () => {
                   <td className="px-4 py-3 text-sm font-body">
                     <p>{o.customer_name}</p>
                     <p className="text-xs text-muted-foreground">{o.customer_phone}</p>
+                  </td>
+                  <td className="px-4 py-3 text-sm font-body max-w-[260px]">
+                    {(orderItems[o.id] || []).length === 0 ? (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    ) : (
+                      <ul className="space-y-0.5">
+                        {(orderItems[o.id] || []).map(it => (
+                          <li key={it.id} className="text-xs leading-snug">
+                            <span className="font-medium">{it.product_name}</span>
+                            <span className="text-muted-foreground"> × {it.quantity}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-sm font-medium text-gold font-body">₹{Number(o.total).toLocaleString()}</td>
                   <td className="px-4 py-3">

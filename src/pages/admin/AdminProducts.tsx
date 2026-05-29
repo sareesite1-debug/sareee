@@ -8,7 +8,7 @@ import DeleteConfirm from "@/components/admin/DeleteConfirm";
 import ImageUploader from "@/components/admin/ImageUploader";
 
 interface Category { id: string; name: string; slug: string; sort_order: number | null; }
-interface Product { id: string; category_id: string | null; name: string; slug: string; description: string | null; price: number; compare_at_price: number | null; image_url: string | null; stock: number | null; status: string; }
+interface Product { id: string; category_id: string | null; name: string; slug: string; description: string | null; price: number; compare_at_price: number | null; image_url: string | null; stock: number | null; status: string; color: string | null; }
 
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + Math.random().toString(36).slice(2, 6);
 
@@ -22,7 +22,7 @@ const AdminProducts = () => {
   const [pDialog, setPDialog] = useState(false);
   const [editingP, setEditingP] = useState<Product | null>(null);
   const [pDel, setPDel] = useState<string | null>(null);
-  const blankP = { category_id: "", name: "", description: "", price: "", compare_at_price: "", image_url: "", stock: "0", status: "active" };
+  const blankP = { category_id: "", name: "", description: "", price: "", compare_at_price: "", image_url: "", stock: "0", status: "active", color: "" };
   const [pForm, setPForm] = useState(blankP);
 
   // Category dialog
@@ -48,7 +48,7 @@ const AdminProducts = () => {
     setPForm({
       category_id: p.category_id || "", name: p.name, description: p.description || "",
       price: String(p.price), compare_at_price: p.compare_at_price ? String(p.compare_at_price) : "",
-      image_url: p.image_url || "", stock: String(p.stock ?? 0), status: p.status,
+      image_url: p.image_url || "", stock: String(p.stock ?? 0), status: p.status, color: p.color || "",
     });
     setPDialog(true);
   };
@@ -62,6 +62,7 @@ const AdminProducts = () => {
       price: Number(pForm.price) || 0,
       compare_at_price: pForm.compare_at_price ? Number(pForm.compare_at_price) : null,
       image_url: pForm.image_url || null, stock: stockNum, status: resolvedStatus,
+      color: pForm.color || null,
     };
     if (!editingP) payload.slug = slugify(pForm.name);
     const { error } = editingP
@@ -125,18 +126,26 @@ const AdminProducts = () => {
         <div className="border border-border rounded-lg overflow-hidden">
           <table className="w-full">
             <thead className="bg-secondary"><tr>
-              {["Image", "Name", "Category", "Price", "Stock", "Status", "Actions"].map(h => (
+              {["Image", "Name", "Category", "Color", "Price", "Stock", "Status", "Actions"].map(h => (
                 <th key={h} className="text-left px-4 py-3 text-xs font-medium uppercase tracking-wider font-body">{h}</th>
               ))}
             </tr></thead>
             <tbody>
               {products.length === 0 ? (
-                <tr><td colSpan={7} className="px-4 py-8 text-center text-sm text-muted-foreground font-body">No products yet.</td></tr>
+                <tr><td colSpan={8} className="px-4 py-8 text-center text-sm text-muted-foreground font-body">No products yet.</td></tr>
               ) : products.map(p => (
                 <tr key={p.id} className="border-t border-border hover:bg-muted/50">
                   <td className="px-4 py-3"><div className="w-12 h-12 bg-secondary rounded overflow-hidden">{p.image_url && <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />}</div></td>
                   <td className="px-4 py-3 text-sm font-medium font-body">{p.name}</td>
                   <td className="px-4 py-3 text-sm font-body">{catName(p.category_id)}</td>
+                  <td className="px-4 py-3 text-sm font-body">
+                    {p.color ? (
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className="w-3 h-3 rounded-full border border-border" style={{ background: p.color }} />
+                        <span className="capitalize">{p.color}</span>
+                      </span>
+                    ) : <span className="text-muted-foreground">—</span>}
+                  </td>
                   <td className="px-4 py-3 text-sm text-gold font-medium font-body">₹{Number(p.price).toLocaleString()}</td>
                   <td className="px-4 py-3 text-sm font-body">{p.stock}</td>
                   <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded-full font-body ${p.status === 'active' ? 'bg-green-100 text-green-700' : p.status === 'out_of_stock' ? 'bg-red-100 text-red-600' : 'bg-secondary text-muted-foreground'}`}>{p.status === 'out_of_stock' ? 'Out of Stock' : p.status}</span></td>
@@ -187,6 +196,20 @@ const AdminProducts = () => {
             <FormField label="Compare-at price (₹)" value={pForm.compare_at_price} onChange={v => setPForm({ ...pForm, compare_at_price: v })} type="number" />
           </div>
           <ImageUploader value={pForm.image_url} onChange={v => setPForm({ ...pForm, image_url: v })} folder="products" label="Product Image" />
+          <div>
+            <label className="block text-xs font-body font-medium uppercase tracking-wider mb-1.5">Color</label>
+            <div className="flex items-center gap-2">
+              <input type="color" value={/^#[0-9a-fA-F]{6}$/.test(pForm.color) ? pForm.color : "#8b1e3f"}
+                onChange={e => setPForm({ ...pForm, color: e.target.value })}
+                className="h-10 w-14 border border-border rounded-md bg-background cursor-pointer p-1" />
+              <input type="text" value={pForm.color} onChange={e => setPForm({ ...pForm, color: e.target.value })}
+                placeholder="e.g. Maroon, Emerald, #c9a84c"
+                className="flex-1 border border-border bg-background px-4 py-2.5 text-sm font-body rounded-md" />
+              {pForm.color && (
+                <button type="button" onClick={() => setPForm({ ...pForm, color: "" })} className="text-xs text-muted-foreground hover:text-destructive px-2">Clear</button>
+              )}
+            </div>
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <FormField label="Stock" value={pForm.stock} onChange={v => {
               const stockNum = Number(v) || 0;

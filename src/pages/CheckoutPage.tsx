@@ -62,7 +62,7 @@ const CheckoutPage = () => {
     const initialStatus = form.payment_method === "online" ? "paid" : "pending";
     const { data: order, error } = await (supabase.from("customer_orders") as any).insert({
       user_id: user.id, order_number, ...form, total,
-      status: initialStatus, tracking_status: "order_placed",
+      status: initialStatus, tracking_status: "confirmed",
     }).select().single();
     
     if (error) { toast.error(error.message); setSubmitting(false); return; }
