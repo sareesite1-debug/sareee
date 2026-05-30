@@ -262,3 +262,43 @@ export function printBills(bills: BillData[]) {
   win.document.close();
   setTimeout(() => { win.focus(); win.print(); }, 600);
 }
+
+/**
+ * Share a bill: tries Web Share (mobile native sheet with WhatsApp etc.),
+ * falls back to opening WhatsApp Web with the PDF attached as a file when
+ * possible, otherwise opens WhatsApp with a pre-filled message.
+ */
+export async function shareBill(b: BillData, phone?: string) {
+  // Build the PDF as a blob/file
+  const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+  await renderBillToPdf(pdf, b, false);
+  const blob = pdf.output("blob");
+  const filename = `${b.doc_type}-${b.number}.pdf`;
+  const file = new File([blob], filename, { type: "application/pdf" });
+
+  const text = `${b.doc_type === "INVOICE" ? "Invoice" : "Quotation"} ${b.number} from ${BRAND.name}\n` +
+               `Amount: Rs. ${Number(b.total).toLocaleString("en-IN")}\n` +
+               `Thank you for your business.`;
+
+  // Try Web Share API with file (mobile / supported browsers)
+  const navAny = navigator as any;
+  if (navAny.canShare && navAny.canShare({ files: [file] })) {
+    try {
+      await navAny.share({ files: [file], title: filename, text });
+      return;
+    } catch { /* user cancelled — fall through */ }
+  }
+
+  // Fallback: download the file and open WhatsApp with a message
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+
+  const waNumber = (phone || "").replace(/\D/g, "");
+  const waUrl = waNumber
+    ? `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`
+    : `https://wa.me/?text=${encodeURIComponent(text)}`;
+  window.open(waUrl, "_blank", "noopener,noreferrer");
+}

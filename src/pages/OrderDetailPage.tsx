@@ -37,7 +37,7 @@ const OrderDetailPage = () => {
   if (!order) return <div className="container mx-auto px-4 py-32 text-center font-body"><p className="text-ink-soft mb-4">Order not found.</p><Link to="/orders" className="text-emerald link-reveal text-[11px] tracking-[0.25em] uppercase">Back to orders</Link></div>;
 
   const activeIdx = trackingSteps.findIndex(s => s.key === order.tracking_status);
-  const canCancel = order.status !== "cancelled" && order.tracking_status !== "delivered" && order.tracking_status !== "cancelled";
+  const canCancel = order.status !== "cancelled" && !["shipped", "delivered", "cancelled"].includes(order.tracking_status);
   
   const total = Number(order.total) || 0;
   const subtotal = Math.round((total / 1.05) * 100) / 100;

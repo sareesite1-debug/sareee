@@ -248,7 +248,9 @@ export type Database = {
           created_at: string
           id: string
           order_id: string
+          product_color: string | null
           product_id: string | null
+          product_image: string | null
           product_name: string
           quantity: number
           subtotal: number
@@ -258,7 +260,9 @@ export type Database = {
           created_at?: string
           id?: string
           order_id: string
+          product_color?: string | null
           product_id?: string | null
+          product_image?: string | null
           product_name: string
           quantity: number
           subtotal: number
@@ -268,7 +272,9 @@ export type Database = {
           created_at?: string
           id?: string
           order_id?: string
+          product_color?: string | null
           product_id?: string | null
+          product_image?: string | null
           product_name?: string
           quantity?: number
           subtotal?: number
@@ -553,11 +559,13 @@ export type Database = {
         Row: {
           category_id: string | null
           color: string | null
+          colors: string[] | null
           compare_at_price: number | null
           created_at: string
           description: string | null
           id: string
           image_url: string | null
+          images: string[] | null
           name: string
           price: number
           slug: string
@@ -568,11 +576,13 @@ export type Database = {
         Insert: {
           category_id?: string | null
           color?: string | null
+          colors?: string[] | null
           compare_at_price?: number | null
           created_at?: string
           description?: string | null
           id?: string
           image_url?: string | null
+          images?: string[] | null
           name: string
           price?: number
           slug: string
@@ -583,11 +593,13 @@ export type Database = {
         Update: {
           category_id?: string | null
           color?: string | null
+          colors?: string[] | null
           compare_at_price?: number | null
           created_at?: string
           description?: string | null
           id?: string
           image_url?: string | null
+          images?: string[] | null
           name?: string
           price?: number
           slug?: string

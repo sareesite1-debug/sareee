@@ -5,7 +5,9 @@ import { motion, useSpring } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/hooks/useCart";
 
-interface Product { id: string; name: string; description: string | null; price: number; compare_at_price: number | null; image_url: string | null; stock: number | null; status: string; category_id: string | null; color: string | null; }
+import { colorToSwatch } from "@/lib/colorNames";
+
+interface Product { id: string; name: string; description: string | null; price: number; compare_at_price: number | null; image_url: string | null; stock: number | null; status: string; category_id: string | null; color: string | null; images: string[] | null; colors: string[] | null; }
 
 const ProductDetailPage = () => {
   const { slug } = useParams();
@@ -14,6 +16,8 @@ const ProductDetailPage = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [qty, setQty] = useState(1);
+  const [activeImage, setActiveImage] = useState<string>("");
+  const [selectedColor, setSelectedColor] = useState<string>("");
 
   // 3D Image interaction
   const imgRef = useRef<HTMLDivElement>(null);
@@ -34,6 +38,11 @@ const ProductDetailPage = () => {
     (async () => {
       const { data } = await (supabase.from("products") as any).select("*").eq("slug", slug).maybeSingle();
       setProduct(data);
+      if (data) {
+        setActiveImage(data.image_url || (data.images?.[0] ?? ""));
+        const cols = (data.colors as string[]) || (data.color ? [data.color] : []);
+        setSelectedColor(cols[0] || "");
+      }
       setLoading(false);
     })();
   }, [slug]);
@@ -78,9 +87,10 @@ const ProductDetailPage = () => {
                 className="relative bg-ivory-deep border border-gold/15 p-4 rounded-sm shadow-2xl"
               >
                 <div className="relative overflow-hidden aspect-[3/4] group img-fit" style={{ transform: "translateZ(30px)" }}>
-                  {product.image_url ? (
+                  {activeImage ? (
                     <motion.img
-                      src={product.image_url}
+                      key={activeImage}
+                      src={activeImage}
                       alt={product.name}
                       whileHover={{ scale: 1.15 }}
                       transition={{ duration: 1.5, ease: [0.23, 1, 0.32, 1] }}
@@ -88,11 +98,28 @@ const ProductDetailPage = () => {
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center text-ink-soft font-body uppercase tracking-widest text-xs">No image</div>
                   )}
-                  {/* Reflected light gradient */}
                   <div className="absolute inset-0 bg-gradient-to-tr from-ivory/0 via-ivory/10 to-ivory/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
                 </div>
               </motion.div>
             </motion.div>
+            {/* Thumbnails */}
+            {(() => {
+              const gallery = Array.from(new Set([
+                ...(product.image_url ? [product.image_url] : []),
+                ...((product.images as string[]) || []),
+              ]));
+              if (gallery.length <= 1) return null;
+              return (
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {gallery.map((url, i) => (
+                    <button key={i} type="button" onClick={() => setActiveImage(url)}
+                      className={`w-16 h-20 border overflow-hidden transition ${activeImage === url ? "border-maroon shadow-md" : "border-gold/20 hover:border-gold/50"}`}>
+                      <img src={url} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" loading="lazy" />
+                    </button>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Info Side */}
@@ -129,15 +156,29 @@ const ProductDetailPage = () => {
                 </motion.div>
               )}
 
-              {product.color && (
-                <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="flex items-center gap-3 pb-2">
-                  <span className="text-[10px] uppercase tracking-[0.25em] font-body text-ink-soft">Color</span>
-                  <span className="inline-flex items-center gap-2">
-                    <span className="w-5 h-5 rounded-full border border-gold/30 shadow-sm" style={{ background: product.color }} />
-                    <span className="text-sm font-body text-ink capitalize">{product.color}</span>
-                  </span>
-                </motion.div>
-              )}
+              {(() => {
+                const allColors = ((product.colors as string[]) || []).length
+                  ? (product.colors as string[])
+                  : (product.color ? [product.color] : []);
+                if (!allColors.length) return null;
+                return (
+                  <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="flex flex-wrap items-center gap-3 pb-2">
+                    <span className="text-[10px] uppercase tracking-[0.25em] font-body text-ink-soft">Color{allColors.length > 1 ? "s" : ""}</span>
+                    <div className="flex flex-wrap gap-2">
+                      {allColors.map(c => {
+                        const active = c === selectedColor;
+                        return (
+                          <button key={c} type="button" onClick={() => setSelectedColor(c)}
+                            className={`inline-flex items-center gap-2 border px-2.5 py-1 transition ${active ? "border-maroon bg-maroon/5" : "border-gold/20 hover:border-gold/50"}`}>
+                            <span className="w-4 h-4 rounded-full border border-gold/30" style={{ background: colorToSwatch(c) }} />
+                            <span className="text-xs font-body text-ink capitalize">{c}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                );
+              })()}
 
               <motion.div variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }} className="flex items-center gap-6 pt-2">
                 {product.status === 'out_of_stock' ? (

@@ -25,6 +25,9 @@ const CheckoutPage     = lazy(() => import("@/pages/CheckoutPage"));
 const OrdersPage       = lazy(() => import("@/pages/OrdersPage"));
 const OrderDetailPage  = lazy(() => import("@/pages/OrderDetailPage"));
 const NotFound         = lazy(() => import("@/pages/NotFound"));
+const PrivacyPage      = lazy(() => import("@/pages/PrivacyPage"));
+const TermsPage        = lazy(() => import("@/pages/TermsPage"));
+const ReturnsPage      = lazy(() => import("@/pages/ReturnsPage"));
 
 // Admin — fully lazy, never loaded for regular visitors
 const AdminDashboard       = lazy(() => import("@/pages/admin/AdminDashboard"));
@@ -76,6 +79,9 @@ const App = () => (
                 <Route path="/orders/:id"      element={<OrderDetailPage />} />
                 <Route path="/about"           element={<AboutPage />} />
                 <Route path="/contact"         element={<ContactPage />} />
+                <Route path="/privacy"         element={<PrivacyPage />} />
+                <Route path="/terms"           element={<TermsPage />} />
+                <Route path="/returns"         element={<ReturnsPage />} />
               </Route>
 
               <Route path="/auth" element={<AuthPage />} />
