@@ -6,9 +6,16 @@ import CrudDialog from "@/components/admin/CrudDialog";
 import FormField from "@/components/admin/FormField";
 import DeleteConfirm from "@/components/admin/DeleteConfirm";
 import ImageUploader from "@/components/admin/ImageUploader";
+import MultiImageUploader from "@/components/admin/MultiImageUploader";
+import ColorTagInput from "@/components/admin/ColorTagInput";
+import { colorToSwatch } from "@/lib/colorNames";
 
 interface Category { id: string; name: string; slug: string; sort_order: number | null; }
-interface Product { id: string; category_id: string | null; name: string; slug: string; description: string | null; price: number; compare_at_price: number | null; image_url: string | null; stock: number | null; status: string; color: string | null; }
+interface Product {
+  id: string; category_id: string | null; name: string; slug: string; description: string | null;
+  price: number; compare_at_price: number | null; image_url: string | null; stock: number | null;
+  status: string; color: string | null; images: string[] | null; colors: string[] | null;
+}
 
 const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + Math.random().toString(36).slice(2, 6);
 
@@ -22,7 +29,10 @@ const AdminProducts = () => {
   const [pDialog, setPDialog] = useState(false);
   const [editingP, setEditingP] = useState<Product | null>(null);
   const [pDel, setPDel] = useState<string | null>(null);
-  const blankP = { category_id: "", name: "", description: "", price: "", compare_at_price: "", image_url: "", stock: "0", status: "active", color: "" };
+  const blankP = {
+    category_id: "", name: "", description: "", price: "", compare_at_price: "",
+    image_url: "", images: [] as string[], stock: "0", status: "active", colors: [] as string[],
+  };
   const [pForm, setPForm] = useState(blankP);
 
   // Category dialog
@@ -45,24 +55,38 @@ const AdminProducts = () => {
   const openNewP = () => { setEditingP(null); setPForm({ ...blankP, category_id: categories[0]?.id || "" }); setPDialog(true); };
   const openEditP = (p: Product) => {
     setEditingP(p);
+    const allImages = Array.from(new Set([
+      ...(p.image_url ? [p.image_url] : []),
+      ...((p.images as string[]) || []),
+    ]));
+    const allColors = Array.from(new Set([
+      ...((p.colors as string[]) || []),
+      ...(p.color ? [p.color] : []),
+    ]));
     setPForm({
       category_id: p.category_id || "", name: p.name, description: p.description || "",
       price: String(p.price), compare_at_price: p.compare_at_price ? String(p.compare_at_price) : "",
-      image_url: p.image_url || "", stock: String(p.stock ?? 0), status: p.status, color: p.color || "",
+      image_url: p.image_url || allImages[0] || "",
+      images: allImages,
+      stock: String(p.stock ?? 0), status: p.status,
+      colors: allColors,
     });
     setPDialog(true);
   };
   const submitP = async (e: React.FormEvent) => {
     e.preventDefault();
     const stockNum = Number(pForm.stock) || 0;
-    // Auto-restore to active if admin restocks an out_of_stock product
     const resolvedStatus = pForm.status === "out_of_stock" && stockNum > 0 ? "active" : pForm.status;
+    const primary = pForm.image_url || pForm.images[0] || null;
     const payload: any = {
       category_id: pForm.category_id || null, name: pForm.name, description: pForm.description,
       price: Number(pForm.price) || 0,
       compare_at_price: pForm.compare_at_price ? Number(pForm.compare_at_price) : null,
-      image_url: pForm.image_url || null, stock: stockNum, status: resolvedStatus,
-      color: pForm.color || null,
+      image_url: primary,
+      images: pForm.images,
+      stock: stockNum, status: resolvedStatus,
+      color: pForm.colors[0] || null,
+      colors: pForm.colors,
     };
     if (!editingP) payload.slug = slugify(pForm.name);
     const { error } = editingP
@@ -106,64 +130,68 @@ const AdminProducts = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-heading font-semibold">Products & Catalog</h1>
           <p className="text-sm text-muted-foreground mt-1 font-body">Manage shop products and category groupings</p>
         </div>
-        <button onClick={tab === "products" ? openNewP : openNewC} className="flex items-center gap-2 gradient-gold text-maroon-deep px-4 py-2 text-xs font-medium uppercase tracking-wider rounded-md font-body">
+        <button onClick={tab === "products" ? openNewP : openNewC} className="flex items-center justify-center gap-2 gradient-gold text-maroon-deep px-4 py-2 text-xs font-medium uppercase tracking-wider rounded-md font-body">
           <Plus size={14} /> New {tab === "products" ? "Product" : "Category"}
         </button>
       </div>
 
-      <div className="flex gap-2 mb-6 border-b border-border">
+      <div className="flex gap-2 mb-6 border-b border-border overflow-x-auto">
         {(["products", "categories"] as const).map(t => (
-          <button key={t} onClick={() => setTab(t)} className={`px-4 py-2 text-xs uppercase tracking-wider font-body ${tab === t ? "text-gold border-b-2 border-gold" : "text-muted-foreground"}`}>{t}</button>
+          <button key={t} onClick={() => setTab(t)} className={`px-4 py-2 text-xs uppercase tracking-wider font-body whitespace-nowrap ${tab === t ? "text-gold border-b-2 border-gold" : "text-muted-foreground"}`}>{t}</button>
         ))}
       </div>
 
       {loading ? <p className="text-sm text-muted-foreground font-body animate-pulse">Loading...</p> : tab === "products" ? (
-        <div className="border border-border rounded-lg overflow-hidden">
-          <table className="w-full">
+        <div className="border border-border rounded-lg overflow-x-auto">
+          <table className="w-full min-w-[860px]">
             <thead className="bg-secondary"><tr>
-              {["Image", "Name", "Category", "Color", "Price", "Stock", "Status", "Actions"].map(h => (
-                <th key={h} className="text-left px-4 py-3 text-xs font-medium uppercase tracking-wider font-body">{h}</th>
+              {["Image", "Name", "Category", "Colors", "Price", "Stock", "Status", "Actions"].map(h => (
+                <th key={h} className="text-left px-4 py-3 text-xs font-medium uppercase tracking-wider font-body whitespace-nowrap">{h}</th>
               ))}
             </tr></thead>
             <tbody>
               {products.length === 0 ? (
                 <tr><td colSpan={8} className="px-4 py-8 text-center text-sm text-muted-foreground font-body">No products yet.</td></tr>
-              ) : products.map(p => (
+              ) : products.map(p => {
+                const cols = (p.colors as string[]) || (p.color ? [p.color] : []);
+                return (
                 <tr key={p.id} className="border-t border-border hover:bg-muted/50">
-                  <td className="px-4 py-3"><div className="w-12 h-12 bg-secondary rounded overflow-hidden">{p.image_url && <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />}</div></td>
-                  <td className="px-4 py-3 text-sm font-medium font-body">{p.name}</td>
-                  <td className="px-4 py-3 text-sm font-body">{catName(p.category_id)}</td>
+                  <td className="px-4 py-3"><div className="w-12 h-12 bg-secondary rounded overflow-hidden">{p.image_url && <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" loading="lazy" />}</div></td>
+                  <td className="px-4 py-3 text-sm font-medium font-body whitespace-nowrap">{p.name}</td>
+                  <td className="px-4 py-3 text-sm font-body whitespace-nowrap">{catName(p.category_id)}</td>
                   <td className="px-4 py-3 text-sm font-body">
-                    {p.color ? (
-                      <span className="inline-flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded-full border border-border" style={{ background: p.color }} />
-                        <span className="capitalize">{p.color}</span>
-                      </span>
+                    {cols.length ? (
+                      <div className="flex items-center gap-1">
+                        {cols.slice(0, 4).map((c, i) => (
+                          <span key={i} title={c} className="w-4 h-4 rounded-full border border-border" style={{ background: colorToSwatch(c) }} />
+                        ))}
+                        {cols.length > 4 && <span className="text-[10px] text-muted-foreground ml-1">+{cols.length - 4}</span>}
+                      </div>
                     ) : <span className="text-muted-foreground">—</span>}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gold font-medium font-body">₹{Number(p.price).toLocaleString()}</td>
+                  <td className="px-4 py-3 text-sm text-gold font-medium font-body whitespace-nowrap">₹{Number(p.price).toLocaleString()}</td>
                   <td className="px-4 py-3 text-sm font-body">{p.stock}</td>
-                  <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded-full font-body ${p.status === 'active' ? 'bg-green-100 text-green-700' : p.status === 'out_of_stock' ? 'bg-red-100 text-red-600' : 'bg-secondary text-muted-foreground'}`}>{p.status === 'out_of_stock' ? 'Out of Stock' : p.status}</span></td>
+                  <td className="px-4 py-3"><span className={`text-xs px-2 py-1 rounded-full font-body whitespace-nowrap ${p.status === 'active' ? 'bg-green-100 text-green-700' : p.status === 'out_of_stock' ? 'bg-red-100 text-red-600' : 'bg-secondary text-muted-foreground'}`}>{p.status === 'out_of_stock' ? 'Out of Stock' : p.status}</span></td>
                   <td className="px-4 py-3"><div className="flex gap-2">
                     <button onClick={() => openEditP(p)} className="text-muted-foreground hover:text-foreground"><Pencil size={14} /></button>
                     <button onClick={() => setPDel(p.id)} className="text-muted-foreground hover:text-destructive"><Trash2 size={14} /></button>
                   </div></td>
                 </tr>
-              ))}
+              );})}
             </tbody>
           </table>
         </div>
       ) : (
-        <div className="border border-border rounded-lg overflow-hidden">
-          <table className="w-full">
+        <div className="border border-border rounded-lg overflow-x-auto">
+          <table className="w-full min-w-[600px]">
             <thead className="bg-secondary"><tr>
               {["Name", "Slug", "Sort", "Products", "Actions"].map(h => (
-                <th key={h} className="text-left px-4 py-3 text-xs font-medium uppercase tracking-wider font-body">{h}</th>
+                <th key={h} className="text-left px-4 py-3 text-xs font-medium uppercase tracking-wider font-body whitespace-nowrap">{h}</th>
               ))}
             </tr></thead>
             <tbody>
@@ -171,8 +199,8 @@ const AdminProducts = () => {
                 <tr><td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground font-body">No categories yet.</td></tr>
               ) : categories.map(c => (
                 <tr key={c.id} className="border-t border-border hover:bg-muted/50">
-                  <td className="px-4 py-3 text-sm font-medium font-body">{c.name}</td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground font-body">{c.slug}</td>
+                  <td className="px-4 py-3 text-sm font-medium font-body whitespace-nowrap">{c.name}</td>
+                  <td className="px-4 py-3 text-xs text-muted-foreground font-body whitespace-nowrap">{c.slug}</td>
                   <td className="px-4 py-3 text-sm font-body">{c.sort_order}</td>
                   <td className="px-4 py-3 text-sm font-body">{products.filter(p => p.category_id === c.id).length}</td>
                   <td className="px-4 py-3"><div className="flex gap-2">
@@ -191,36 +219,31 @@ const AdminProducts = () => {
           <FormField label="Name" value={pForm.name} onChange={v => setPForm({ ...pForm, name: v })} required />
           <FormField label="Category" value={pForm.category_id} onChange={v => setPForm({ ...pForm, category_id: v })} options={categories.map(c => ({ value: c.id, label: c.name }))} />
           <FormField label="Description" value={pForm.description} onChange={v => setPForm({ ...pForm, description: v })} type="textarea" />
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <FormField label="Price (₹)" value={pForm.price} onChange={v => setPForm({ ...pForm, price: v })} type="number" required />
             <FormField label="Compare-at price (₹)" value={pForm.compare_at_price} onChange={v => setPForm({ ...pForm, compare_at_price: v })} type="number" />
           </div>
-          <ImageUploader value={pForm.image_url} onChange={v => setPForm({ ...pForm, image_url: v })} folder="products" label="Product Image" />
-          <div>
-            <label className="block text-xs font-body font-medium uppercase tracking-wider mb-1.5">Color</label>
-            <div className="flex items-center gap-2">
-              <input type="color" value={/^#[0-9a-fA-F]{6}$/.test(pForm.color) ? pForm.color : "#8b1e3f"}
-                onChange={e => setPForm({ ...pForm, color: e.target.value })}
-                className="h-10 w-14 border border-border rounded-md bg-background cursor-pointer p-1" />
-              <input type="text" value={pForm.color} onChange={e => setPForm({ ...pForm, color: e.target.value })}
-                placeholder="e.g. Maroon, Emerald, #c9a84c"
-                className="flex-1 border border-border bg-background px-4 py-2.5 text-sm font-body rounded-md" />
-              {pForm.color && (
-                <button type="button" onClick={() => setPForm({ ...pForm, color: "" })} className="text-xs text-muted-foreground hover:text-destructive px-2">Clear</button>
-              )}
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
+
+          <MultiImageUploader
+            images={pForm.images}
+            onChange={imgs => setPForm({ ...pForm, images: imgs, image_url: pForm.image_url && imgs.includes(pForm.image_url) ? pForm.image_url : (imgs[0] || "") })}
+            primaryUrl={pForm.image_url}
+            onPrimaryChange={url => setPForm({ ...pForm, image_url: url })}
+            folder="products"
+          />
+
+          <ColorTagInput colors={pForm.colors} onChange={cols => setPForm({ ...pForm, colors: cols })} />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <FormField label="Stock" value={pForm.stock} onChange={v => {
               const stockNum = Number(v) || 0;
-              // Auto-restore active when admin adds stock back
               const newStatus = pForm.status === "out_of_stock" && stockNum > 0 ? "active" : pForm.status;
               setPForm(f => ({ ...f, stock: v, status: newStatus }));
             }} type="number" />
             <FormField label="Status" value={pForm.status} onChange={v => setPForm(f => ({ ...f, status: v }))} options={[
               { value: "active", label: "Active" },
-              { value: "out_of_stock", label: "Out of Stock" },
-              { value: "inactive", label: "Inactive" },
+              { value: "out_of_stock", label: "Out of Stock (hidden from shop)" },
+              { value: "inactive", label: "Inactive (hidden from shop)" },
             ]} />
           </div>
           <button type="submit" className="w-full gradient-gold text-maroon-deep py-2.5 text-xs font-body font-semibold uppercase tracking-[0.2em] rounded-md">

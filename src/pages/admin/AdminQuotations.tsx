@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Plus, Pencil, Trash2, FileDown, Printer, X } from "lucide-react";
+import { Plus, Pencil, Trash2, FileDown, Printer, X, Share2 } from "lucide-react";
 import { useSupabaseCrud } from "@/hooks/useSupabaseCrud";
 import CrudDialog from "@/components/admin/CrudDialog";
 import FormField from "@/components/admin/FormField";
 import DeleteConfirm from "@/components/admin/DeleteConfirm";
 import PartySelector from "@/components/admin/PartySelector";
-import { printBill, downloadBillPdf, BillData, BillItem } from "@/lib/billPdf";
+import { printBill, downloadBillPdf, shareBill, BillData, BillItem } from "@/lib/billPdf";
 
 interface Quotation {
   id: string; quotation_number: string; client_name: string; client_email: string;
@@ -128,6 +128,7 @@ const AdminQuotations = () => {
                     <div className="flex gap-2">
                       <button onClick={() => printBill(toBill(q))} className="text-muted-foreground hover:text-foreground" title="Print"><Printer size={14} /></button>
                       <button onClick={() => downloadBillPdf(toBill(q))} className="text-gold hover:text-gold/80" title="Download PDF"><FileDown size={14} /></button>
+                      <button onClick={() => shareBill(toBill(q))} className="text-emerald hover:text-emerald-deep" title="Share (WhatsApp / device share)"><Share2 size={14} /></button>
                       <button onClick={() => openEdit(q)} className="text-muted-foreground hover:text-foreground"><Pencil size={14} /></button>
                       <button onClick={() => setDeleteId(q.id)} className="text-muted-foreground hover:text-destructive"><Trash2 size={14} /></button>
                     </div>
