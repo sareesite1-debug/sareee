@@ -70,6 +70,8 @@ const CheckoutPage = () => {
     const itemRows = items.map(i => ({
       order_id: order.id, product_id: i.product_id, product_name: i.product?.name || "Item",
       unit_price: Number(i.product?.price) || 0, quantity: i.quantity, subtotal: (Number(i.product?.price) || 0) * i.quantity,
+      product_image: (i.product as any)?.image_url || null,
+      product_color: (i.product as any)?.color || null,
     }));
     await (supabase.from("customer_order_items") as any).insert(itemRows);
     await clearCart();

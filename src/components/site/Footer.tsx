@@ -110,7 +110,13 @@ const Footer = () => {
         <div className="container mx-auto px-6 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="font-body text-[10px] text-ivory/60 tracking-widest">© {year} {BRAND.name}. Crafted with reverence.</p>
           <div className="flex gap-8">
-            {["Privacy", "Terms", "Returns"].map(l => <a key={l} href="#" className="font-body text-[10px] text-ivory/60 hover:text-ivory tracking-widest transition-colors">{l}</a>)}
+            {[
+              { to: "/privacy", label: "Privacy" },
+              { to: "/terms", label: "Terms" },
+              { to: "/returns", label: "Returns" },
+            ].map(l => (
+              <Link key={l.to} to={l.to} className="font-body text-[10px] text-ivory/60 hover:text-ivory tracking-widest transition-colors">{l.label}</Link>
+            ))}
           </div>
         </div>
       </div>
