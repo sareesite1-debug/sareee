@@ -125,20 +125,20 @@ const HomePage = () => {
           <div className="absolute top-1/3 left-1/3 w-80 h-80 rounded-full bg-gold/8 blur-[120px] pointer-events-none" aria-hidden="true" />
 
           <div className="relative z-10 max-w-lg w-full">
-            <div className="flex items-center gap-4 mb-8 sm:mb-10">
+            <div className="flex items-center gap-4 mb-3 sm:mb-4">
               <div className="w-10 h-px bg-gold/60" aria-hidden="true" />
               <span className="eyebrow text-gold/80">{hero.eyebrow || "Since 1985 · Arpitha Saree Center"}</span>
             </div>
 
-            <h1 className="font-heading text-[clamp(2.5rem,5.5vw,5.5rem)] text-ivory leading-[1.05] mb-6 sm:mb-8">
+            <h1 className="font-heading text-[clamp(2.5rem,5.5vw,5.5rem)] text-ivory leading-[1.05] mb-4 sm:mb-3">
               <span className="block">{hero.heading || "Woven in"}</span>
               <span className="block italic text-gold">Kanchipuram.</span>
               <span className="block">Worn with pride.</span>
             </h1>
 
-            <div className="h-px bg-gradient-to-r from-gold via-gold/60 to-transparent mb-6 sm:mb-8" aria-hidden="true" />
+            <div className="h-px bg-gradient-to-r from-gold via-gold/60 to-transparent mb-4 sm:mb-3" aria-hidden="true" />
 
-            <p className="text-ivory/90 text-base font-body font-light leading-relaxed max-w-md mb-10 sm:mb-12">
+            <p className="text-ivory/90 text-base font-body font-light leading-relaxed max-w-md mb-4 sm:mb-3">
               {hero.subheading || "Pure Kanchipuram silk sarees, handwoven by master craftsmen — GI-certified, real zari, and crafted to last a lifetime."}
             </p>
 
@@ -232,11 +232,11 @@ const HomePage = () => {
 
       {/* ── FRESH FROM THE LOOM ──────────────────────────────────── */}
       {featuredProducts.length > 0 && (
-        <section className="py-20 sm:py-32 lg:py-44 bg-ivory" aria-labelledby="loom-heading">
+        <section className="py-10 sm:py-14 bg-ivory" aria-labelledby="loom-heading">
           <div className="container mx-auto px-4 sm:px-6 lg:px-10">
-            <div className="flex items-end justify-between mb-12 sm:mb-16 gap-6 flex-wrap">
+            <div className="flex items-end justify-between mb-3 sm:mb-4 gap-6 flex-wrap">
               <div>
-                <div className="flex items-center gap-3 mb-5">
+                <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-px bg-gold-dark" aria-hidden="true" />
                   <span className="eyebrow text-gold-dark">Just Woven</span>
                 </div>
@@ -247,11 +247,11 @@ const HomePage = () => {
               <Link to="/shop" className="link-reveal font-display text-[9px] tracking-[0.3em] uppercase text-maroon">Shop all →</Link>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 sm:gap-x-5 gap-y-10 sm:gap-y-16">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 sm:gap-x-5 gap-y-4 sm:gap-y-6">
               {featuredProducts.slice(0, 4).map((p, i) => (
                 <FadeUp key={p.id} delay={Math.min(i * 0.04, 0.16)}>
                   <Link to={`/shop/${p.slug}`} className="group block relative">
-                    <div className="relative overflow-hidden aspect-[3/4] mb-4 sm:mb-5 bg-ivory-deep border border-gold/10 img-fit">
+                    <div className="relative overflow-hidden aspect-[3/4] mb-4 sm:mb-3 bg-ivory-deep border border-gold/10 img-fit">
                       {p.image_url ? (
                         <img
                           src={p.image_url}
@@ -276,11 +276,11 @@ const HomePage = () => {
 
       {/* ── NEW ARRIVALS ─────────────────────────────────────────── */}
       {featuredProducts.length > 0 && (
-        <section className="py-20 sm:py-32 lg:py-44 bg-ivory-deep" aria-labelledby="arrivals-heading">
+        <section className="py-10 sm:py-14 bg-ivory-deep" aria-labelledby="arrivals-heading">
           <div className="container mx-auto px-4 sm:px-6 lg:px-10">
-            <div className="flex items-end justify-between mb-12 sm:mb-16 gap-6 flex-wrap">
+            <div className="flex items-end justify-between mb-3 sm:mb-4 gap-6 flex-wrap">
               <div>
-                <div className="flex items-center gap-3 mb-5">
+                <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-px bg-gold-dark" aria-hidden="true" />
                   <span className="eyebrow text-gold-dark">New In</span>
                 </div>
@@ -291,11 +291,11 @@ const HomePage = () => {
               <Link to="/shop" className="link-reveal font-display text-[9px] tracking-[0.3em] uppercase text-maroon">View all →</Link>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 sm:gap-x-5 gap-y-10 sm:gap-y-16">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 sm:gap-x-5 gap-y-4 sm:gap-y-6">
               {featuredProducts.map((p, i) => (
                 <FadeUp key={p.id} delay={Math.min(i * 0.04, 0.16)}>
                   <Link to={`/shop/${p.slug}`} className="group block relative">
-                    <div className="relative overflow-hidden aspect-[3/4] mb-4 sm:mb-5 bg-ivory border border-gold/10 img-fit">
+                    <div className="relative overflow-hidden aspect-[3/4] mb-4 sm:mb-3 bg-ivory border border-gold/10 img-fit">
                       {/* NEW IN badge */}
                       <div className="absolute top-3 left-3 z-10 bg-maroon-deep text-ivory font-display text-[8px] tracking-[0.25em] uppercase px-2.5 py-1">
                         New In
@@ -323,11 +323,11 @@ const HomePage = () => {
       )}
 
       {/* ── COLLECTIONS / CATEGORIES ─────────────────────────────── */}
-      <section className="py-20 sm:py-32 lg:py-44 bg-ivory" aria-labelledby="collections-heading">
+      <section className="py-10 sm:py-14 bg-ivory" aria-labelledby="collections-heading">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="flex items-end justify-between mb-12 sm:mb-16 gap-6 flex-wrap">
+          <div className="flex items-end justify-between mb-3 sm:mb-4 gap-6 flex-wrap">
             <div>
-              <div className="flex items-center gap-3 mb-5">
+              <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-px bg-gold-dark" aria-hidden="true" />
                 <span className="eyebrow text-gold-dark">{featured.eyebrow || "The Collections"}</span>
               </div>
@@ -339,16 +339,16 @@ const HomePage = () => {
           </div>
 
           {categories.length === 0 ? (
-            <div className="border border-dashed border-gold/30 py-16 sm:py-24 text-center">
+            <div className="border border-dashed border-gold/30 py-8 sm:py-12 text-center">
               <p className="font-heading text-2xl sm:text-3xl text-ink mb-2">Collections coming soon</p>
               <p className="text-sm text-ink-soft font-body">Add your first category from the admin panel.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 sm:gap-x-6 gap-y-12 sm:gap-y-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-4 sm:gap-x-6 gap-y-4 sm:gap-y-6">
               {categories.map((c, i) => (
                 <FadeUp key={c.id} delay={Math.min(i * 0.05, 0.2)}>
                   <Link to={`/categories/${c.slug}`} className="group block">
-                    <div className="relative overflow-hidden aspect-[4/5] mb-5 sm:mb-6 bg-ivory-deep img-fit">
+                    <div className="relative overflow-hidden aspect-[4/5] mb-3 sm:mb-4 bg-ivory-deep img-fit">
                       {c.image_url ? (
                         <>
                           <img
@@ -383,13 +383,13 @@ const HomePage = () => {
       </section>
 
       {/* ── TESTIMONIALS ─────────────────────────────────────────── */}
-      <section className="relative py-20 sm:py-32 lg:py-44 bg-maroon-deep overflow-hidden" aria-labelledby="testimonials-heading">
+      <section className="relative py-10 sm:py-14 bg-maroon-deep overflow-hidden" aria-labelledby="testimonials-heading">
         <PatternBg />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gold/5 blur-[140px] pointer-events-none" aria-hidden="true" />
 
         <div className="container mx-auto px-4 sm:px-6 lg:px-10 relative z-10">
-          <div className="text-center mb-14 sm:mb-20">
-            <div className="flex items-center justify-center gap-3 mb-5">
+          <div className="text-center mb-3 sm:mb-4">
+            <div className="flex items-center justify-center gap-3 mb-3">
               <div className="w-8 h-px bg-gold/40" aria-hidden="true" />
               <span className="eyebrow text-gold">What Our Customers Say</span>
               <div className="w-8 h-px bg-gold/40" aria-hidden="true" />
@@ -424,7 +424,7 @@ const HomePage = () => {
       </section>
 
       {/* ── TRUST STRIP ──────────────────────────────────────────── */}
-      <section className="bg-ivory-deep py-16 sm:py-20 border-y border-gold/15 relative overflow-hidden" aria-label="Why shop with us">
+      <section className="bg-ivory-deep py-8 sm:py-10 border-y border-gold/15 relative overflow-hidden" aria-label="Why shop with us">
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-gold/15">
             {[
@@ -447,21 +447,21 @@ const HomePage = () => {
       </section>
 
       {/* ── CTA ──────────────────────────────────────────────────── */}
-      <section className="relative py-20 sm:py-32 lg:py-44 bg-maroon-deep overflow-hidden" aria-labelledby="cta-heading">
+      <section className="relative py-10 sm:py-14 bg-maroon-deep overflow-hidden" aria-labelledby="cta-heading">
         <div className="container mx-auto px-4 sm:px-6 text-center max-w-2xl relative z-10">
-          <div className="flex items-center justify-center gap-3 mb-6">
+          <div className="flex items-center justify-center gap-3 mb-4">
             <div className="w-8 h-px bg-gold/40" aria-hidden="true" />
             <span className="eyebrow text-gold">Visit Arpitha Saree Center</span>
             <div className="w-8 h-px bg-gold/40" aria-hidden="true" />
           </div>
 
-          <h2 id="cta-heading" className="text-display text-3xl sm:text-4xl md:text-6xl text-ivory mb-8 leading-[1.0]">
+          <h2 id="cta-heading" className="text-display text-3xl sm:text-4xl md:text-6xl text-ivory mb-5 leading-[1.0]">
             A saree is best
             <br />
             <span className="italic text-gold/90">chosen in person.</span>
           </h2>
 
-          <p className="text-ivory/85 font-body mb-10 sm:mb-12 leading-relaxed text-sm sm:text-base">
+          <p className="text-ivory/85 font-body mb-4 sm:mb-3 leading-relaxed text-sm sm:text-base">
             Step into Arpitha Saree Center in Kanchipuram and experience the joy of choosing your pure silk saree in person — feel the zari, touch the silk, and find the one that's truly yours.
           </p>
 
