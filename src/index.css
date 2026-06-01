@@ -110,12 +110,11 @@
   img { image-rendering: -webkit-optimize-contrast; }
   ::selection { background: hsl(var(--gold) / 0.35); color: hsl(var(--ink)); }
 
-  /* Mobile: increase minimum touch target sizes */
+  /* Mobile: increase minimum touch target sizes — only on interactive elements that aren't already flex containers */
   @media (max-width: 1024px) {
-    a, button {
+    button:not([class*="flex"]):not([class*="grid"]),
+    a:not([class*="flex"]):not([class*="grid"]):not([class*="block"]) {
       min-height: 44px;
-      display: inline-flex;
-      align-items: center;
     }
   }
 
@@ -336,12 +335,18 @@
   .card-3d {
     transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.5s cubic-bezier(0.23, 1, 0.32, 1);
     transform-origin: center bottom;
+    contain: layout style;
   }
   @media (min-width: 1024px) {
     .card-3d:hover {
       transform: perspective(800px) rotateX(3deg) translateY(-10px);
       box-shadow: 0 50px 100px -30px hsl(var(--maroon-deep) / 0.2), 0 0 0 1px hsl(var(--gold) / 0.15);
+      will-change: transform;
     }
+  }
+  /* On mobile, disable 3D card entirely — too expensive */
+  @media (max-width: 1023px) {
+    .card-3d { transform: none !important; transition: none !important; }
   }
 
   .image-reveal { overflow: hidden; }
@@ -430,18 +435,23 @@
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-.marquee-track { display: flex; width: max-content; animation: marquee 30s linear infinite; }
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+  will-change: transform;
+}
 .marquee-track:hover { animation-play-state: paused; }
-/* Pause marquee on mobile to save battery */
+/* Stop marquee entirely on mobile — saves CPU/battery, no one reads it */
 @media (max-width: 640px) {
-  .marquee-track { animation-duration: 20s; }
+  .marquee-track { animation: none; }
 }
 
 @keyframes float { 0%, 100% { transform: translateY(0px) rotate(-0.5deg); } 50% { transform: translateY(-14px) rotate(0.5deg); } }
-.animate-float { animation: float 7s ease-in-out infinite; }
+.animate-float { animation: float 7s ease-in-out infinite; will-change: transform; }
 
 @keyframes slow-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-.animate-slow-spin { animation: slow-spin 35s linear infinite; }
+.animate-slow-spin { animation: slow-spin 35s linear infinite; will-change: transform; }
 
 @keyframes pulse-gold { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 .animate-pulse-gold { animation: pulse-gold 3s ease-in-out infinite; }
@@ -450,7 +460,7 @@
   0%, 100% { opacity: 0.4; transform: scale(1); }
   50% { opacity: 0.8; transform: scale(1.05); }
 }
-.animate-pulse-glow { animation: pulseGlow 4s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulseGlow 4s ease-in-out infinite; will-change: transform, opacity; }
 
 @keyframes floatOrb {
   0%, 100% { transform: translate(0, 0) scale(1); }
@@ -458,7 +468,7 @@
   50% { transform: translate(-10px, -40px) scale(0.95); }
   75% { transform: translate(-30px, -10px) scale(1.03); }
 }
-.animate-float-orb { animation: floatOrb 12s ease-in-out infinite; }
+.animate-float-orb { animation: floatOrb 12s ease-in-out infinite; will-change: transform; }
 
 @keyframes aurora {
   0%, 100% { background-position: 0% 50%; }
