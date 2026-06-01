@@ -16,29 +16,6 @@ const NAV_LINKS = [
   { to: "/contact",    label: "Contact",     icon: Phone   },
 ];
 
-// ─── Scroll-lock helpers ──────────────────────────────────────────────────────
-// iOS Safari ignores overflow:hidden on <body>. We need to fix the body
-// position to truly prevent background scroll on all mobile browsers.
-let scrollY = 0;
-
-function lockScroll() {
-  scrollY = window.scrollY;
-  document.body.style.overflow   = "hidden";
-  document.body.style.position   = "fixed";
-  document.body.style.top        = `-${scrollY}px`;
-  document.body.style.width      = "100%";
-}
-
-function unlockScroll() {
-  document.body.style.overflow   = "";
-  document.body.style.position   = "";
-  document.body.style.top        = "";
-  document.body.style.width      = "";
-  // Restore scroll position silently
-  window.scrollTo({ top: scrollY, behavior: "instant" as ScrollBehavior });
-}
-// ─────────────────────────────────────────────────────────────────────────────
-
 const Navbar = () => {
   const [open, setOpen]         = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -48,27 +25,13 @@ const Navbar = () => {
   const location  = useLocation();
   const navigate  = useNavigate();
   const { count } = useCart();
-  const closeRef  = useRef<HTMLButtonElement>(null);
+  const xBtnRef   = useRef<HTMLButtonElement>(null);
 
-  // Track whether drawer is truly closed (animation done) to guard re-opens
-  const isClosing = useRef(false);
+  // ── stable callbacks ────────────────────────────────────────────────────────
+  const close = useCallback(() => setOpen(false), []);
+  const open_ = useCallback(() => setOpen(true),  []);
 
-  // Single stable open/close — guards against rapid navigation races
-  const openDrawer = useCallback(() => {
-    if (isClosing.current) return; // ignore tap while exit-animation is running
-    setOpen(true);
-  }, []);
-
-  const close = useCallback(() => {
-    isClosing.current = true;
-    setOpen(false);
-  }, []);
-
-  const onExitComplete = useCallback(() => {
-    isClosing.current = false;
-  }, []);
-
-  /* ── scroll detection ───────────────────────────────────────────────────── */
+  // ── scroll detection ────────────────────────────────────────────────────────
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
@@ -76,7 +39,7 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* ── auth ───────────────────────────────────────────────────────────────── */
+  // ── auth ────────────────────────────────────────────────────────────────────
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setUser(session?.user ?? null);
@@ -90,33 +53,25 @@ const Navbar = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  /* ── body scroll lock (iOS-safe) ────────────────────────────────────────── */
+  // ── body scroll lock ────────────────────────────────────────────────────────
+  // We only toggle overflow — do NOT use position:fixed on body because it
+  // shifts the layout coordinate space and breaks tap targets on the backdrop
+  // and X button. The drawer itself already has pointer-events correctly layered.
   useEffect(() => {
-    if (open) {
-      lockScroll();
-    } else {
-      unlockScroll();
-    }
-    // Always clean up on unmount — prevents stuck lock if the component
-    // is destroyed while the drawer is open (e.g. admin route change).
-    return () => { unlockScroll(); };
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
   }, [open]);
 
-  /* ── close on route change ──────────────────────────────────────────────── */
-  // Use a ref for `close` so the effect below doesn't re-subscribe on every render
-  const closeRef2 = useRef(close);
-  useEffect(() => { closeRef2.current = close; }, [close]);
-
+  // ── close on route change ───────────────────────────────────────────────────
+  const pathnameRef = useRef(location.pathname);
   useEffect(() => {
-    // Only fire when the drawer is actually open to avoid no-op calls
-    return () => {
-      // Runs before the next pathname effect — closes synchronously
-      closeRef2.current();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (pathnameRef.current !== location.pathname) {
+      pathnameRef.current = location.pathname;
+      setOpen(false);
+    }
   }, [location.pathname]);
 
-  /* ── Escape key ─────────────────────────────────────────────────────────── */
+  // ── Escape key ──────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") close(); };
@@ -124,15 +79,15 @@ const Navbar = () => {
     return () => document.removeEventListener("keydown", handler);
   }, [open, close]);
 
-  /* ── focus close button when drawer opens ───────────────────────────────── */
+  // ── focus X button when drawer opens ────────────────────────────────────────
   useEffect(() => {
     if (open) {
-      const t = setTimeout(() => closeRef.current?.focus(), 50);
+      const t = setTimeout(() => xBtnRef.current?.focus(), 60);
       return () => clearTimeout(t);
     }
   }, [open]);
 
-  /* ── swipe-left to close ────────────────────────────────────────────────── */
+  // ── swipe-left to close (horizontal swipe only) ──────────────────────────────
   useEffect(() => {
     if (!open) return;
     let startX = 0;
@@ -144,8 +99,7 @@ const Navbar = () => {
     const onEnd = (e: TouchEvent) => {
       const dx = startX - e.changedTouches[0].clientX;
       const dy = Math.abs(e.changedTouches[0].clientY - startY);
-      // Only treat as a left-swipe if horizontal motion dominates
-      if (dx > 50 && dx > dy * 1.5) close();
+      if (dx > 60 && dx > dy * 2) close();   // clearly horizontal leftward swipe
     };
     document.addEventListener("touchstart", onStart, { passive: true });
     document.addEventListener("touchend",   onEnd,   { passive: true });
@@ -249,7 +203,7 @@ const Navbar = () => {
               {/* Hamburger */}
               <button
                 className="lg:hidden flex items-center justify-center w-11 h-11 ml-1 text-ink border border-gold/20 active:scale-95 transition-transform"
-                onClick={openDrawer}
+                onClick={open_}
                 aria-label="Open navigation menu"
                 aria-expanded={open}
                 aria-controls="mobile-nav"
@@ -261,25 +215,29 @@ const Navbar = () => {
         </div>
       </header>
 
-      {/* ══ MOBILE DRAWER ══ */}
-      <AnimatePresence onExitComplete={onExitComplete}>
+      {/* ══ MOBILE DRAWER ══
+          Both backdrop and drawer use fixed positioning inside a React portal-like
+          fragment. The backdrop sits at z-[60], drawer at z-[70] so the drawer is
+          always on top and its buttons receive pointer events first.
+          IMPORTANT: do NOT set position:fixed on <body> — it moves the layout
+          coordinate system and makes fixed children miss click/touch targets.       */}
+      <AnimatePresence>
         {open && (
           <>
-            {/* Backdrop — clicking closes */}
+            {/* ── Backdrop ── */}
             <motion.div
               key="backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.25 }}
               className="lg:hidden fixed inset-0 z-[60] bg-black/50"
               onClick={close}
+              onTouchEnd={(e) => { e.preventDefault(); close(); }}
               aria-hidden="true"
-              // Prevent scroll-through on the backdrop itself
-              style={{ touchAction: "none" }}
             />
 
-            {/* Drawer */}
+            {/* ── Drawer panel ── */}
             <motion.aside
               key="drawer"
               id="mobile-nav"
@@ -291,9 +249,8 @@ const Navbar = () => {
               exit={{ x: "-100%" }}
               transition={{ type: "spring", stiffness: 340, damping: 38 }}
               className="lg:hidden fixed top-0 left-0 bottom-0 z-[70] w-[80vw] max-w-[300px] bg-ivory flex flex-col"
-              // Stop clicks/touches inside the drawer from reaching the backdrop
               onClick={(e) => e.stopPropagation()}
-              onTouchMove={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
             >
 
               {/* Header */}
@@ -303,7 +260,7 @@ const Navbar = () => {
                   <span className="font-heading text-2xl text-ivory font-light leading-tight">Arpitha</span>
                 </div>
                 <button
-                  ref={closeRef}
+                  ref={xBtnRef}
                   onClick={close}
                   aria-label="Close navigation menu"
                   className="flex items-center justify-center w-10 h-10 border border-ivory/20 text-ivory/70 hover:text-ivory hover:border-ivory/50 transition-colors rounded-sm"
@@ -327,11 +284,7 @@ const Navbar = () => {
                     </div>
                   </div>
                 ) : (
-                  <Link
-                    to="/auth"
-                    onClick={close}
-                    className="flex items-center gap-3 group"
-                  >
+                  <Link to="/auth" onClick={close} className="flex items-center gap-3 group">
                     <div className="w-9 h-9 rounded-full border border-gold/30 flex items-center justify-center shrink-0 group-hover:border-maroon transition-colors" aria-hidden="true">
                       <User size={15} className="text-ink-soft group-hover:text-maroon transition-colors" strokeWidth={1.5} />
                     </div>
@@ -349,7 +302,7 @@ const Navbar = () => {
 
                 {NAV_LINKS.map((l) => {
                   const active = location.pathname === l.to;
-                  const Icon = l.icon;
+                  const Icon   = l.icon;
                   return (
                     <Link
                       key={l.to}
