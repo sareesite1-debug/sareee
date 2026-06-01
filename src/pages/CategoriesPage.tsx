@@ -1,9 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, ShoppingBag, Sparkles } from "lucide-react";
+import { ArrowLeft, Sparkles } from "lucide-react";
 import { motion, useScroll, useTransform, useSpring, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import { useCart } from "@/hooks/useCart";
 
 interface Category { id: string; name: string; slug: string; description: string | null; image_url: string | null; sort_order: number; }
 interface Product { id: string; name: string; slug: string; price: number; compare_at_price: number | null; image_url: string | null; stock: number | null; status: string; }
@@ -37,7 +36,7 @@ const Magnetic3DCard = ({ children, className = "" }: { children: React.ReactNod
   );
 };
 
-const ProductCard = ({ product, index, addToCart }: { product: Product; index: number; addToCart: (id: string) => void }) => {
+const ProductCard = ({ product, index }: { product: Product; index: number }) => {
   const [hovered, setHovered] = useState(false);
   return (
     <motion.div initial={{ opacity: 1, scale: 0.9, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ type: "spring", stiffness: 200, damping: 25, delay: index * 0.05 }}
@@ -47,11 +46,6 @@ const ProductCard = ({ product, index, addToCart }: { product: Product; index: n
           {product.image_url ? (
             <>
               <motion.img src={product.image_url} alt={product.name} animate={{ scale: hovered ? 1.08 : 1 }} transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }} loading="lazy" />
-              <motion.div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/70 via-emerald-deep/20 to-transparent" initial={{ opacity: 1 }} animate={{ opacity: hovered ? 1 : 0.98 }} transition={{ duration: 0.4 }} />
-              <motion.button className="absolute bottom-4 left-4 right-4 glass-card-dark text-gold font-display text-[8px] tracking-[0.3em] uppercase py-3 flex items-center justify-center gap-2 border-gold/20"
-                initial={{ y: 20, opacity: 1 }} animate={{ y: hovered ? 0 : 20, opacity: hovered ? 1 : 0.98 }} transition={{ duration: 0.4, type: "spring" }} onClick={(e) => { e.preventDefault(); addToCart(product.id); }}>
-                <ShoppingBag size={11} strokeWidth={1.5} /> Quick Add
-              </motion.button>
             </>
           ) : <div className="w-full h-full flex items-center justify-center"><Sparkles size={20} className="text-gold/30" /></div>}
         </div>
@@ -70,7 +64,6 @@ const CategoriesPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
   const [loading, setLoading] = useState(true);
-  const { addToCart } = useCart();
 
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
@@ -214,7 +207,7 @@ const CategoriesPage = () => {
         ) : (
           <motion.div layout className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-16">
             <AnimatePresence mode="popLayout">
-              {products.map((p, i) => <ProductCard key={p.id} product={p} index={i} addToCart={addToCart} />)}
+              {products.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
             </AnimatePresence>
           </motion.div>
         )}
