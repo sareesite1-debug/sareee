@@ -21,34 +21,29 @@ export default defineConfig({
     sourcemap: false,
     target: "es2020",
     chunkSizeWarningLimit: 600,
+    // Inline small assets (<4KB) to save round trips
+    assetsInlineLimit: 4096,
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // Keep React core tiny and stable
           if (id.includes("node_modules/react/") || id.includes("node_modules/react-dom/") || id.includes("node_modules/react-router-dom/")) {
             return "vendor-react";
           }
-          // Isolate framer-motion (137KB) — loaded async per page
           if (id.includes("node_modules/framer-motion/")) {
             return "vendor-motion";
           }
-          // Supabase client
           if (id.includes("node_modules/@supabase/")) {
             return "vendor-supabase";
           }
-          // Tanstack query
           if (id.includes("node_modules/@tanstack/")) {
             return "vendor-query";
           }
-          // Radix UI components
           if (id.includes("node_modules/@radix-ui/")) {
             return "vendor-radix";
           }
-          // Icons
           if (id.includes("node_modules/lucide-react/")) {
             return "vendor-icons";
           }
-          // Heavy PDF/canvas libs — only loaded on checkout/admin pages
           if (id.includes("node_modules/html2canvas") || id.includes("node_modules/jspdf") || id.includes("node_modules/html2pdf")) {
             return "vendor-pdf";
           }
@@ -63,9 +58,15 @@ export default defineConfig({
         drop_console: true,
         drop_debugger: true,
         pure_funcs: ["console.log", "console.info", "console.warn"],
+        passes: 2,          // double-pass for smaller output
+        ecma: 2020,
       },
       format: { comments: false },
+      mangle: { toplevel: true },
     },
     cssCodeSplit: true,
+    cssMinify: true,
+    // Emit module preload directives for faster chunk loading
+    modulePreload: { polyfill: true },
   },
 });
