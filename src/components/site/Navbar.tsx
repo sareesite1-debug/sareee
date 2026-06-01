@@ -25,13 +25,18 @@ const Navbar = () => {
   const location  = useLocation();
   const navigate  = useNavigate();
   const { count } = useCart();
-  const xBtnRef   = useRef<HTMLButtonElement>(null);
 
-  // ── stable callbacks ────────────────────────────────────────────────────────
-  const close = useCallback(() => setOpen(false), []);
-  const open_ = useCallback(() => setOpen(true),  []);
+  // ── open / close ─────────────────────────────────────────────────────────────
+  const openSidebar  = useCallback(() => setOpen(true),  []);
+  const closeSidebar = useCallback(() => setOpen(false), []);
 
-  // ── scroll detection ────────────────────────────────────────────────────────
+  // Navigate to a page AND close the sidebar in the right order
+  const goTo = useCallback((path: string) => {
+    setOpen(false);          // close first
+    navigate(path);          // then navigate
+  }, [navigate]);
+
+  // ── scroll detection ─────────────────────────────────────────────────────────
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
@@ -39,7 +44,7 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // ── auth ────────────────────────────────────────────────────────────────────
+  // ── auth ─────────────────────────────────────────────────────────────────────
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setUser(session?.user ?? null);
@@ -53,65 +58,53 @@ const Navbar = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // ── body scroll lock ────────────────────────────────────────────────────────
-  // We only toggle overflow — do NOT use position:fixed on body because it
-  // shifts the layout coordinate space and breaks tap targets on the backdrop
-  // and X button. The drawer itself already has pointer-events correctly layered.
+  // ── body scroll lock (simple overflow only — no position:fixed on body) ──────
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
-  // ── close on route change ───────────────────────────────────────────────────
-  const pathnameRef = useRef(location.pathname);
+  // ── close sidebar when route actually changes (safety net) ───────────────────
+  const prevPathname = useRef(location.pathname);
   useEffect(() => {
-    if (pathnameRef.current !== location.pathname) {
-      pathnameRef.current = location.pathname;
+    if (prevPathname.current !== location.pathname) {
+      prevPathname.current = location.pathname;
       setOpen(false);
     }
   }, [location.pathname]);
 
-  // ── Escape key ──────────────────────────────────────────────────────────────
+  // ── Escape key ───────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!open) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") close(); };
-    document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
-  }, [open, close]);
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeSidebar(); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, closeSidebar]);
 
-  // ── focus X button when drawer opens ────────────────────────────────────────
-  useEffect(() => {
-    if (open) {
-      const t = setTimeout(() => xBtnRef.current?.focus(), 60);
-      return () => clearTimeout(t);
-    }
-  }, [open]);
-
-  // ── swipe-left to close (horizontal swipe only) ──────────────────────────────
+  // ── swipe-left to close ───────────────────────────────────────────────────────
   useEffect(() => {
     if (!open) return;
-    let startX = 0;
-    let startY = 0;
-    const onStart = (e: TouchEvent) => {
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
+    let sx = 0, sy = 0;
+    const onTouchStart = (e: TouchEvent) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; };
+    const onTouchEnd   = (e: TouchEvent) => {
+      const dx = sx - e.changedTouches[0].clientX;
+      const dy = Math.abs(e.changedTouches[0].clientY - sy);
+      if (dx > 60 && dx > dy * 2) closeSidebar();
     };
-    const onEnd = (e: TouchEvent) => {
-      const dx = startX - e.changedTouches[0].clientX;
-      const dy = Math.abs(e.changedTouches[0].clientY - startY);
-      if (dx > 60 && dx > dy * 2) close();   // clearly horizontal leftward swipe
-    };
-    document.addEventListener("touchstart", onStart, { passive: true });
-    document.addEventListener("touchend",   onEnd,   { passive: true });
+    document.addEventListener("touchstart", onTouchStart, { passive: true });
+    document.addEventListener("touchend",   onTouchEnd,   { passive: true });
     return () => {
-      document.removeEventListener("touchstart", onStart);
-      document.removeEventListener("touchend",   onEnd);
+      document.removeEventListener("touchstart", onTouchStart);
+      document.removeEventListener("touchend",   onTouchEnd);
     };
-  }, [open, close]);
+  }, [open, closeSidebar]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    setUser(null); setIsAdmin(false); close(); navigate("/");
+    setUser(null);
+    setIsAdmin(false);
+    setOpen(false);
+    navigate("/");
   };
 
   const userInitial = user?.email?.[0]?.toUpperCase() ?? "U";
@@ -200,10 +193,10 @@ const Navbar = () => {
                 </AnimatePresence>
               </Link>
 
-              {/* Hamburger */}
+              {/* Hamburger — mobile only */}
               <button
                 className="lg:hidden flex items-center justify-center w-11 h-11 ml-1 text-ink border border-gold/20 active:scale-95 transition-transform"
-                onClick={open_}
+                onClick={openSidebar}
                 aria-label="Open navigation menu"
                 aria-expanded={open}
                 aria-controls="mobile-nav"
@@ -215,31 +208,25 @@ const Navbar = () => {
         </div>
       </header>
 
-      {/* ══ MOBILE DRAWER ══
-          Both backdrop and drawer use fixed positioning inside a React portal-like
-          fragment. The backdrop sits at z-[60], drawer at z-[70] so the drawer is
-          always on top and its buttons receive pointer events first.
-          IMPORTANT: do NOT set position:fixed on <body> — it moves the layout
-          coordinate system and makes fixed children miss click/touch targets.       */}
+      {/* ══ MOBILE SIDEBAR ══ */}
       <AnimatePresence>
         {open && (
           <>
-            {/* ── Backdrop ── */}
+            {/* Backdrop — tapping it closes the sidebar */}
             <motion.div
               key="backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
+              transition={{ duration: 0.22 }}
               className="lg:hidden fixed inset-0 z-[60] bg-black/50"
-              onClick={close}
-              onTouchEnd={(e) => { e.preventDefault(); close(); }}
+              onClick={closeSidebar}
               aria-hidden="true"
             />
 
-            {/* ── Drawer panel ── */}
+            {/* Sidebar panel */}
             <motion.aside
-              key="drawer"
+              key="sidebar"
               id="mobile-nav"
               role="dialog"
               aria-modal="true"
@@ -247,21 +234,22 @@ const Navbar = () => {
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
-              transition={{ type: "spring", stiffness: 340, damping: 38 }}
+              transition={{ type: "spring", stiffness: 320, damping: 36 }}
               className="lg:hidden fixed top-0 left-0 bottom-0 z-[70] w-[80vw] max-w-[300px] bg-ivory flex flex-col"
+              // Prevent taps inside the sidebar from also hitting the backdrop behind it
               onClick={(e) => e.stopPropagation()}
-              onTouchEnd={(e) => e.stopPropagation()}
             >
 
-              {/* Header */}
+              {/* ── Sidebar header (maroon band with X button) ── */}
               <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-gold/15 bg-maroon-deep shrink-0">
                 <div className="flex flex-col">
                   <span className="font-display text-[8px] tracking-[0.45em] text-gold uppercase">Since 1985</span>
                   <span className="font-heading text-2xl text-ivory font-light leading-tight">Arpitha</span>
                 </div>
+                {/* X close button */}
                 <button
-                  ref={xBtnRef}
-                  onClick={close}
+                  type="button"
+                  onClick={closeSidebar}
                   aria-label="Close navigation menu"
                   className="flex items-center justify-center w-10 h-10 border border-ivory/20 text-ivory/70 hover:text-ivory hover:border-ivory/50 transition-colors rounded-sm"
                 >
@@ -269,7 +257,7 @@ const Navbar = () => {
                 </button>
               </div>
 
-              {/* User strip */}
+              {/* ── User strip ── */}
               <div className="px-5 py-3.5 border-b border-gold/10 bg-ivory-deep/60 shrink-0">
                 {user ? (
                   <div className="flex items-center gap-3">
@@ -284,7 +272,11 @@ const Navbar = () => {
                     </div>
                   </div>
                 ) : (
-                  <Link to="/auth" onClick={close} className="flex items-center gap-3 group">
+                  <button
+                    type="button"
+                    onClick={() => goTo("/auth")}
+                    className="flex items-center gap-3 group w-full text-left"
+                  >
                     <div className="w-9 h-9 rounded-full border border-gold/30 flex items-center justify-center shrink-0 group-hover:border-maroon transition-colors" aria-hidden="true">
                       <User size={15} className="text-ink-soft group-hover:text-maroon transition-colors" strokeWidth={1.5} />
                     </div>
@@ -292,11 +284,11 @@ const Navbar = () => {
                       <p className="font-body text-sm text-ink group-hover:text-maroon transition-colors font-medium">Sign in</p>
                       <p className="font-body text-[11px] text-ink-soft">Orders &amp; wishlist</p>
                     </div>
-                  </Link>
+                  </button>
                 )}
               </div>
 
-              {/* Nav links */}
+              {/* ── Nav links ── */}
               <nav aria-label="Mobile navigation" className="flex-1 overflow-y-auto px-4 py-4">
                 <p className="px-2 mb-2 font-display text-[8px] tracking-[0.3em] uppercase text-ink-soft/50">Menu</p>
 
@@ -304,12 +296,12 @@ const Navbar = () => {
                   const active = location.pathname === l.to;
                   const Icon   = l.icon;
                   return (
-                    <Link
+                    <button
                       key={l.to}
-                      to={l.to}
-                      onClick={close}
+                      type="button"
+                      onClick={() => goTo(l.to)}
                       aria-current={active ? "page" : undefined}
-                      className={`flex items-center gap-4 px-3 py-4 rounded-sm mb-0.5 transition-all duration-150 group ${
+                      className={`w-full flex items-center gap-4 px-3 py-4 rounded-sm mb-0.5 transition-all duration-150 group ${
                         active
                           ? "bg-maroon-deep/8 border border-maroon/20"
                           : "hover:bg-ivory-deep border border-transparent"
@@ -318,7 +310,9 @@ const Navbar = () => {
                       <span
                         aria-hidden="true"
                         className={`flex items-center justify-center w-9 h-9 rounded-sm transition-colors shrink-0 ${
-                          active ? "bg-maroon-deep text-ivory" : "bg-ivory-deep text-ink-soft group-hover:text-maroon group-hover:bg-maroon/8"
+                          active
+                            ? "bg-maroon-deep text-ivory"
+                            : "bg-ivory-deep text-ink-soft group-hover:text-maroon group-hover:bg-maroon/8"
                         }`}
                       >
                         <Icon size={16} strokeWidth={1.5} />
@@ -328,8 +322,10 @@ const Navbar = () => {
                       }`}>
                         {l.label}
                       </span>
-                      {active && <span className="ml-auto w-2 h-2 rounded-full bg-maroon-deep shrink-0" aria-hidden="true" />}
-                    </Link>
+                      {active && (
+                        <span className="ml-auto w-2 h-2 rounded-full bg-maroon-deep shrink-0" aria-hidden="true" />
+                      )}
+                    </button>
                   );
                 })}
 
@@ -337,11 +333,11 @@ const Navbar = () => {
                 <div className="mt-5 pt-4 border-t border-gold/15">
                   <p className="px-2 mb-2 font-display text-[8px] tracking-[0.3em] uppercase text-ink-soft/50">Quick Access</p>
 
-                  <Link
-                    to="/cart"
-                    onClick={close}
+                  <button
+                    type="button"
+                    onClick={() => goTo("/cart")}
                     aria-label={count > 0 ? `Shopping bag, ${count} item${count !== 1 ? "s" : ""}` : "Shopping bag"}
-                    className="flex items-center gap-4 px-3 py-4 rounded-sm mb-0.5 hover:bg-ivory-deep border border-transparent transition-all duration-150 group"
+                    className="w-full flex items-center gap-4 px-3 py-4 rounded-sm mb-0.5 hover:bg-ivory-deep border border-transparent transition-all duration-150 group"
                   >
                     <span aria-hidden="true" className="flex items-center justify-center w-9 h-9 rounded-sm bg-ivory-deep text-ink-soft group-hover:text-maroon group-hover:bg-maroon/8 transition-colors shrink-0">
                       <ShoppingBag size={16} strokeWidth={1.5} />
@@ -352,53 +348,54 @@ const Navbar = () => {
                         {count}
                       </span>
                     )}
-                  </Link>
+                  </button>
 
                   {user && (
-                    <Link
-                      to="/orders"
-                      onClick={close}
-                      className="flex items-center gap-4 px-3 py-4 rounded-sm mb-0.5 hover:bg-ivory-deep border border-transparent transition-all duration-150 group"
+                    <button
+                      type="button"
+                      onClick={() => goTo("/orders")}
+                      className="w-full flex items-center gap-4 px-3 py-4 rounded-sm mb-0.5 hover:bg-ivory-deep border border-transparent transition-all duration-150 group"
                     >
                       <span aria-hidden="true" className="flex items-center justify-center w-9 h-9 rounded-sm bg-ivory-deep text-ink-soft group-hover:text-maroon group-hover:bg-maroon/8 transition-colors shrink-0">
                         <Package size={16} strokeWidth={1.5} />
                       </span>
                       <span className="font-heading text-[1.35rem] text-ink group-hover:text-maroon leading-none transition-colors">My Orders</span>
-                    </Link>
+                    </button>
                   )}
 
                   {isAdmin && (
-                    <Link
-                      to="/admin"
-                      onClick={close}
-                      className="flex items-center gap-4 px-3 py-4 rounded-sm mb-0.5 hover:bg-ivory-deep border border-transparent transition-all duration-150 group"
+                    <button
+                      type="button"
+                      onClick={() => goTo("/admin")}
+                      className="w-full flex items-center gap-4 px-3 py-4 rounded-sm mb-0.5 hover:bg-ivory-deep border border-transparent transition-all duration-150 group"
                     >
                       <span aria-hidden="true" className="flex items-center justify-center w-9 h-9 rounded-sm bg-gold/10 text-gold-dark group-hover:bg-gold/20 transition-colors shrink-0">
                         <Settings size={16} strokeWidth={1.5} />
                       </span>
                       <span className="font-heading text-[1.35rem] text-gold-dark group-hover:text-maroon leading-none transition-colors">Admin Panel</span>
-                    </Link>
+                    </button>
                   )}
                 </div>
               </nav>
 
-              {/* Footer */}
+              {/* ── Footer ── */}
               <div className="px-5 py-4 border-t border-gold/15 bg-ivory-deep/40 shrink-0">
                 {user ? (
                   <button
+                    type="button"
                     onClick={handleSignOut}
                     className="w-full flex items-center justify-center gap-2.5 py-3.5 border border-gold/25 text-ink-soft hover:text-maroon hover:border-maroon/40 transition-colors rounded-sm font-display text-[8px] tracking-[0.3em] uppercase"
                   >
                     <LogOut size={13} strokeWidth={1.5} aria-hidden="true" /> Sign Out
                   </button>
                 ) : (
-                  <Link
-                    to="/auth"
-                    onClick={close}
+                  <button
+                    type="button"
+                    onClick={() => goTo("/auth")}
                     className="w-full flex items-center justify-center gap-2.5 py-3.5 bg-maroon-deep text-ivory font-display text-[8px] tracking-[0.3em] uppercase rounded-sm hover:bg-maroon transition-colors"
                   >
                     <User size={13} strokeWidth={1.5} aria-hidden="true" /> Sign In
-                  </Link>
+                  </button>
                 )}
                 <p className="text-center font-body text-[10px] text-ink-soft/40 mt-3">
                   Arpitha Saree Center · Kanchipuram
