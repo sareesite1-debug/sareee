@@ -14,41 +14,53 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import HomePage from "@/pages/HomePage";
 
 // Lazy-load everything else — they're never needed on the landing page
-const CategoriesPage   = lazy(() => import("@/pages/CategoriesPage"));
-const AboutPage        = lazy(() => import("@/pages/AboutPage"));
-const ContactPage      = lazy(() => import("@/pages/ContactPage"));
-const AuthPage         = lazy(() => import("@/pages/AuthPage"));
-const ShopPage         = lazy(() => import("@/pages/ShopPage"));
-const ProductDetailPage= lazy(() => import("@/pages/ProductDetailPage"));
-const CartPage         = lazy(() => import("@/pages/CartPage"));
-const CheckoutPage     = lazy(() => import("@/pages/CheckoutPage"));
-const OrdersPage       = lazy(() => import("@/pages/OrdersPage"));
-const OrderDetailPage  = lazy(() => import("@/pages/OrderDetailPage"));
-const NotFound         = lazy(() => import("@/pages/NotFound"));
-const PrivacyPage      = lazy(() => import("@/pages/PrivacyPage"));
-const TermsPage        = lazy(() => import("@/pages/TermsPage"));
-const ReturnsPage      = lazy(() => import("@/pages/ReturnsPage"));
+const CategoriesPage    = lazy(() => import("@/pages/CategoriesPage"));
+const AboutPage         = lazy(() => import("@/pages/AboutPage"));
+const ContactPage       = lazy(() => import("@/pages/ContactPage"));
+const AuthPage          = lazy(() => import("@/pages/AuthPage"));
+const ShopPage          = lazy(() => import("@/pages/ShopPage"));
+const ProductDetailPage = lazy(() => import("@/pages/ProductDetailPage"));
+const CartPage          = lazy(() => import("@/pages/CartPage"));
+const CheckoutPage      = lazy(() => import("@/pages/CheckoutPage"));
+const OrdersPage        = lazy(() => import("@/pages/OrdersPage"));
+const OrderDetailPage   = lazy(() => import("@/pages/OrderDetailPage"));
+const NotFound          = lazy(() => import("@/pages/NotFound"));
+const PrivacyPage       = lazy(() => import("@/pages/PrivacyPage"));
+const TermsPage         = lazy(() => import("@/pages/TermsPage"));
+const ReturnsPage       = lazy(() => import("@/pages/ReturnsPage"));
 
 // Admin — fully lazy, never loaded for regular visitors
-const AdminDashboard       = lazy(() => import("@/pages/admin/AdminDashboard"));
-const AdminClients         = lazy(() => import("@/pages/admin/AdminClients"));
-const AdminPortfolio       = lazy(() => import("@/pages/admin/AdminPortfolio"));
-const AdminQuotations      = lazy(() => import("@/pages/admin/AdminQuotations"));
-const AdminPayments        = lazy(() => import("@/pages/admin/AdminPayments"));
-const AdminVendors         = lazy(() => import("@/pages/admin/AdminVendors"));
-const AdminTeam            = lazy(() => import("@/pages/admin/AdminTeam"));
-const AdminContent         = lazy(() => import("@/pages/admin/AdminContent"));
-const AdminAppointments    = lazy(() => import("@/pages/admin/AdminAppointments"));
-const AdminChat            = lazy(() => import("@/pages/admin/AdminChat"));
-const AdminClientPortal    = lazy(() => import("@/pages/admin/AdminClientPortal"));
-const AdminProducts        = lazy(() => import("@/pages/admin/AdminProducts"));
-const AdminCustomerOrders  = lazy(() => import("@/pages/admin/AdminCustomerOrders"));
+const AdminDashboard      = lazy(() => import("@/pages/admin/AdminDashboard"));
+const AdminClients        = lazy(() => import("@/pages/admin/AdminClients"));
+const AdminPortfolio      = lazy(() => import("@/pages/admin/AdminPortfolio"));
+const AdminQuotations     = lazy(() => import("@/pages/admin/AdminQuotations"));
+const AdminPayments       = lazy(() => import("@/pages/admin/AdminPayments"));
+const AdminVendors        = lazy(() => import("@/pages/admin/AdminVendors"));
+const AdminTeam           = lazy(() => import("@/pages/admin/AdminTeam"));
+const AdminContent        = lazy(() => import("@/pages/admin/AdminContent"));
+const AdminAppointments   = lazy(() => import("@/pages/admin/AdminAppointments"));
+const AdminChat           = lazy(() => import("@/pages/admin/AdminChat"));
+const AdminClientPortal   = lazy(() => import("@/pages/admin/AdminClientPortal"));
+const AdminProducts       = lazy(() => import("@/pages/admin/AdminProducts"));
+const AdminCustomerOrders = lazy(() => import("@/pages/admin/AdminCustomerOrders"));
 
 const queryClient = new QueryClient();
 
-// Minimal fallback while lazy chunks load — intentionally plain to avoid layout shift
-const PageLoader = () => (
-  <div style={{ minHeight: "60vh", background: "#FBF7F0" }} aria-hidden="true" />
+/**
+ * AppShell fallback — used by the *outer* Suspense only.
+ * This only triggers on the very first page load before any chunk is ready.
+ * It matches the site background colour so there is never a white flash.
+ * Per-page navigation fallbacks are handled inside SiteLayout so the
+ * Navbar and Footer stay visible.
+ */
+const AppShell = () => (
+  <div
+    aria-hidden="true"
+    style={{
+      minHeight: "100vh",
+      background: "hsl(36 67% 97%)", // --ivory, exact match to body bg
+    }}
+  />
 );
 
 const App = () => (
@@ -59,25 +71,31 @@ const App = () => (
       <BrowserRouter>
         <ScrollToTop />
         <CartProvider>
-          <Suspense fallback={<PageLoader />}>
+          {/*
+            Outer Suspense: only fires on the very first app load
+            (before SiteLayout's own chunk is ready — rare in practice
+            since SiteLayout is eagerly imported above).
+            Per-page lazy loading is caught by the Suspense inside SiteLayout.
+          */}
+          <Suspense fallback={<AppShell />}>
             <Routes>
               {/* Public site */}
               <Route element={<SiteLayout />}>
-                <Route path="/"                element={<HomePage />} />
-                <Route path="/collections"     element={<CategoriesPage />} />
-                <Route path="/categories"      element={<CategoriesPage />} />
+                <Route path="/"                 element={<HomePage />} />
+                <Route path="/collections"      element={<CategoriesPage />} />
+                <Route path="/categories"       element={<CategoriesPage />} />
                 <Route path="/categories/:slug" element={<CategoriesPage />} />
-                <Route path="/shop"            element={<ShopPage />} />
-                <Route path="/shop/:slug"      element={<ProductDetailPage />} />
-                <Route path="/cart"            element={<CartPage />} />
-                <Route path="/checkout"        element={<CheckoutPage />} />
-                <Route path="/orders"          element={<OrdersPage />} />
-                <Route path="/orders/:id"      element={<OrderDetailPage />} />
-                <Route path="/about"           element={<AboutPage />} />
-                <Route path="/contact"         element={<ContactPage />} />
-                <Route path="/privacy"         element={<PrivacyPage />} />
-                <Route path="/terms"           element={<TermsPage />} />
-                <Route path="/returns"         element={<ReturnsPage />} />
+                <Route path="/shop"             element={<ShopPage />} />
+                <Route path="/shop/:slug"       element={<ProductDetailPage />} />
+                <Route path="/cart"             element={<CartPage />} />
+                <Route path="/checkout"         element={<CheckoutPage />} />
+                <Route path="/orders"           element={<OrdersPage />} />
+                <Route path="/orders/:id"       element={<OrderDetailPage />} />
+                <Route path="/about"            element={<AboutPage />} />
+                <Route path="/contact"          element={<ContactPage />} />
+                <Route path="/privacy"          element={<PrivacyPage />} />
+                <Route path="/terms"            element={<TermsPage />} />
+                <Route path="/returns"          element={<ReturnsPage />} />
               </Route>
 
               <Route path="/auth" element={<AuthPage />} />
@@ -91,19 +109,19 @@ const App = () => (
                   </ProtectedRoute>
                 }
               >
-                <Route index                      element={<AdminDashboard />} />
-                <Route path="products"            element={<AdminProducts />} />
-                <Route path="customer-orders"     element={<AdminCustomerOrders />} />
-                <Route path="clients"             element={<AdminClients />} />
-                <Route path="portfolio"           element={<AdminPortfolio />} />
-                <Route path="quotations"          element={<AdminQuotations />} />
-                <Route path="payments"            element={<AdminPayments />} />
-                <Route path="vendors"             element={<AdminVendors />} />
-                <Route path="team"                element={<AdminTeam />} />
-                <Route path="content"             element={<AdminContent />} />
-                <Route path="appointments"        element={<AdminAppointments />} />
-                <Route path="chat"                element={<AdminChat />} />
-                <Route path="client-portal"       element={<AdminClientPortal />} />
+                <Route index                   element={<AdminDashboard />} />
+                <Route path="products"         element={<AdminProducts />} />
+                <Route path="customer-orders"  element={<AdminCustomerOrders />} />
+                <Route path="clients"          element={<AdminClients />} />
+                <Route path="portfolio"        element={<AdminPortfolio />} />
+                <Route path="quotations"       element={<AdminQuotations />} />
+                <Route path="payments"         element={<AdminPayments />} />
+                <Route path="vendors"          element={<AdminVendors />} />
+                <Route path="team"             element={<AdminTeam />} />
+                <Route path="content"          element={<AdminContent />} />
+                <Route path="appointments"     element={<AdminAppointments />} />
+                <Route path="chat"             element={<AdminChat />} />
+                <Route path="client-portal"    element={<AdminClientPortal />} />
               </Route>
 
               <Route path="*" element={<NotFound />} />
