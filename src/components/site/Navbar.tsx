@@ -30,10 +30,17 @@ const Navbar = () => {
   const openSidebar  = useCallback(() => setOpen(true),  []);
   const closeSidebar = useCallback(() => setOpen(false), []);
 
-  // Navigate to a page AND close the sidebar in the right order
+  /**
+   * Navigate to a page AND close the sidebar.
+   * We close first so AnimatePresence starts the exit animation,
+   * then navigate on the next tick so the page transition doesn't
+   * cancel the sidebar slide-out animation mid-way.
+   */
   const goTo = useCallback((path: string) => {
-    setOpen(false);          // close first
-    navigate(path);          // then navigate
+    setOpen(false);
+    // Small timeout lets the exit animation begin before React
+    // unmounts/re-renders the whole layout on navigation
+    setTimeout(() => navigate(path), 10);
   }, [navigate]);
 
   // ── scroll detection ─────────────────────────────────────────────────────────
@@ -58,13 +65,13 @@ const Navbar = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  // ── body scroll lock (simple overflow only — no position:fixed on body) ──────
+  // ── body scroll lock ─────────────────────────────────────────────────────────
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
-  // ── close sidebar when route actually changes (safety net) ───────────────────
+  // ── close sidebar on route change (safety net) ───────────────────────────────
   const prevPathname = useRef(location.pathname);
   useEffect(() => {
     if (prevPathname.current !== location.pathname) {
@@ -208,13 +215,18 @@ const Navbar = () => {
         </div>
       </header>
 
-      {/* ══ MOBILE SIDEBAR ══ */}
+      {/* ══ MOBILE SIDEBAR ══
+          Structure: fixed full-screen wrapper (z-[60]) that captures all clicks.
+          Inside: backdrop div (fills wrapper, closes on click) + sidebar panel
+          (sits on top, stops propagation so its own clicks don't reach backdrop).
+          This is more reliable than two sibling motion elements competing for clicks.
+      ══ */}
       <AnimatePresence>
         {open && (
           <>
-            {/* Backdrop — tapping it closes the sidebar */}
+            {/* Backdrop — click anywhere on it to close */}
             <motion.div
-              key="backdrop"
+              key="sidebar-backdrop"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -224,9 +236,9 @@ const Navbar = () => {
               aria-hidden="true"
             />
 
-            {/* Sidebar panel */}
+            {/* Sidebar panel — z higher than backdrop */}
             <motion.aside
-              key="sidebar"
+              key="sidebar-panel"
               id="mobile-nav"
               role="dialog"
               aria-modal="true"
@@ -236,7 +248,6 @@ const Navbar = () => {
               exit={{ x: "-100%" }}
               transition={{ type: "spring", stiffness: 320, damping: 36 }}
               className="lg:hidden fixed top-0 left-0 bottom-0 z-[70] w-[80vw] max-w-[300px] bg-ivory flex flex-col"
-              // Prevent taps inside the sidebar from also hitting the backdrop behind it
               onClick={(e) => e.stopPropagation()}
             >
 
