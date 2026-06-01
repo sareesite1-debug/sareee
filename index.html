@@ -34,27 +34,37 @@
     <meta name="twitter:description" content="GI-certified Kanchipuram pure silk sarees. Real zari, master weavers, since 1985." />
     <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b8a75ef7-434c-4ccc-a116-5853fcf0665f/id-preview-848f2687--0a31de4e-8c2a-4b1c-adf3-d34d15a699b4.lovable.app-1776582349591.png" />
 
-    <!-- Favicon & Icons -->
+    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/favicon.ico" />
 
-    <!-- DNS Prefetch + Preconnect for critical third-party origins -->
+    <!-- DNS Prefetch + Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
     <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
-    <!-- Preconnect to Supabase so the first API call is instant -->
     <link rel="preconnect" href="https://ofpwpqgfwhlhqtdqhnmp.supabase.co" crossorigin />
 
-    <!-- Google Fonts — non-render-blocking via media trick, then swap -->
+    <!--
+      PERFORMANCE: Preload only the two fonts that appear above-the-fold.
+      Cormorant Garamond (headings) and Cinzel (eyebrow/display) are LCP-blocking.
+      Inter is body text — defer it.
+    -->
     <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&family=Cinzel:wght@400;500&display=swap"
-      media="print"
-      onload="this.media='all'"
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;500&display=swap"
+      onload="this.rel='stylesheet'"
+    />
+    <!-- Inter deferred — body text, not LCP-critical -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap"
+      onload="this.rel='stylesheet'"
     />
     <noscript>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500&family=Cinzel:wght@400;500&display=swap" />
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;500&family=Inter:wght@300;400;500&display=swap" />
     </noscript>
 
     <!-- Structured Data — LocalBusiness -->
@@ -91,6 +101,14 @@
   </head>
 
   <body>
+    <!-- Skip-to-content: critical for keyboard & screen-reader accessibility -->
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-maroon-deep focus:text-ivory focus:font-body focus:text-sm focus:rounded focus:outline-none focus:ring-2 focus:ring-gold"
+    >
+      Skip to main content
+    </a>
+
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
