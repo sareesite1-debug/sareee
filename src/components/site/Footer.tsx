@@ -52,7 +52,7 @@ const Footer = () => {
 
       <motion.div ref={ref} variants={cV} initial="hidden" animate={inView ? "visible" : "hidden"} className="container mx-auto px-6 lg:px-10 py-20">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-14">
-          <div className="md:col-span-4">
+          <div className="md:col-span-3">
             <motion.div variants={iV}>
               <Link to="/" className="block mb-7 group">
                 <span className="font-display text-[9px] tracking-[0.5em] text-gold/60 uppercase">Since 1985</span>
@@ -76,7 +76,7 @@ const Footer = () => {
               </div>
             </motion.div>
           </div>
-          <div className="md:col-span-3">
+          <div className="md:col-span-2">
             <motion.div variants={iV}>
               <h4 className="eyebrow text-gold mb-6">The House</h4>
               <div className="flex flex-col gap-3.5">
@@ -84,8 +84,12 @@ const Footer = () => {
                   <Link key={l.label} to={l.to} className="link-reveal text-sm text-ivory/75 hover:text-ivory transition-colors font-body w-fit">{l.label}</Link>
                 ))}
               </div>
-              <div className="mt-7 pt-6 border-t border-ivory/8 flex flex-col gap-3">
-                <p className="eyebrow text-ivory/40 mb-1">Legal</p>
+            </motion.div>
+          </div>
+          <div className="md:col-span-2">
+            <motion.div variants={iV}>
+              <h4 className="eyebrow text-gold mb-6">Legal</h4>
+              <div className="flex flex-col gap-3.5">
                 {[{ to: "/privacy", label: "Privacy Policy" }, { to: "/terms", label: "Terms of Service" }, { to: "/returns", label: "Returns & Exchange" }].map(l => (
                   <Link key={l.to} to={l.to} className="link-reveal text-sm text-ivory/75 hover:text-ivory transition-colors font-body w-fit">{l.label}</Link>
                 ))}
@@ -114,7 +118,7 @@ const Footer = () => {
 
       <div className="border-t border-ivory/5 py-4">
         <div className="container mx-auto px-6 lg:px-10 flex items-center justify-center">
-          <p className="font-body text-[9px] text-ivory/35 tracking-widest">© {year} {BRAND.name}. Crafted with reverence.</p>
+          <p className="font-body text-[8px] text-ivory/25 tracking-widest">© {year} {BRAND.name}. Crafted with reverence.</p>
         </div>
       </div>
     </footer>
