@@ -16,21 +16,59 @@ const NAV_LINKS = [
   { to: "/contact",    label: "Contact",     icon: Phone   },
 ];
 
+// ─── Scroll-lock helpers ──────────────────────────────────────────────────────
+// iOS Safari ignores overflow:hidden on <body>. We need to fix the body
+// position to truly prevent background scroll on all mobile browsers.
+let scrollY = 0;
+
+function lockScroll() {
+  scrollY = window.scrollY;
+  document.body.style.overflow   = "hidden";
+  document.body.style.position   = "fixed";
+  document.body.style.top        = `-${scrollY}px`;
+  document.body.style.width      = "100%";
+}
+
+function unlockScroll() {
+  document.body.style.overflow   = "";
+  document.body.style.position   = "";
+  document.body.style.top        = "";
+  document.body.style.width      = "";
+  // Restore scroll position silently
+  window.scrollTo({ top: scrollY, behavior: "instant" as ScrollBehavior });
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 const Navbar = () => {
-  const [open, setOpen]       = useState(false);
+  const [open, setOpen]         = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [user, setUser]       = useState<any>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [user, setUser]         = useState<any>(null);
+  const [isAdmin, setIsAdmin]   = useState(false);
 
-  const location     = useLocation();
-  const navigate     = useNavigate();
-  const { count }    = useCart();
-  const closeRef     = useRef<HTMLButtonElement>(null);
+  const location  = useLocation();
+  const navigate  = useNavigate();
+  const { count } = useCart();
+  const closeRef  = useRef<HTMLButtonElement>(null);
 
-  // Single stable close function — used everywhere
-  const close = useCallback(() => setOpen(false), []);
+  // Track whether drawer is truly closed (animation done) to guard re-opens
+  const isClosing = useRef(false);
 
-  /* scroll detection */
+  // Single stable open/close — guards against rapid navigation races
+  const openDrawer = useCallback(() => {
+    if (isClosing.current) return; // ignore tap while exit-animation is running
+    setOpen(true);
+  }, []);
+
+  const close = useCallback(() => {
+    isClosing.current = true;
+    setOpen(false);
+  }, []);
+
+  const onExitComplete = useCallback(() => {
+    isClosing.current = false;
+  }, []);
+
+  /* ── scroll detection ───────────────────────────────────────────────────── */
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
     onScroll();
@@ -38,7 +76,7 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* auth */
+  /* ── auth ───────────────────────────────────────────────────────────────── */
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setUser(session?.user ?? null);
@@ -52,16 +90,33 @@ const Navbar = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  /* body scroll lock */
+  /* ── body scroll lock (iOS-safe) ────────────────────────────────────────── */
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    if (open) {
+      lockScroll();
+    } else {
+      unlockScroll();
+    }
+    // Always clean up on unmount — prevents stuck lock if the component
+    // is destroyed while the drawer is open (e.g. admin route change).
+    return () => { unlockScroll(); };
   }, [open]);
 
-  /* close on pathname change */
-  useEffect(() => { close(); }, [location.pathname, close]);
+  /* ── close on route change ──────────────────────────────────────────────── */
+  // Use a ref for `close` so the effect below doesn't re-subscribe on every render
+  const closeRef2 = useRef(close);
+  useEffect(() => { closeRef2.current = close; }, [close]);
 
-  /* Escape key */
+  useEffect(() => {
+    // Only fire when the drawer is actually open to avoid no-op calls
+    return () => {
+      // Runs before the next pathname effect — closes synchronously
+      closeRef2.current();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
+  /* ── Escape key ─────────────────────────────────────────────────────────── */
   useEffect(() => {
     if (!open) return;
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") close(); };
@@ -69,7 +124,7 @@ const Navbar = () => {
     return () => document.removeEventListener("keydown", handler);
   }, [open, close]);
 
-  /* focus close button when drawer opens */
+  /* ── focus close button when drawer opens ───────────────────────────────── */
   useEffect(() => {
     if (open) {
       const t = setTimeout(() => closeRef.current?.focus(), 50);
@@ -77,12 +132,21 @@ const Navbar = () => {
     }
   }, [open]);
 
-  /* swipe-left to close */
+  /* ── swipe-left to close ────────────────────────────────────────────────── */
   useEffect(() => {
     if (!open) return;
     let startX = 0;
-    const onStart = (e: TouchEvent) => { startX = e.touches[0].clientX; };
-    const onEnd   = (e: TouchEvent) => { if (startX - e.changedTouches[0].clientX > 50) close(); };
+    let startY = 0;
+    const onStart = (e: TouchEvent) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    };
+    const onEnd = (e: TouchEvent) => {
+      const dx = startX - e.changedTouches[0].clientX;
+      const dy = Math.abs(e.changedTouches[0].clientY - startY);
+      // Only treat as a left-swipe if horizontal motion dominates
+      if (dx > 50 && dx > dy * 1.5) close();
+    };
     document.addEventListener("touchstart", onStart, { passive: true });
     document.addEventListener("touchend",   onEnd,   { passive: true });
     return () => {
@@ -185,7 +249,7 @@ const Navbar = () => {
               {/* Hamburger */}
               <button
                 className="lg:hidden flex items-center justify-center w-11 h-11 ml-1 text-ink border border-gold/20 active:scale-95 transition-transform"
-                onClick={() => setOpen(true)}
+                onClick={openDrawer}
                 aria-label="Open navigation menu"
                 aria-expanded={open}
                 aria-controls="mobile-nav"
@@ -198,7 +262,7 @@ const Navbar = () => {
       </header>
 
       {/* ══ MOBILE DRAWER ══ */}
-      <AnimatePresence>
+      <AnimatePresence onExitComplete={onExitComplete}>
         {open && (
           <>
             {/* Backdrop — clicking closes */}
@@ -211,6 +275,8 @@ const Navbar = () => {
               className="lg:hidden fixed inset-0 z-[60] bg-black/50"
               onClick={close}
               aria-hidden="true"
+              // Prevent scroll-through on the backdrop itself
+              style={{ touchAction: "none" }}
             />
 
             {/* Drawer */}
@@ -225,8 +291,9 @@ const Navbar = () => {
               exit={{ x: "-100%" }}
               transition={{ type: "spring", stiffness: 340, damping: 38 }}
               className="lg:hidden fixed top-0 left-0 bottom-0 z-[70] w-[80vw] max-w-[300px] bg-ivory flex flex-col"
-              // Stop clicks inside the drawer from reaching the backdrop
+              // Stop clicks/touches inside the drawer from reaching the backdrop
               onClick={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
             >
 
               {/* Header */}
