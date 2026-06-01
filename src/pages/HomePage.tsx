@@ -276,16 +276,16 @@ const HomePage = () => {
 
       {/* ── NEW ARRIVALS ─────────────────────────────────────────── */}
       {featuredProducts.length > 0 && (
-        <section className="py-10 sm:py-14 bg-ivory-deep" aria-labelledby="arrivals-heading">
+        <section className="py-10 sm:py-14 bg-ivory-deep" aria-labelledby="picks-heading">
           <div className="container mx-auto px-4 sm:px-6 lg:px-10">
             <div className="flex items-end justify-between mb-3 sm:mb-4 gap-6 flex-wrap">
               <div>
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-px bg-gold-dark" aria-hidden="true" />
-                  <span className="eyebrow text-gold-dark">New In</span>
+                  <span className="eyebrow text-gold-dark">Owner's Selection</span>
                 </div>
-                <h2 id="arrivals-heading" className="text-display text-4xl sm:text-5xl md:text-6xl text-ink">
-                  New Arrivals.
+                <h2 id="picks-heading" className="text-display text-4xl sm:text-5xl md:text-6xl text-ink">
+                  Hand-Picked<br /><span className="italic">for You.</span>
                 </h2>
               </div>
               <Link to="/shop" className="link-reveal font-display text-[9px] tracking-[0.3em] uppercase text-maroon">View all →</Link>
@@ -296,14 +296,14 @@ const HomePage = () => {
                 <FadeUp key={p.id} delay={Math.min(i * 0.04, 0.16)}>
                   <Link to={`/shop/${p.slug}`} className="group block relative">
                     <div className="relative overflow-hidden aspect-[3/4] mb-4 sm:mb-3 bg-ivory border border-gold/10 img-fit">
-                      {/* NEW IN badge */}
+                      {/* HAND-PICKED badge */}
                       <div className="absolute top-3 left-3 z-10 bg-maroon-deep text-ivory font-display text-[8px] tracking-[0.25em] uppercase px-2.5 py-1">
-                        New In
+                        Owner's Pick
                       </div>
                       {p.image_url ? (
                         <img
                           src={p.image_url}
-                          alt={`${p.name} - New arrival saree`}
+                          alt={`${p.name} - Hand-picked saree`}
                           loading="lazy"
                           decoding="async"
                           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
