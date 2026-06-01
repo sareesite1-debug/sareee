@@ -193,7 +193,7 @@ const ProductDetailPage = () => {
                       <input type="number" value={qty} onChange={e => setQty(Math.max(1, Math.min(product.stock ?? 999, Number(e.target.value))))} className="w-14 text-center bg-transparent border-x border-gold/20 font-body h-10 focus:outline-none" />
                       <motion.button whileTap={{ scale: 0.9 }} onClick={() => setQty(Math.min(product.stock ?? 999, qty + 1))} className="w-10 h-10 hover:bg-gold/10 transition-colors text-ink text-lg">+</motion.button>
                     </div>
-                    {product.stock != null && product.stock > 0 && <span className="text-xs text-maroon font-body bg-maroon/10 px-3 py-1.5">{product.stock} in stock</span>}
+                    {product.stock === 1 && <span className="text-xs text-maroon font-body bg-maroon/10 px-3 py-1.5">Only 1 left!</span>}
                   </>
                 )}
               </motion.div>
