@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ShoppingBag, Sparkles, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useCart } from "@/hooks/useCart";
 
 interface Category { id: string; name: string; slug: string; sort_order: number; }
 interface Product { id: string; category_id: string | null; name: string; slug: string; description: string | null; price: number; compare_at_price: number | null; image_url: string | null; stock: number | null; status: string; }
@@ -25,7 +24,7 @@ const FilterPill = ({ active, onClick, children }: { active: boolean; onClick: (
   </motion.button>
 );
 
-const ProductCard = ({ product, index, addToCart }: { product: Product; index: number; addToCart: (id: string) => void }) => {
+const ProductCard = ({ product, index }: { product: Product; index: number }) => {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -44,16 +43,6 @@ const ProductCard = ({ product, index, addToCart }: { product: Product; index: n
           {product.image_url ? (
             <>
               <motion.img src={product.image_url} alt={product.name} animate={{ scale: hovered ? 1.08 : 1 }} transition={{ duration: 1.2, ease: [0.23, 1, 0.32, 1] }} loading="lazy" />
-              <motion.div className="absolute inset-0 bg-gradient-to-t from-emerald-deep/70 via-emerald-deep/20 to-transparent" initial={{ opacity: 0 }} animate={{ opacity: hovered ? 1 : 0 }} transition={{ duration: 0.4 }} />
-              <motion.button
-                className="absolute bottom-4 left-4 right-4 glass-card-dark text-gold font-display text-[8px] tracking-[0.3em] uppercase py-3 flex items-center justify-center gap-2 border-gold/20"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: hovered ? 0 : 20, opacity: hovered ? 1 : 0 }}
-                transition={{ duration: 0.4, type: "spring" }}
-                onClick={(e) => { e.preventDefault(); addToCart(product.id); }}
-              >
-                <ShoppingBag size={11} strokeWidth={1.5} /> Quick Add
-              </motion.button>
             </>
           ) : (
             <div className="w-full h-full flex items-center justify-center text-ink-soft text-xs font-body uppercase tracking-widest"><Sparkles size={20} className="text-gold/30" strokeWidth={1} /></div>
@@ -81,7 +70,6 @@ const ShopPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [active, setActive] = useState("all");
   const [loading, setLoading] = useState(true);
-  const { addToCart } = useCart();
 
   useEffect(() => {
     (async () => {
@@ -150,7 +138,7 @@ const ShopPage = () => {
         ) : (
           <motion.div layout className="grid grid-cols-2 lg:grid-cols-4 gap-x-5 gap-y-16">
             <AnimatePresence mode="popLayout">
-              {visible.map((p, i) => <ProductCard key={p.id} product={p} index={i} addToCart={addToCart} />)}
+              {visible.map((p, i) => <ProductCard key={p.id} product={p} index={i} />)}
             </AnimatePresence>
           </motion.div>
         )}
