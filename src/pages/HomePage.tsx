@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, Shield, Truck } from "lucide-react";
+import { ArrowRight, Sparkles, Shield, Truck, Star, Quote } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import craftImg from "@/assets/craft-silks.jpg";
 import heroEditorial from "@/assets/hero-editorial.jpg";
@@ -11,7 +11,6 @@ interface Category { id: string; name: string; slug: string; image_url: string |
 interface Product { id: string; name: string; slug: string; price: number; image_url: string | null; }
 interface Section { section_key: string; content: any; }
 
-/* Lightweight CSS-only fade-up — no JS work per element, no scroll listeners. */
 const FadeUp = ({
   children,
   className = "",
@@ -61,6 +60,33 @@ const PatternBg = () => (
   />
 );
 
+const TESTIMONIALS = [
+  {
+    name: "Priya Raghunathan",
+    location: "Chennai",
+    stars: 5,
+    text: "I ordered a Kanchipuram silk saree for my daughter's wedding. The zari work is absolutely breathtaking — exactly as shown and GI certified. Will treasure it forever.",
+  },
+  {
+    name: "Meenakshi Iyer",
+    location: "Bengaluru",
+    stars: 5,
+    text: "Arpitha Saree Center has been my family's go-to for three generations. The quality never wavers, and the team helped me pick the perfect bridal set. Highly recommend.",
+  },
+  {
+    name: "Deepa Subramaniam",
+    location: "Mumbai",
+    stars: 5,
+    text: "Bought a temple-border silk for Navarathri. The drape, the weight, the sheen — pure luxury. Delivery was insured and arrived beautifully packaged.",
+  },
+  {
+    name: "Kavitha Nair",
+    location: "Coimbatore",
+    stars: 5,
+    text: "I was sceptical about buying silk sarees online, but Arpitha's certification photos and detailed descriptions made me confident. My saree exceeded every expectation.",
+  },
+];
+
 const HomePage = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -87,7 +113,8 @@ const HomePage = () => {
 
   return (
     <div className="bg-ivory overflow-x-hidden">
-      {/* HERO */}
+
+      {/* ── HERO ─────────────────────────────────────────────────── */}
       <section
         className="relative min-h-screen flex flex-col lg:flex-row overflow-hidden pt-[80px] lg:pt-0 text-safe"
         aria-label="Hero section"
@@ -203,7 +230,99 @@ const HomePage = () => {
 
       <Marquee />
 
-      {/* COLLECTIONS GRID */}
+      {/* ── FRESH FROM THE LOOM ──────────────────────────────────── */}
+      {featuredProducts.length > 0 && (
+        <section className="py-20 sm:py-32 lg:py-44 bg-ivory" aria-labelledby="loom-heading">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-10">
+            <div className="flex items-end justify-between mb-12 sm:mb-16 gap-6 flex-wrap">
+              <div>
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-8 h-px bg-gold-dark" aria-hidden="true" />
+                  <span className="eyebrow text-gold-dark">Just Woven</span>
+                </div>
+                <h2 id="loom-heading" className="text-display text-4xl sm:text-5xl md:text-6xl text-ink">
+                  Fresh from the loom.
+                </h2>
+              </div>
+              <Link to="/shop" className="link-reveal font-display text-[9px] tracking-[0.3em] uppercase text-maroon">Shop all →</Link>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 sm:gap-x-5 gap-y-10 sm:gap-y-16">
+              {featuredProducts.slice(0, 4).map((p, i) => (
+                <FadeUp key={p.id} delay={Math.min(i * 0.04, 0.16)}>
+                  <Link to={`/shop/${p.slug}`} className="group block relative">
+                    <div className="relative overflow-hidden aspect-[3/4] mb-4 sm:mb-5 bg-ivory-deep border border-gold/10 img-fit">
+                      {p.image_url ? (
+                        <img
+                          src={p.image_url}
+                          alt={`${p.name} - Buy saree online`}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-ink-soft text-xs font-body uppercase tracking-widest">No image</div>
+                      )}
+                    </div>
+                    <h3 className="font-heading text-lg sm:text-xl text-ink group-hover:text-maroon transition-colors leading-tight">{p.name}</h3>
+                    <p className="font-body text-sm text-gold-dark mt-1">₹{Number(p.price).toLocaleString("en-IN")}</p>
+                  </Link>
+                </FadeUp>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── NEW ARRIVALS ─────────────────────────────────────────── */}
+      {featuredProducts.length > 0 && (
+        <section className="py-20 sm:py-32 lg:py-44 bg-ivory-deep" aria-labelledby="arrivals-heading">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-10">
+            <div className="flex items-end justify-between mb-12 sm:mb-16 gap-6 flex-wrap">
+              <div>
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-8 h-px bg-gold-dark" aria-hidden="true" />
+                  <span className="eyebrow text-gold-dark">New In</span>
+                </div>
+                <h2 id="arrivals-heading" className="text-display text-4xl sm:text-5xl md:text-6xl text-ink">
+                  New Arrivals.
+                </h2>
+              </div>
+              <Link to="/shop" className="link-reveal font-display text-[9px] tracking-[0.3em] uppercase text-maroon">View all →</Link>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 sm:gap-x-5 gap-y-10 sm:gap-y-16">
+              {featuredProducts.map((p, i) => (
+                <FadeUp key={p.id} delay={Math.min(i * 0.04, 0.16)}>
+                  <Link to={`/shop/${p.slug}`} className="group block relative">
+                    <div className="relative overflow-hidden aspect-[3/4] mb-4 sm:mb-5 bg-ivory border border-gold/10 img-fit">
+                      {/* NEW IN badge */}
+                      <div className="absolute top-3 left-3 z-10 bg-maroon-deep text-ivory font-display text-[8px] tracking-[0.25em] uppercase px-2.5 py-1">
+                        New In
+                      </div>
+                      {p.image_url ? (
+                        <img
+                          src={p.image_url}
+                          alt={`${p.name} - New arrival saree`}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-ink-soft text-xs font-body uppercase tracking-widest">No image</div>
+                      )}
+                    </div>
+                    <h3 className="font-heading text-lg sm:text-xl text-ink group-hover:text-maroon transition-colors leading-tight">{p.name}</h3>
+                    <p className="font-body text-sm text-gold-dark mt-1">₹{Number(p.price).toLocaleString("en-IN")}</p>
+                  </Link>
+                </FadeUp>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── COLLECTIONS / CATEGORIES ─────────────────────────────── */}
       <section className="py-20 sm:py-32 lg:py-44 bg-ivory" aria-labelledby="collections-heading">
         <div className="container mx-auto px-4 sm:px-6 lg:px-10">
           <div className="flex items-end justify-between mb-12 sm:mb-16 gap-6 flex-wrap">
@@ -263,114 +382,48 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* STORY */}
-      <section className="relative bg-maroon-deep overflow-hidden py-20 sm:py-32 lg:py-44" aria-labelledby="story-heading">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-            <div className="lg:col-span-5">
-              <div className="relative">
-                <div className="aspect-[4/5] overflow-hidden rounded-sm">
-                  <img
-                    src={craftImg}
-                    alt="Folded handwoven silk sarees at Arpitha Saree Center"
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                    decoding="async"
-                    width="480"
-                    height="600"
-                  />
-                </div>
-                <div className="absolute -bottom-4 -right-4 w-full h-full border border-gold/20 pointer-events-none" aria-hidden="true" />
-                <div className="absolute -bottom-8 -left-4 sm:-left-6 glass-card p-5 sm:p-6">
-                  <p className="font-heading text-4xl sm:text-5xl text-maroon-deep leading-none">40+</p>
-                  <p className="font-body text-xs text-ink-soft uppercase tracking-widest mt-1">Years of craft</p>
-                </div>
-              </div>
+      {/* ── TESTIMONIALS ─────────────────────────────────────────── */}
+      <section className="relative py-20 sm:py-32 lg:py-44 bg-maroon-deep overflow-hidden" aria-labelledby="testimonials-heading">
+        <PatternBg />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gold/5 blur-[140px] pointer-events-none" aria-hidden="true" />
+
+        <div className="container mx-auto px-4 sm:px-6 lg:px-10 relative z-10">
+          <div className="text-center mb-14 sm:mb-20">
+            <div className="flex items-center justify-center gap-3 mb-5">
+              <div className="w-8 h-px bg-gold/40" aria-hidden="true" />
+              <span className="eyebrow text-gold">What Our Customers Say</span>
+              <div className="w-8 h-px bg-gold/40" aria-hidden="true" />
             </div>
+            <h2 id="testimonials-heading" className="text-display text-3xl sm:text-4xl md:text-6xl text-ivory leading-[1.0]">
+              Woven into
+              <br />
+              <span className="italic text-gold/90">their stories.</span>
+            </h2>
+          </div>
 
-            <div className="lg:col-span-6 lg:col-start-7 mt-12 lg:mt-0">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-8 h-px bg-gold" aria-hidden="true" />
-                <span className="eyebrow text-gold">Our Story</span>
-              </div>
-
-              <h2 id="story-heading" className="text-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-ivory mb-8 leading-[1.0]">
-                Four decades of cloth,
-                <br />
-                <span className="italic text-gold">conversation & craft.</span>
-              </h2>
-
-              <div className="h-px bg-gradient-to-r from-gold to-transparent mb-8" aria-hidden="true" />
-
-              {[
-                "What began as a small store in Kanchipuram in 1985, Arpitha Saree Center is today a trusted destination for those who know that a Kanchipuram silk saree is more than a garment — it's a legacy woven in pure mulberry silk and real zari.",
-                "We source directly from master weavers of Kanchipuram, preserving centuries-old techniques — every saree GI-certified, every thread authentic.",
-              ].map((para, i) => (
-                <p key={i} className="text-ivory/90 font-body leading-relaxed mb-5 text-[15px]">
-                  {para}
-                </p>
-              ))}
-
-              <div className="grid grid-cols-3 gap-4 sm:gap-6 my-8 sm:my-10 border-t border-b border-ivory/10 py-6 sm:py-8 relative">
-                {[["1985", "Est."], ["12+", "Weaving regions"], ["5000+", "Sarees curated"]].map(([num, label]) => (
-                  <div key={label} className="relative z-10">
-                    <p className="font-heading text-2xl sm:text-3xl text-gold leading-none">{num}</p>
-                    <p className="font-body text-[10px] text-ivory/65 uppercase tracking-widest mt-1">{label}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {TESTIMONIALS.map((t, i) => (
+              <FadeUp key={t.name} delay={Math.min(i * 0.07, 0.28)}>
+                <div className="relative bg-ivory/5 border border-gold/20 p-7 sm:p-8 flex flex-col gap-5 h-full hover:bg-ivory/10 hover:border-gold/40 transition-all duration-300">
+                  <Quote size={20} className="text-gold/50 shrink-0" aria-hidden="true" />
+                  <p className="font-body text-[14px] text-ivory/85 leading-relaxed flex-1">"{t.text}"</p>
+                  <div className="border-t border-gold/15 pt-5">
+                    <div className="flex gap-0.5 mb-2" aria-label={`${t.stars} out of 5 stars`}>
+                      {Array.from({ length: t.stars }).map((_, s) => (
+                        <Star key={s} size={10} className="fill-gold text-gold" aria-hidden="true" />
+                      ))}
+                    </div>
+                    <p className="font-heading text-base text-ivory leading-tight">{t.name}</p>
+                    <p className="font-display text-[9px] tracking-[0.25em] uppercase text-ivory/50 mt-0.5">{t.location}</p>
                   </div>
-                ))}
-              </div>
-
-              <Link to="/about" className="link-reveal font-display text-[9px] tracking-[0.35em] uppercase text-gold">Read the full story →</Link>
-            </div>
+                </div>
+              </FadeUp>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* FEATURED PRODUCTS */}
-      {featuredProducts.length > 0 && (
-        <section className="py-20 sm:py-32 lg:py-44 bg-ivory" aria-labelledby="products-heading">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-10">
-            <div className="flex items-end justify-between mb-12 sm:mb-16 gap-6 flex-wrap">
-              <div>
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-8 h-px bg-gold-dark" aria-hidden="true" />
-                  <span className="eyebrow text-gold-dark">New In</span>
-                </div>
-                <h2 id="products-heading" className="text-display text-4xl sm:text-5xl md:text-6xl text-ink">
-                  Fresh from the loom.
-                </h2>
-              </div>
-              <Link to="/shop" className="link-reveal font-display text-[9px] tracking-[0.3em] uppercase text-maroon">Shop all →</Link>
-            </div>
-
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-3 sm:gap-x-5 gap-y-10 sm:gap-y-16">
-              {featuredProducts.map((p, i) => (
-                <FadeUp key={p.id} delay={Math.min(i * 0.04, 0.16)}>
-                  <Link to={`/shop/${p.slug}`} className="group block relative">
-                    <div className="relative overflow-hidden aspect-[3/4] mb-4 sm:mb-5 bg-ivory-deep border border-gold/10 img-fit">
-                      {p.image_url ? (
-                        <img
-                          src={p.image_url}
-                          alt={`${p.name} - Buy saree online`}
-                          loading="lazy"
-                          decoding="async"
-                          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-ink-soft text-xs font-body uppercase tracking-widest">No image</div>
-                      )}
-                    </div>
-                    <h3 className="font-heading text-lg sm:text-xl text-ink group-hover:text-maroon transition-colors leading-tight">{p.name}</h3>
-                    <p className="font-body text-sm text-gold-dark mt-1">₹{Number(p.price).toLocaleString("en-IN")}</p>
-                  </Link>
-                </FadeUp>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* TRUST STRIP */}
+      {/* ── TRUST STRIP ──────────────────────────────────────────── */}
       <section className="bg-ivory-deep py-16 sm:py-20 border-y border-gold/15 relative overflow-hidden" aria-label="Why shop with us">
         <div className="container mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-gold/15">
@@ -393,7 +446,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* ── CTA ──────────────────────────────────────────────────── */}
       <section className="relative py-20 sm:py-32 lg:py-44 bg-maroon-deep overflow-hidden" aria-labelledby="cta-heading">
         <div className="container mx-auto px-4 sm:px-6 text-center max-w-2xl relative z-10">
           <div className="flex items-center justify-center gap-3 mb-6">
@@ -420,6 +473,7 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
     </div>
   );
 };
