@@ -1,27 +1,10 @@
-import { Outlet, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { lazy, Suspense } from "react";
+import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import FloatingChat from "./FloatingChat";
 
-/* ── Lightweight page transition (no blocking, no delay) ── */
-const PageTransition = ({ children }: { children: React.ReactNode }) => {
-  const location = useLocation();
-
-  return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={location.pathname}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.25, ease: "easeOut" }}
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
-  );
-};
+// FloatingChat is never needed on first paint — lazy load it
+const FloatingChat = lazy(() => import("./FloatingChat"));
 
 const SiteLayout = () => {
   return (
@@ -31,12 +14,13 @@ const SiteLayout = () => {
 
       <Navbar />
       <main className="flex-1" id="main-content">
-        <PageTransition>
-          <Outlet />
-        </PageTransition>
+        <Outlet />
       </main>
       <Footer />
-      <FloatingChat />
+      {/* Load chat widget only after the rest of the page has hydrated */}
+      <Suspense fallback={null}>
+        <FloatingChat />
+      </Suspense>
     </div>
   );
 };
