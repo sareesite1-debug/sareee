@@ -84,6 +84,12 @@ const Footer = () => {
                   <Link key={l.label} to={l.to} className="link-reveal text-sm text-ivory/75 hover:text-ivory transition-colors font-body w-fit">{l.label}</Link>
                 ))}
               </div>
+              <div className="mt-7 pt-6 border-t border-ivory/8 flex flex-col gap-3">
+                <p className="eyebrow text-ivory/40 mb-1">Legal</p>
+                {[{ to: "/privacy", label: "Privacy Policy" }, { to: "/terms", label: "Terms of Service" }, { to: "/returns", label: "Returns & Exchange" }].map(l => (
+                  <Link key={l.to} to={l.to} className="link-reveal text-sm text-ivory/75 hover:text-ivory transition-colors font-body w-fit">{l.label}</Link>
+                ))}
+              </div>
             </motion.div>
           </div>
           <div className="md:col-span-3">
@@ -106,18 +112,9 @@ const Footer = () => {
         </div>
       </motion.div>
 
-      <div className="border-t border-ivory/5 py-6">
-        <div className="container mx-auto px-6 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="font-body text-[10px] text-ivory/60 tracking-widest">© {year} {BRAND.name}. Crafted with reverence.</p>
-          <div className="flex gap-8">
-            {[
-              { to: "/privacy", label: "Privacy" },
-              { to: "/terms", label: "Terms" },
-              { to: "/returns", label: "Returns" },
-            ].map(l => (
-              <Link key={l.to} to={l.to} className="font-body text-[10px] text-ivory/60 hover:text-ivory tracking-widest transition-colors">{l.label}</Link>
-            ))}
-          </div>
+      <div className="border-t border-ivory/5 py-4">
+        <div className="container mx-auto px-6 lg:px-10 flex items-center justify-center">
+          <p className="font-body text-[9px] text-ivory/35 tracking-widest">© {year} {BRAND.name}. Crafted with reverence.</p>
         </div>
       </div>
     </footer>
