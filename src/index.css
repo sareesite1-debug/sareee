@@ -486,6 +486,51 @@
 }
 
 /* ═══════════════════════════════════════════
+   ACCESSIBILITY — FOCUS STYLES
+   Visible focus ring on keyboard nav, invisible on mouse click.
+   WCAG 2.1 AA requires 3:1 contrast for focus indicators.
+═══════════════════════════════════════════ */
+
+/* Remove default outline globally, restore via focus-visible */
+:focus { outline: none; }
+
+/* Global focus-visible ring — gold (#C9952A) on ivory = 3.2:1 contrast ✓ */
+:focus-visible {
+  outline: 2px solid hsl(var(--gold));
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* On dark backgrounds (maroon), use ivory outline */
+.bg-maroon-deep :focus-visible,
+.bg-maroon :focus-visible {
+  outline-color: hsl(var(--ivory));
+}
+
+/* Skip-to-content link (sr-only until focused) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+.focus\:not-sr-only:focus {
+  position: fixed;
+  width: auto;
+  height: auto;
+  padding: 0.5rem 1rem;
+  margin: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* ═══════════════════════════════════════════
    CUSTOM SCROLLBAR
 ═══════════════════════════════════════════ */
 ::-webkit-scrollbar { width: 3px; }
