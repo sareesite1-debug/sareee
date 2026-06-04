@@ -1,7 +1,7 @@
 // Premium PDF / print rendering for quotations and invoices.
 // GST is INCLUSIVE — total field is what was actually paid; subtotal & GST are derived.
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+// jspdf + html2canvas are dynamically imported inside functions that need them, so the
+// ~170 KiB vendor-pdf chunk only ships when an admin actually generates a PDF.
 import { BRAND } from "./brand";
 
 export interface BillItem { name: string; description?: string; quantity: number; rate: number; amount: number; }
@@ -164,7 +164,8 @@ const CONTENT_WIDTH_MM = A4_WIDTH_MM - MARGIN_MM * 2;
 const PX_PER_MM = 3.7795;
 const RENDER_SCALE = 2;
 
-async function renderBillToPdf(pdf: jsPDF, b: BillData, addPageBefore: boolean) {
+async function renderBillToPdf(pdf: any, b: BillData, addPageBefore: boolean) {
+  const { default: html2canvas } = await import("html2canvas");
   const widthPx = Math.round(CONTENT_WIDTH_MM * PX_PER_MM);
   const wrapper = document.createElement("div");
   wrapper.style.position = "fixed";
@@ -232,6 +233,7 @@ export function printBill(b: BillData) {
 }
 
 export async function downloadBillPdf(b: BillData) {
+  const { default: jsPDF } = await import("jspdf");
   const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   await renderBillToPdf(pdf, b, false);
   pdf.save(`${b.doc_type}-${b.number}.pdf`);
@@ -239,6 +241,7 @@ export async function downloadBillPdf(b: BillData) {
 
 export async function downloadMergedPdf(bills: BillData[], filename = "bills.pdf") {
   if (!bills.length) return;
+  const { default: jsPDF } = await import("jspdf");
   const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   for (let i = 0; i < bills.length; i++) {
     await renderBillToPdf(pdf, bills[i], i > 0);
@@ -270,6 +273,7 @@ export function printBills(bills: BillData[]) {
  */
 export async function shareBill(b: BillData, phone?: string) {
   // Build the PDF as a blob/file
+  const { default: jsPDF } = await import("jspdf");
   const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
   await renderBillToPdf(pdf, b, false);
   const blob = pdf.output("blob");

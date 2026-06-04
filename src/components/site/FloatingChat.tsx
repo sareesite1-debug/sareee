@@ -72,7 +72,7 @@ const FloatingChat = () => {
           >
             <div className="bg-emerald-deep/90 backdrop-blur-xl px-4 py-3 flex items-center justify-between border-b border-gold/10">
               <span className="text-ivory font-heading text-sm font-semibold">Chat with Us</span>
-              <button onClick={() => setOpen(false)} className="text-ivory/50 hover:text-ivory transition-colors"><X size={16} /></button>
+              <button onClick={() => setOpen(false)} aria-label="Close chat" className="text-ivory/50 hover:text-ivory transition-colors"><X size={16} aria-hidden="true" /></button>
             </div>
             {!user ? (
               <div className="p-6 text-center space-y-3">
@@ -113,11 +113,13 @@ const FloatingChat = () => {
       {/* Chat button with pulsing ring */}
       <motion.button
         onClick={() => setOpen(!open)}
+        aria-label={open ? "Close chat" : "Open chat"}
+        aria-expanded={open}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         className="relative w-14 h-14 bg-gold rounded-full flex items-center justify-center shadow-lg"
       >
-        <MessageCircle size={22} className="text-emerald-deep relative z-10" />
+        <MessageCircle size={22} className="text-emerald-deep relative z-10" aria-hidden="true" />
         <motion.div
           className="absolute inset-0 rounded-full border-2 border-gold/40"
           animate={{ scale: [1, 1.4, 1], opacity: [0.6, 0, 0.6] }}

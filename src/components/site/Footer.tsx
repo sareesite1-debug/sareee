@@ -4,7 +4,7 @@ import { motion, useInView, useSpring, type Variants } from "framer-motion";
 import { MapPin, Phone, Mail, Globe, PhoneCall, Send } from "lucide-react";
 import { BRAND } from "@/lib/brand";
 
-const MagneticIcon = ({ Icon, href }: { Icon: any; href: string }) => {
+const MagneticIcon = ({ Icon, href, label }: { Icon: any; href: string; label: string }) => {
   const ref = useRef<HTMLAnchorElement>(null);
   const x = useSpring(0, { stiffness: 200, damping: 20 });
   const y = useSpring(0, { stiffness: 200, damping: 20 });
@@ -16,9 +16,9 @@ const MagneticIcon = ({ Icon, href }: { Icon: any; href: string }) => {
     y.set((e.clientY - rect.top - rect.height / 2) * 0.3);
   };
   return (
-    <motion.a ref={ref} href={href} onMouseMove={handleMouse} onMouseLeave={() => { x.set(0); y.set(0); }} style={{ x, y }} whileHover={{ scale: 1.1 }}
+    <motion.a ref={ref} href={href} aria-label={label} onMouseMove={handleMouse} onMouseLeave={() => { x.set(0); y.set(0); }} style={{ x, y }} whileHover={{ scale: 1.1 }}
       className="group w-10 h-10 border border-ivory/10 flex items-center justify-center text-ivory/30 hover:border-gold/50 hover:text-gold transition-colors duration-500">
-      <Icon size={14} strokeWidth={1.2} />
+      <Icon size={14} strokeWidth={1.2} aria-hidden="true" />
     </motion.a>
   );
 };
@@ -62,7 +62,9 @@ const Footer = () => {
               <p className="text-sm text-ivory/80 leading-relaxed font-body font-light max-w-sm mb-8">Pure Kanchipuram silk sarees — GI certified, handwoven by master craftsmen, and delivered to your door since 1985.</p>
               <motion.div className="h-px bg-gold/15 mb-7" initial={{ scaleX: 0 }} animate={inView ? { scaleX: 1 } : {}} transition={{ duration: 1.2, delay: 0.5, ease: [0.76, 0, 0.24, 1] }} style={{ transformOrigin: "left" }} />
               <div className="flex gap-3">
-                {[Globe, PhoneCall, Send].map((Icon, i) => <MagneticIcon key={i} Icon={Icon} href="#" />)}
+                <MagneticIcon Icon={Globe} href={`mailto:${BRAND.email}`} label="Website" />
+                <MagneticIcon Icon={PhoneCall} href={`tel:${BRAND.phone}`} label="Call us" />
+                <MagneticIcon Icon={Send} href={`mailto:${BRAND.email}`} label="Send a message" />
               </div>
             </motion.div>
           </div>
