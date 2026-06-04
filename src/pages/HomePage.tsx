@@ -408,7 +408,7 @@ const HomePage = () => {
                   <Quote size={20} className="text-gold/50 shrink-0" aria-hidden="true" />
                   <p className="font-body text-[14px] text-ivory/85 leading-relaxed flex-1">"{t.text}"</p>
                   <div className="border-t border-gold/15 pt-5">
-                    <div className="flex gap-0.5 mb-2" aria-label={`${t.stars} out of 5 stars`}>
+                    <div className="flex gap-0.5 mb-2" role="img" aria-label={`${t.stars} out of 5 stars`}>
                       {Array.from({ length: t.stars }).map((_, s) => (
                         <Star key={s} size={10} className="fill-gold text-gold" aria-hidden="true" />
                       ))}
