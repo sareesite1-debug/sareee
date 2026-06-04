@@ -1,16 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, Sparkles, SlidersHorizontal } from "lucide-react";
+import { ArrowLeft, Sparkles, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
-import ProductFilters, { applyProductFilters, FilterState } from "@/components/site/ProductFilters";
+import ProductFilters, { applyProductFilters, applyProductSort, FilterState, SortKey, SORT_OPTIONS } from "@/components/site/ProductFilters";
+import MobileFilterSortBar from "@/components/site/MobileFilterSortBar";
+import { optimizeImg, imgSrcSet } from "@/lib/img";
 
 interface Category { id: string; name: string; slug: string; description: string | null; image_url: string | null; sort_order: number; }
 interface Product {
   id: string; category_id: string | null; name: string; slug: string;
   price: number; compare_at_price: number | null; image_url: string | null;
   stock: number | null; status: string;
-  colors?: string[] | null; color?: string | null;
+  colors?: string[] | null; color?: string | null; created_at?: string;
 }
 
 const ProductCard = ({ product, index }: { product: Product; index: number }) => {
@@ -30,7 +32,9 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
         <div className="relative overflow-hidden aspect-[3/4] mb-5 bg-ivory-deep border border-gold/10 img-fit">
           {product.image_url ? (
             <motion.img
-              src={product.image_url}
+              src={optimizeImg(product.image_url, 600)}
+              srcSet={imgSrcSet(product.image_url, [300, 450, 600, 900])}
+              sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 22vw"
               alt={product.name}
               width={600}
               height={800}
@@ -58,7 +62,7 @@ const CategoriesPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [activeCategory, setActiveCategory] = useState<Category | null>(null);
   const [loading, setLoading] = useState(true);
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [sort, setSort] = useState<SortKey>("newest");
   const [filters, setFilters] = useState<FilterState>({ categoryId: "all", colors: [], minPrice: 0, maxPrice: 1000000 });
 
   useEffect(() => {
@@ -92,7 +96,10 @@ const CategoriesPage = () => {
     return { min: Math.floor(Math.min(...prices)), max: Math.ceil(Math.max(...prices)) };
   }, [products]);
 
-  const visible = useMemo(() => applyProductFilters(products, filters), [products, filters]);
+  const visible = useMemo(
+    () => applyProductSort(applyProductFilters(products, filters), sort),
+    [products, filters, sort],
+  );
 
   // Collections index view
   if (!slug) {
@@ -136,7 +143,7 @@ const CategoriesPage = () => {
 
   // Single category view
   return (
-    <div className="bg-ivory min-h-screen">
+    <div className="bg-ivory min-h-screen pb-24 lg:pb-0">
       <header className="border-b border-gold/15 bg-ivory pt-28 pb-8">
         <div className="container mx-auto px-6 lg:px-10">
           <Link to="/categories" className="inline-flex items-center gap-2 text-[10px] text-ink-soft hover:text-emerald mb-4 font-body uppercase tracking-[0.25em] transition-colors">
@@ -162,21 +169,8 @@ const CategoriesPage = () => {
       </header>
 
       <section className="container mx-auto px-6 lg:px-10 py-10">
-        <div className="flex items-center justify-between mb-6 lg:hidden">
-          <p className="font-display text-[8px] text-ink-soft uppercase tracking-[0.3em]">{visible.length} {visible.length === 1 ? "piece" : "pieces"}</p>
-          <button
-            type="button"
-            onClick={() => setFiltersOpen(v => !v)}
-            className="inline-flex items-center gap-2 border border-gold/30 px-4 py-2 font-display text-[10px] tracking-[0.25em] uppercase text-ink"
-            aria-expanded={filtersOpen}
-            aria-controls="cat-filters"
-          >
-            <SlidersHorizontal size={14} aria-hidden="true" /> Filters
-          </button>
-        </div>
-
         <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-8">
-          <div id="cat-filters" className={`${filtersOpen ? "block" : "hidden"} lg:block`}>
+          <div className="hidden lg:block">
             <ProductFilters
               products={products}
               categories={[]}
@@ -188,8 +182,22 @@ const CategoriesPage = () => {
           </div>
 
           <div>
-            <div className="hidden lg:flex items-center justify-end mb-6 pb-4 border-b border-gold/15">
+            <div className="flex items-center justify-between gap-3 mb-6 pb-4 border-b border-gold/15">
               <p className="font-display text-[8px] text-ink-soft uppercase tracking-[0.3em]">{visible.length} {visible.length === 1 ? "piece" : "pieces"}</p>
+              <label className="hidden lg:inline-flex items-center gap-2">
+                <span className="font-display text-[9px] tracking-[0.25em] uppercase text-ink-soft">Sort</span>
+                <div className="relative">
+                  <select
+                    value={sort}
+                    onChange={e => setSort(e.target.value as SortKey)}
+                    className="appearance-none bg-ivory border border-gold/25 pl-3 pr-8 py-2 text-sm font-body text-ink focus:border-emerald focus:outline-none cursor-pointer"
+                    aria-label="Sort products"
+                  >
+                    {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                  <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-ink-soft" aria-hidden="true" />
+                </div>
+              </label>
             </div>
 
             {loading ? (
@@ -212,6 +220,18 @@ const CategoriesPage = () => {
           </div>
         </div>
       </section>
+
+      <MobileFilterSortBar
+        products={products}
+        categories={[]}
+        showCategory={false}
+        state={filters}
+        onChange={setFilters}
+        priceBounds={priceBounds}
+        sort={sort}
+        onSortChange={setSort}
+        visibleCount={visible.length}
+      />
     </div>
   );
 };
