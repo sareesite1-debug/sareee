@@ -6,6 +6,8 @@ export interface FilterableProduct {
   id: string;
   category_id: string | null;
   price: number;
+  name?: string;
+  created_at?: string;
   colors?: string[] | null;
   color?: string | null;
 }
@@ -18,6 +20,15 @@ export interface FilterState {
   minPrice: number;
   maxPrice: number;
 }
+
+export type SortKey = "newest" | "price-asc" | "price-desc" | "name-asc";
+
+export const SORT_OPTIONS: { value: SortKey; label: string }[] = [
+  { value: "newest",     label: "Newest first" },
+  { value: "price-asc",  label: "Price: Low to High" },
+  { value: "price-desc", label: "Price: High to Low" },
+  { value: "name-asc",   label: "Name: A – Z" },
+];
 
 interface Props {
   products: FilterableProduct[];
@@ -38,6 +49,17 @@ export function applyProductFilters<T extends FilterableProduct>(products: T[], 
     }
     return true;
   });
+}
+
+export function applyProductSort<T extends FilterableProduct>(products: T[], sort: SortKey): T[] {
+  const arr = [...products];
+  switch (sort) {
+    case "price-asc":  return arr.sort((a, b) => Number(a.price) - Number(b.price));
+    case "price-desc": return arr.sort((a, b) => Number(b.price) - Number(a.price));
+    case "name-asc":   return arr.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    case "newest":
+    default:           return arr.sort((a, b) => (b.created_at || "").localeCompare(a.created_at || ""));
+  }
 }
 
 const ProductFilters = ({ products, categories, showCategory = true, state, onChange, priceBounds }: Props) => {
