@@ -1,7 +1,7 @@
 // Premium PDF / print rendering for quotations and invoices.
 // GST is INCLUSIVE — total field is what was actually paid; subtotal & GST are derived.
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+// jspdf + html2canvas are dynamically imported inside functions that need them, so the
+// ~170 KiB vendor-pdf chunk only ships when an admin actually generates a PDF.
 import { BRAND } from "./brand";
 
 export interface BillItem { name: string; description?: string; quantity: number; rate: number; amount: number; }
