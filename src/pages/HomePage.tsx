@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import craftImg from "@/assets/craft-silks.jpg";
 import heroEditorial from "@/assets/hero-editorial.jpg";
 import heroPattern from "@/assets/hero-pattern.png";
+import { optimizeImg, imgSrcSet } from "@/lib/img";
 
 interface Category { id: string; name: string; slug: string; image_url: string | null; description: string | null; }
 interface Product { id: string; name: string; slug: string; price: number; image_url: string | null; }
@@ -254,8 +255,12 @@ const HomePage = () => {
                     <div className="relative overflow-hidden aspect-[3/4] mb-4 sm:mb-3 bg-ivory-deep border border-gold/10 img-fit">
                       {p.image_url ? (
                         <img
-                          src={p.image_url}
+                          src={optimizeImg(p.image_url, 500)}
+                          srcSet={imgSrcSet(p.image_url, [280, 400, 600, 800])}
+                          sizes="(max-width: 640px) 48vw, (max-width: 1024px) 30vw, 22vw"
                           alt={`${p.name} - Buy saree online`}
+                          width={500}
+                          height={667}
                           loading="lazy"
                           decoding="async"
                           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
@@ -302,8 +307,12 @@ const HomePage = () => {
                       </div>
                       {p.image_url ? (
                         <img
-                          src={p.image_url}
+                          src={optimizeImg(p.image_url, 500)}
+                          srcSet={imgSrcSet(p.image_url, [280, 400, 600, 800])}
+                          sizes="(max-width: 640px) 48vw, (max-width: 1024px) 30vw, 22vw"
                           alt={`${p.name} - Hand-picked saree`}
+                          width={500}
+                          height={667}
                           loading="lazy"
                           decoding="async"
                           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
@@ -352,8 +361,12 @@ const HomePage = () => {
                       {c.image_url ? (
                         <>
                           <img
-                            src={c.image_url}
+                            src={optimizeImg(c.image_url, 700)}
+                            srcSet={imgSrcSet(c.image_url, [400, 600, 800, 1200])}
+                            sizes="(max-width: 640px) 92vw, (max-width: 1024px) 46vw, 30vw"
                             alt={`${c.name} saree collection`}
+                            width={700}
+                            height={875}
                             loading="lazy"
                             decoding="async"
                             className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
