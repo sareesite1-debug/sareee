@@ -442,9 +442,8 @@
   will-change: transform;
 }
 .marquee-track:hover { animation-play-state: paused; }
-/* Stop marquee entirely on mobile — saves CPU/battery, no one reads it */
 @media (max-width: 640px) {
-  .marquee-track { animation: none; }
+  .marquee-track { animation-duration: 22s; }
 }
 
 @keyframes float { 0%, 100% { transform: translateY(0px) rotate(-0.5deg); } 50% { transform: translateY(-14px) rotate(0.5deg); } }

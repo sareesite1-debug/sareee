@@ -117,11 +117,11 @@ const HomePage = () => {
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
       <section
-        className="relative min-h-screen flex flex-col lg:flex-row overflow-hidden pt-[80px] lg:pt-0 text-safe"
+        className="relative lg:min-h-screen flex flex-col lg:flex-row overflow-hidden pt-[80px] lg:pt-0 text-safe"
         aria-label="Hero section"
       >
         {/* LEFT PANEL */}
-        <div className="relative flex-1 lg:w-[52%] bg-maroon-deep flex items-center justify-center px-6 sm:px-10 lg:px-20 py-16 lg:py-24 order-2 lg:order-1 min-h-[60vh] lg:min-h-screen">
+        <div className="relative flex-1 lg:w-[52%] bg-maroon-deep flex items-center justify-center px-6 sm:px-10 lg:px-20 py-16 lg:py-24 order-2 lg:order-1 min-h-[calc(100vh-80px)] lg:min-h-screen">
           <PatternBg />
           <div className="absolute top-1/3 left-1/3 w-80 h-80 rounded-full bg-gold/8 blur-[120px] pointer-events-none" aria-hidden="true" />
 
@@ -165,7 +165,7 @@ const HomePage = () => {
         </div>
 
         {/* RIGHT PANEL */}
-        <div className="relative flex-1 lg:w-[48%] bg-ivory-deep flex items-center justify-center order-1 lg:order-2 min-h-[55vh] lg:min-h-screen overflow-hidden">
+        <div className="relative hidden lg:flex flex-1 lg:w-[48%] bg-ivory-deep items-center justify-center order-1 lg:order-2 lg:min-h-screen overflow-hidden">
           <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
             <svg viewBox="0 0 500 500" className="w-[90%] max-w-[480px] opacity-20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <g fill="none" stroke="#6B0F1A" strokeWidth="1">
