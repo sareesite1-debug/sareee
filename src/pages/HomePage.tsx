@@ -117,11 +117,11 @@ const HomePage = () => {
 
       {/* ── HERO ─────────────────────────────────────────────────── */}
       <section
-        className="relative min-h-screen flex flex-col lg:flex-row overflow-hidden pt-[80px] lg:pt-0 text-safe"
+        className="relative lg:min-h-screen flex flex-col lg:flex-row overflow-hidden pt-[80px] lg:pt-0 text-safe"
         aria-label="Hero section"
       >
         {/* LEFT PANEL */}
-        <div className="relative flex-1 lg:w-[52%] bg-maroon-deep flex items-center justify-center px-6 sm:px-10 lg:px-20 py-16 lg:py-24 order-2 lg:order-1 min-h-[60vh] lg:min-h-screen">
+        <div className="relative flex-1 lg:w-[52%] bg-maroon-deep flex items-center justify-center px-6 sm:px-10 lg:px-20 py-16 lg:py-24 order-2 lg:order-1 min-h-[calc(100vh-80px)] lg:min-h-screen">
           <PatternBg />
           <div className="absolute top-1/3 left-1/3 w-80 h-80 rounded-full bg-gold/8 blur-[120px] pointer-events-none" aria-hidden="true" />
 
