@@ -8,16 +8,14 @@ const SR_EMAIL = Deno.env.get("SHIPROCKET_EMAIL");
 const SR_PASSWORD = Deno.env.get("SHIPROCKET_PASSWORD");
 const SR_PICKUP = Deno.env.get("SHIPROCKET_PICKUP_LOCATION") || "Primary";
 
-// ── Token cache (lives for the lifetime of this isolate, ~24h) ──────────────
+// Token cache (lives for the lifetime of this isolate, ~24h)
 let cachedToken: string | null = null;
 let tokenFetchedAt = 0;
-const TOKEN_TTL_MS = 23 * 60 * 60 * 1000; // 23 hours (Shiprocket tokens valid 24h)
+const TOKEN_TTL_MS = 23 * 60 * 60 * 1000;
 
 async function getToken(): Promise<string> {
   const now = Date.now();
-  if (cachedToken && now - tokenFetchedAt < TOKEN_TTL_MS) {
-    return cachedToken;
-  }
+  if (cachedToken && now - tokenFetchedAt < TOKEN_TTL_MS) return cachedToken;
   const res = await fetch("https://apiv2.shiprocket.in/v1/external/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -31,6 +29,7 @@ async function getToken(): Promise<string> {
 }
 
 Deno.serve(async (req) => {
+  console.log("Function invoked:", req.method);
   const corsHeaders = buildCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -41,11 +40,14 @@ Deno.serve(async (req) => {
     });
 
   try {
+    console.log("Credentials check — email set:", !!SR_EMAIL, "password set:", !!SR_PASSWORD);
     if (!SR_EMAIL || !SR_PASSWORD) {
       return respond({ ok: false, skipped: true, reason: "Shiprocket credentials not configured" });
     }
 
-    const { order_id } = await req.json();
+    const body = await req.json();
+    console.log("Request body:", JSON.stringify(body));
+    const { order_id } = body;
     if (!order_id) throw new Error("order_id required");
 
     const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
@@ -54,17 +56,13 @@ Deno.serve(async (req) => {
       .select("*")
       .eq("id", order_id)
       .single();
-    if (oErr || !order) throw new Error("Order not found");
+    if (oErr || !order) throw new Error(`Order not found: ${JSON.stringify(oErr)}`);
+    console.log("Order fetched:", order.order_number, "shiprocket_order_id:", order.shiprocket_order_id);
 
-    // ── Idempotency guard: skip if already synced ───────────────────────────
+    // Idempotency guard: skip if already synced
     if (order.shiprocket_order_id) {
-      console.log(`Order ${order_id} already synced to Shiprocket (${order.shiprocket_order_id}), skipping.`);
-      return respond({
-        ok: true,
-        skipped: true,
-        reason: "Already synced",
-        shiprocket_order_id: order.shiprocket_order_id,
-      });
+      console.log(`Already synced to Shiprocket (${order.shiprocket_order_id}), skipping.`);
+      return respond({ ok: true, skipped: true, reason: "Already synced", shiprocket_order_id: order.shiprocket_order_id });
     }
 
     const { data: items } = await supabase
@@ -72,8 +70,10 @@ Deno.serve(async (req) => {
       .select("*")
       .eq("order_id", order_id);
     if (!items || items.length === 0) throw new Error("No items in order");
+    console.log("Items fetched:", items.length);
 
     const token = await getToken();
+    console.log("Shiprocket token obtained");
 
     const [firstName, ...rest] = (order.customer_name || "Customer").split(" ");
     const lastName = rest.join(" ") || ".";
@@ -108,21 +108,21 @@ Deno.serve(async (req) => {
       weight: 0.5,
     };
 
+    console.log("Sending to Shiprocket:", JSON.stringify(payload));
+
     const srRes = await fetch("https://apiv2.shiprocket.in/v1/external/orders/create/adhoc", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify(payload),
     });
     const srData = await srRes.json();
+    console.log("Shiprocket response status:", srRes.status, "body:", JSON.stringify(srData));
 
-    // ── If Shiprocket says "duplicate order", treat as success ──────────────
+    // If Shiprocket says duplicate, treat as success
     if (!srRes.ok) {
       const msg = JSON.stringify(srData).toLowerCase();
       if (msg.includes("already exists") || msg.includes("duplicate")) {
-        console.warn("Shiprocket duplicate order warning, treating as success:", srData);
+        console.warn("Duplicate order in Shiprocket, treating as success");
         return respond({ ok: true, skipped: true, reason: "Duplicate in Shiprocket", shiprocket: srData });
       }
       throw new Error(`Shiprocket order create failed: ${JSON.stringify(srData)}`);
@@ -136,6 +136,7 @@ Deno.serve(async (req) => {
       })
       .eq("id", order_id);
 
+    console.log("Order synced successfully:", srData.order_id);
     return respond({ ok: true, shiprocket: srData });
   } catch (err) {
     console.error("shiprocket error:", err);
