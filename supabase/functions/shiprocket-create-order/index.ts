@@ -8,7 +8,16 @@ const SR_EMAIL = Deno.env.get("SHIPROCKET_EMAIL");
 const SR_PASSWORD = Deno.env.get("SHIPROCKET_PASSWORD");
 const SR_PICKUP = Deno.env.get("SHIPROCKET_PICKUP_LOCATION") || "Primary";
 
+// ── Token cache (lives for the lifetime of this isolate, ~24h) ──────────────
+let cachedToken: string | null = null;
+let tokenFetchedAt = 0;
+const TOKEN_TTL_MS = 23 * 60 * 60 * 1000; // 23 hours (Shiprocket tokens valid 24h)
+
 async function getToken(): Promise<string> {
+  const now = Date.now();
+  if (cachedToken && now - tokenFetchedAt < TOKEN_TTL_MS) {
+    return cachedToken;
+  }
   const res = await fetch("https://apiv2.shiprocket.in/v1/external/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -16,40 +25,68 @@ async function getToken(): Promise<string> {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(`Shiprocket auth failed: ${JSON.stringify(data)}`);
-  return data.token;
+  cachedToken = data.token;
+  tokenFetchedAt = now;
+  return cachedToken!;
 }
 
 Deno.serve(async (req) => {
   const corsHeaders = buildCorsHeaders(req);
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  const respond = (body: unknown, status = 200) =>
+    new Response(JSON.stringify(body), {
+      status,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+
   try {
     if (!SR_EMAIL || !SR_PASSWORD) {
-      return new Response(JSON.stringify({ ok: false, skipped: true, reason: "Shiprocket credentials not configured" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return respond({ ok: false, skipped: true, reason: "Shiprocket credentials not configured" });
     }
 
     const { order_id } = await req.json();
     if (!order_id) throw new Error("order_id required");
 
     const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
-    const { data: order, error: oErr } = await supabase.from("customer_orders").select("*").eq("id", order_id).single();
+    const { data: order, error: oErr } = await supabase
+      .from("customer_orders")
+      .select("*")
+      .eq("id", order_id)
+      .single();
     if (oErr || !order) throw new Error("Order not found");
-    const { data: items } = await supabase.from("customer_order_items").select("*").eq("order_id", order_id);
+
+    // ── Idempotency guard: skip if already synced ───────────────────────────
+    if (order.shiprocket_order_id) {
+      console.log(`Order ${order_id} already synced to Shiprocket (${order.shiprocket_order_id}), skipping.`);
+      return respond({
+        ok: true,
+        skipped: true,
+        reason: "Already synced",
+        shiprocket_order_id: order.shiprocket_order_id,
+      });
+    }
+
+    const { data: items } = await supabase
+      .from("customer_order_items")
+      .select("*")
+      .eq("order_id", order_id);
     if (!items || items.length === 0) throw new Error("No items in order");
 
     const token = await getToken();
 
-    const addr = order.shipping_address || "";
-    const [namePart] = (order.customer_name || "Customer").split(" ");
-    const lastName = (order.customer_name || "").split(" ").slice(1).join(" ") || ".";
-
+    const [firstName, ...rest] = (order.customer_name || "Customer").split(" ");
+    const lastName = rest.join(" ") || ".";
+    const addr = (order.shipping_address || "Address not provided").slice(0, 80);
     const pm = String(order.payment_method || "cod").toLowerCase();
+
     const payload = {
       order_id: order.order_number,
       order_date: new Date(order.created_at).toISOString().slice(0, 19).replace("T", " "),
       pickup_location: SR_PICKUP,
-      billing_customer_name: namePart,
+      billing_customer_name: firstName,
       billing_last_name: lastName,
-      billing_address: (addr || "Address not provided").slice(0, 80),
+      billing_address: addr,
       billing_city: order.city || "Mysore",
       billing_pincode: order.zip_code || "570009",
       billing_state: order.state || "Karnataka",
@@ -63,27 +100,45 @@ Deno.serve(async (req) => {
         units: i.quantity,
         selling_price: Number(i.unit_price),
       })),
-      payment_method: pm === "online" || pm === "paid" || pm === "prepaid" ? "Prepaid" : "COD",
+      payment_method: ["online", "paid", "prepaid"].includes(pm) ? "Prepaid" : "COD",
       sub_total: Number(order.total),
-      length: 20, breadth: 15, height: 5, weight: 0.5,
+      length: 20,
+      breadth: 15,
+      height: 5,
+      weight: 0.5,
     };
 
     const srRes = await fetch("https://apiv2.shiprocket.in/v1/external/orders/create/adhoc", {
       method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(payload),
     });
     const srData = await srRes.json();
-    if (!srRes.ok) throw new Error(`Shiprocket order create failed: ${JSON.stringify(srData)}`);
 
-    await supabase.from("customer_orders").update({
-      shiprocket_order_id: String(srData.order_id || ""),
-      shiprocket_shipment_id: String(srData.shipment_id || ""),
-    }).eq("id", order_id);
+    // ── If Shiprocket says "duplicate order", treat as success ──────────────
+    if (!srRes.ok) {
+      const msg = JSON.stringify(srData).toLowerCase();
+      if (msg.includes("already exists") || msg.includes("duplicate")) {
+        console.warn("Shiprocket duplicate order warning, treating as success:", srData);
+        return respond({ ok: true, skipped: true, reason: "Duplicate in Shiprocket", shiprocket: srData });
+      }
+      throw new Error(`Shiprocket order create failed: ${JSON.stringify(srData)}`);
+    }
 
-    return new Response(JSON.stringify({ ok: true, shiprocket: srData }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    await supabase
+      .from("customer_orders")
+      .update({
+        shiprocket_order_id: String(srData.order_id || ""),
+        shiprocket_shipment_id: String(srData.shipment_id || ""),
+      })
+      .eq("id", order_id);
+
+    return respond({ ok: true, shiprocket: srData });
   } catch (err) {
     console.error("shiprocket error:", err);
-    return new Response(JSON.stringify({ ok: false, error: String(err) }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return respond({ ok: false, error: String(err) }, 500);
   }
 });
