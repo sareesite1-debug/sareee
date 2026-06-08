@@ -3,9 +3,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { buildCorsHeaders } from "../_shared/cors.ts";
 
 const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY")!;
-const FROM_EMAIL = "sareesite1@gmail.com";
-const FROM_NAME = "Arpita Saree Center";
-const OWNER_EMAIL = "sareesite1@gmail.com";
+const FROM_EMAIL = "arpithasareecenter2421@gmail.com";
+const FROM_NAME = "Arpitha Saree Center";
+const OWNER_EMAIL = "arpithasareecenter2421@gmail.com";
 
 // SUPABASE_URL is auto-injected, SERVICE_ROLE_KEY set manually in secrets
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -51,7 +51,7 @@ const renderEmail = (heading: string, intro: string, order: any, items: any[]) =
   </table>
   <p style="text-align:right;font-size:16px;color:#7a1e1e"><strong>Total: ₹${Number(order.total).toLocaleString()}</strong></p>
   <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
-  <p style="color:#888;font-size:12px;text-align:center">Arpita Saree Center<br/>#LIG 63, 6th Cross, Gangotri Layout, Mysore - 570009<br/>Phone: 9611225226 · sareesite1@gmail.com</p>
+  <p style="color:#888;font-size:12px;text-align:center">Arpitha Saree Center<br/>#LIG 63, 6th Cross, Gangotri Layout, Mysore - 570009<br/>Phone: 9611225226 · arpithasareecenter2421@gmail.com</p>
 </div>`;
 
 async function sendEmail(to: string, toName: string, subject: string, html: string) {
