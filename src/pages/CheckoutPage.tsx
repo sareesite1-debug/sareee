@@ -89,10 +89,13 @@ const CheckoutPage = () => {
       });
     } catch {}
 
-    // Fire-and-forget: auto-push order to Shiprocket
+    // Push order to Shiprocket — awaited so the function completes before navigation
     try {
-      supabase.functions.invoke("shiprocket-create-order", { body: { order_id: order.id } });
-    } catch {}
+      await supabase.functions.invoke("shiprocket-create-order", { body: { order_id: order.id } });
+    } catch (err) {
+      console.error("Shiprocket sync failed (non-blocking):", err);
+      // Non-fatal: order is saved in DB regardless
+    }
 
     toast.success(form.payment_method === "online" ? "Payment secured. Order confirmed!" : "Order confirmed!");
     navigate(`/orders/${order.id}`);
