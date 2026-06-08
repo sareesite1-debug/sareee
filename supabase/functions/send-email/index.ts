@@ -51,7 +51,7 @@ const renderEmail = (heading: string, intro: string, order: any, items: any[]) =
   </table>
   <p style="text-align:right;font-size:16px;color:#7a1e1e"><strong>Total: ₹${Number(order.total).toLocaleString()}</strong></p>
   <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
-  <p style="color:#888;font-size:12px;text-align:center">Arpita Saree Center<br/>#LIG 63, 6th Cross, Gangotri Layout, Mysore - 570009<br/>Phone: 9611225226 · sareesite1@gmail.com</p>
+  <p style="color:#888;font-size:12px;text-align:center">Arpitha Saree Center<br/>#LIG 63, 6th Cross, Gangotri Layout, Mysore - 570009<br/>Phone: 9611225226 · arpithasareecenter2421@gmail.com</p>
 </div>`;
 
 async function sendEmail(to: string, toName: string, subject: string, html: string) {
