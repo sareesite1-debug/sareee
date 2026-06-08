@@ -42,16 +42,17 @@ Deno.serve(async (req) => {
     const [namePart] = (order.customer_name || "Customer").split(" ");
     const lastName = (order.customer_name || "").split(" ").slice(1).join(" ") || ".";
 
+    const pm = String(order.payment_method || "cod").toLowerCase();
     const payload = {
       order_id: order.order_number,
       order_date: new Date(order.created_at).toISOString().slice(0, 19).replace("T", " "),
       pickup_location: SR_PICKUP,
       billing_customer_name: namePart,
       billing_last_name: lastName,
-      billing_address: addr.slice(0, 80) || "Address not provided",
-      billing_city: "Mysore",
-      billing_pincode: "570009",
-      billing_state: "Karnataka",
+      billing_address: (addr || "Address not provided").slice(0, 80),
+      billing_city: order.city || "Mysore",
+      billing_pincode: order.zip_code || "570009",
+      billing_state: order.state || "Karnataka",
       billing_country: "India",
       billing_email: order.customer_email || "noemail@example.com",
       billing_phone: order.customer_phone || "0000000000",
@@ -62,7 +63,7 @@ Deno.serve(async (req) => {
         units: i.quantity,
         selling_price: Number(i.unit_price),
       })),
-      payment_method: "COD",
+      payment_method: pm === "online" || pm === "paid" || pm === "prepaid" ? "Prepaid" : "COD",
       sub_total: Number(order.total),
       length: 20, breadth: 15, height: 5, weight: 0.5,
     };

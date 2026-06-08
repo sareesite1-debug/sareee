@@ -89,6 +89,11 @@ const CheckoutPage = () => {
       });
     } catch {}
 
+    // Fire-and-forget: auto-push order to Shiprocket
+    try {
+      supabase.functions.invoke("shiprocket-create-order", { body: { order_id: order.id } });
+    } catch {}
+
     toast.success(form.payment_method === "online" ? "Payment secured. Order confirmed!" : "Order confirmed!");
     navigate(`/orders/${order.id}`);
   };
