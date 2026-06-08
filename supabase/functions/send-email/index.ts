@@ -3,9 +3,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { buildCorsHeaders } from "../_shared/cors.ts";
 
 const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY")!;
-const FROM_EMAIL = "sareesite1@gmail.com";
-const FROM_NAME = "Arpita Saree Center";
-const OWNER_EMAIL = "sareesite1@gmail.com";
+const FROM_EMAIL = "arpithasareecenter2421@gmail.com";
+const FROM_NAME = "Arpitha Saree Center";
+const OWNER_EMAIL = "arpithasareecenter2421@gmail.com";
 
 // SUPABASE_URL is auto-injected, SERVICE_ROLE_KEY set manually in secrets
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
