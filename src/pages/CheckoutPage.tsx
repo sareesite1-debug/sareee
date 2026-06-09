@@ -205,8 +205,16 @@ const CheckoutPage = () => {
                   {activeStep === 2 && (
                     <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                       <div className="mb-4">
-                        <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft">Complete Address *</label>
-                        <textarea value={form.shipping_address} onChange={e => { const v = e.target.value; setForm(f => ({ ...f, shipping_address: v })); }} required rows={3}
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="block text-[9px] font-body uppercase tracking-[0.25em] text-ink-soft">Complete Address *</label>
+                          {savedCount > 0 && (
+                            <button type="button" onClick={() => setPickerOpen(true)}
+                              className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-emerald hover:text-emerald-deep font-body">
+                              <BookMarked size={11} /> Use saved address
+                            </button>
+                          )}
+                        </div>
+                        <textarea value={form.shipping_address} onFocus={() => { if (savedCount > 0 && !form.shipping_address) setPickerOpen(true); }} onChange={e => { const v = e.target.value; setForm(f => ({ ...f, shipping_address: v })); setUsedSavedId(null); }} required rows={3}
                           className="w-full border border-gold/20 bg-ivory-deep/30 p-4 text-sm font-body focus:outline-none focus:border-maroon transition-colors resize-none placeholder:text-ink-soft/30" placeholder="Street, area," />
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
@@ -328,6 +336,13 @@ const CheckoutPage = () => {
           </div>
         </div>
       </div>
+      <AddressPickerModal
+        open={pickerOpen}
+        userId={user?.id || null}
+        onClose={() => setPickerOpen(false)}
+        onSelect={applySavedAddress}
+        onNew={() => { setPickerOpen(false); setUsedSavedId(null); }}
+      />
     </div>
   );
 };

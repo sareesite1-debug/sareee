@@ -46,6 +46,12 @@ const OrderDetailPage = () => {
 
   const cancelOrder = async () => {
     if (!confirm("Are you sure you want to cancel this order? This action cannot be undone.")) return;
+    // Cancel in Shiprocket first (no-op if not synced)
+    try {
+      await supabase.functions.invoke("shiprocket-cancel-order", { body: { order_id: order.id } });
+    } catch (err) {
+      console.error("Shiprocket cancel failed (non-blocking):", err);
+    }
     const { error } = await (supabase.from("customer_orders") as any).update({ status: "cancelled", tracking_status: "cancelled" }).eq("id", order.id);
     if (error) { toast.error(error.message); return; }
     toast.success("Order cancelled successfully.");

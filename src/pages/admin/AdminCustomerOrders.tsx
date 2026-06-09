@@ -60,6 +60,10 @@ const AdminCustomerOrders = () => {
   };
 
   const updateField = async (id: string, field: string, value: string) => {
+    // If cancelling, sync to Shiprocket first
+    if ((field === "status" || field === "tracking_status") && value === "cancelled") {
+      await callFn("shiprocket-cancel-order", { order_id: id });
+    }
     const { error } = await (supabase.from("customer_orders") as any).update({ [field]: value }).eq("id", id);
     if (error) { toast.error(error.message); return; }
     toast.success("Updated");
@@ -73,6 +77,8 @@ const AdminCustomerOrders = () => {
   };
 
   const remove = async (id: string) => {
+    // Cancel in Shiprocket before deleting locally (no-op if never synced)
+    await callFn("shiprocket-cancel-order", { order_id: id });
     const { error } = await (supabase.from("customer_orders") as any).delete().eq("id", id);
     if (error) toast.error(error.message); else { toast.success("Deleted"); refresh(); }
   };
