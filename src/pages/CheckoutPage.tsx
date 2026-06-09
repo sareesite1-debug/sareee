@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lock, CreditCard, Truck, ShieldCheck, Check } from "lucide-react";
+import { Lock, CreditCard, Truck, ShieldCheck, Check, BookMarked } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/hooks/useCart";
+import AddressPickerModal, { SavedAddress } from "@/components/site/AddressPickerModal";
 
 const INDIAN_STATES = [
   "Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana",
@@ -32,16 +33,45 @@ const CheckoutPage = () => {
   });
   const [submitting, setSubmitting] = useState(false);
   const [activeStep, setActiveStep] = useState(1);
+  const [savedCount, setSavedCount] = useState(0);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [usedSavedId, setUsedSavedId] = useState<string | null>(null);
+  const [orderPlaced, setOrderPlaced] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) { navigate("/auth"); return; }
       setUser(session.user);
       setForm(f => ({ ...f, customer_email: session.user.email || "" }));
+      // Preload saved address count + autofill name/phone from profile
+      const [{ data: prof }, { count }] = await Promise.all([
+        (supabase.from("profiles") as any).select("full_name, phone").eq("user_id", session.user.id).maybeSingle(),
+        (supabase.from("customer_addresses") as any).select("*", { count: "exact", head: true }).eq("user_id", session.user.id),
+      ]);
+      setSavedCount(count || 0);
+      setForm(f => ({
+        ...f,
+        customer_name: f.customer_name || prof?.full_name || "",
+        customer_phone: f.customer_phone || prof?.phone || "",
+      }));
     });
   }, [navigate]);
 
-  useEffect(() => { if (!items.length && user) navigate("/cart"); }, [items, user, navigate]);
+  // Only redirect to /cart if cart empties *before* an order is placed.
+  useEffect(() => { if (!items.length && user && !orderPlaced && !submitting) navigate("/cart"); }, [items, user, navigate, orderPlaced, submitting]);
+
+  const applySavedAddress = (a: SavedAddress) => {
+    setForm(f => ({
+      ...f,
+      customer_name: a.recipient_name,
+      customer_phone: a.phone,
+      shipping_address: a.address_line,
+      city: a.city, state: a.state, zip_code: a.zip_code,
+    }));
+    setUsedSavedId(a.id);
+    setPickerOpen(false);
+    toast.success("Address applied");
+  };
 
   // GST INCLUSIVE
   const isKarnataka = form.state.trim().toLowerCase() === "karnataka";
@@ -58,6 +88,7 @@ const CheckoutPage = () => {
     e.preventDefault();
     if (!validateStep1() || !validateStep2()) { toast.error("Please complete all required fields"); return; }
     setSubmitting(true);
+    setOrderPlaced(true);
     const order_number = `ORD-${Date.now().toString(36).toUpperCase()}`;
     const initialStatus = form.payment_method === "online" ? "paid" : "pending";
     const { data: order, error } = await (supabase.from("customer_orders") as any).insert({
@@ -65,7 +96,7 @@ const CheckoutPage = () => {
       status: initialStatus, tracking_status: "confirmed",
     }).select().single();
     
-    if (error) { toast.error(error.message); setSubmitting(false); return; }
+    if (error) { toast.error(error.message); setSubmitting(false); setOrderPlaced(false); return; }
     
     const itemRows = items.map(i => ({
       order_id: order.id, product_id: i.product_id, product_name: i.product?.name || "Item",
@@ -74,6 +105,23 @@ const CheckoutPage = () => {
       product_color: (i.product as any)?.color || null,
     }));
     await (supabase.from("customer_order_items") as any).insert(itemRows);
+
+    // Offer to save the address used (only if it wasn't already a saved one)
+    if (!usedSavedId && form.shipping_address && form.city && form.zip_code) {
+      const save = confirm("Save this address for faster checkout next time?");
+      if (save) {
+        await (supabase.from("customer_addresses") as any).insert({
+          user_id: user.id,
+          label: "Address",
+          recipient_name: form.customer_name,
+          phone: form.customer_phone,
+          address_line: form.shipping_address,
+          city: form.city, state: form.state, zip_code: form.zip_code,
+          is_default: savedCount === 0,
+        });
+      }
+    }
+
     await clearCart();
 
     try {
@@ -98,7 +146,7 @@ const CheckoutPage = () => {
     }
 
     toast.success(form.payment_method === "online" ? "Payment secured. Order confirmed!" : "Order confirmed!");
-    navigate(`/orders/${order.id}`);
+    navigate(`/orders/${order.id}`, { replace: true });
   };
 
   return (
@@ -157,8 +205,16 @@ const CheckoutPage = () => {
                   {activeStep === 2 && (
                     <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
                       <div className="mb-4">
-                        <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft">Complete Address *</label>
-                        <textarea value={form.shipping_address} onChange={e => { const v = e.target.value; setForm(f => ({ ...f, shipping_address: v })); }} required rows={3}
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="block text-[9px] font-body uppercase tracking-[0.25em] text-ink-soft">Complete Address *</label>
+                          {savedCount > 0 && (
+                            <button type="button" onClick={() => setPickerOpen(true)}
+                              className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.2em] text-emerald hover:text-emerald-deep font-body">
+                              <BookMarked size={11} /> Use saved address
+                            </button>
+                          )}
+                        </div>
+                        <textarea value={form.shipping_address} onFocus={() => { if (savedCount > 0 && !form.shipping_address) setPickerOpen(true); }} onChange={e => { const v = e.target.value; setForm(f => ({ ...f, shipping_address: v })); setUsedSavedId(null); }} required rows={3}
                           className="w-full border border-gold/20 bg-ivory-deep/30 p-4 text-sm font-body focus:outline-none focus:border-maroon transition-colors resize-none placeholder:text-ink-soft/30" placeholder="Street, area," />
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
@@ -280,6 +336,13 @@ const CheckoutPage = () => {
           </div>
         </div>
       </div>
+      <AddressPickerModal
+        open={pickerOpen}
+        userId={user?.id || null}
+        onClose={() => setPickerOpen(false)}
+        onSelect={applySavedAddress}
+        onNew={() => { setPickerOpen(false); setUsedSavedId(null); }}
+      />
     </div>
   );
 };

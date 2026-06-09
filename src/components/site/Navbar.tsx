@@ -364,6 +364,19 @@ const Navbar = () => {
                   {user && (
                     <button
                       type="button"
+                      onClick={() => goTo("/profile")}
+                      className="w-full flex items-center gap-4 px-3 py-4 rounded-sm mb-0.5 hover:bg-ivory-deep border border-transparent transition-all duration-150 group"
+                    >
+                      <span aria-hidden="true" className="flex items-center justify-center w-9 h-9 rounded-sm bg-ivory-deep text-ink-soft group-hover:text-maroon group-hover:bg-maroon/8 transition-colors shrink-0">
+                        <User size={16} strokeWidth={1.5} />
+                      </span>
+                      <span className="font-heading text-[1.35rem] text-ink group-hover:text-maroon leading-none transition-colors">My Profile</span>
+                    </button>
+                  )}
+
+                  {user && (
+                    <button
+                      type="button"
                       onClick={() => goTo("/orders")}
                       className="w-full flex items-center gap-4 px-3 py-4 rounded-sm mb-0.5 hover:bg-ivory-deep border border-transparent transition-all duration-150 group"
                     >

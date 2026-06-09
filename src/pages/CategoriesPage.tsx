@@ -29,7 +29,7 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
       className="group card-3d"
     >
       <Link to={`/shop/${product.slug}`} className="block">
-        <div className="relative overflow-hidden aspect-[3/4] mb-5 bg-ivory-deep border border-gold/10 img-fit">
+        <div className="relative overflow-hidden aspect-[3/4] mb-5 bg-ivory-deep border border-gold/10 img-fit transition-all duration-500 group-hover:border-emerald/40 group-hover:shadow-[0_25px_60px_-25px_hsl(var(--emerald)/0.35)]">
           {product.image_url ? (
             <motion.img
               src={optimizeImg(product.image_url, 600)}
@@ -38,8 +38,8 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
               alt={product.name}
               width={600}
               height={800}
-              animate={{ scale: hovered ? 1.06 : 1 }}
-              transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }}
+              animate={{ scale: hovered ? 1.08 : 1 }}
+              transition={{ duration: 1.1, ease: [0.23, 1, 0.32, 1] }}
               loading="lazy"
               decoding="async"
             />
@@ -48,8 +48,17 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
               <Sparkles size={20} className="text-gold/30" aria-hidden="true" />
             </div>
           )}
+          {/* Gold sheen overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+          {/* Quick view ribbon */}
+          <div className="absolute bottom-0 left-0 right-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out bg-ivory/95 backdrop-blur-sm py-3 text-center pointer-events-none">
+            <span className="font-display text-[9px] tracking-[0.3em] uppercase text-emerald">View piece →</span>
+          </div>
         </div>
-        <h3 className="font-heading text-xl text-ink group-hover:text-emerald transition-colors duration-300 mb-1.5">{product.name}</h3>
+        <h3 className="font-heading text-xl text-ink group-hover:text-emerald transition-colors duration-300 mb-1.5 relative inline-block">
+          {product.name}
+          <span className="absolute -bottom-0.5 left-0 h-px w-0 group-hover:w-full bg-gold-dark transition-all duration-500" />
+        </h3>
         <p className="font-body text-sm text-gold-dark">₹{Number(product.price).toLocaleString("en-IN")}</p>
       </Link>
     </motion.div>
@@ -126,12 +135,32 @@ const CategoriesPage = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {categories.map(c => (
-                <Link key={c.id} to={`/categories/${c.slug}`} className="group block bg-ivory-deep/50 border border-gold/15 p-6 hover:border-emerald transition-colors">
-                  <h2 className="font-heading text-2xl text-ink group-hover:text-emerald transition-colors">{c.name}</h2>
-                  {c.description && <p className="text-sm text-ink-soft font-body mt-2 leading-relaxed line-clamp-3">{c.description}</p>}
-                  <span className="mt-4 inline-flex items-center gap-2 font-display text-[9px] tracking-[0.25em] uppercase text-gold-dark group-hover:text-emerald">
-                    View edit <ArrowLeft size={11} className="rotate-180" aria-hidden="true" />
-                  </span>
+                <Link key={c.id} to={`/categories/${c.slug}`} className="group block bg-ivory-deep/50 border border-gold/15 overflow-hidden hover:border-emerald transition-all duration-500 hover:shadow-[0_20px_50px_-20px_hsl(var(--emerald)/0.25)] hover:-translate-y-1">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-ivory-deep">
+                    {c.image_url ? (
+                      <img
+                        src={optimizeImg(c.image_url, 800)}
+                        srcSet={imgSrcSet(c.image_url, [400, 600, 800, 1200])}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        alt={c.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-110"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Sparkles size={28} className="text-gold/30" aria-hidden="true" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-ink/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  </div>
+                  <div className="p-6">
+                    <h2 className="font-heading text-2xl text-ink group-hover:text-emerald transition-colors">{c.name}</h2>
+                    {c.description && <p className="text-sm text-ink-soft font-body mt-2 leading-relaxed line-clamp-2">{c.description}</p>}
+                    <span className="mt-4 inline-flex items-center gap-2 font-display text-[9px] tracking-[0.25em] uppercase text-gold-dark group-hover:text-emerald transition-colors">
+                      View edit <ArrowLeft size={11} className="rotate-180 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                    </span>
+                  </div>
                 </Link>
               ))}
             </div>

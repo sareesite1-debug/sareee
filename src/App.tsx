@@ -24,6 +24,7 @@ const CartPage          = lazy(() => import("@/pages/CartPage"));
 const CheckoutPage      = lazy(() => import("@/pages/CheckoutPage"));
 const OrdersPage        = lazy(() => import("@/pages/OrdersPage"));
 const OrderDetailPage   = lazy(() => import("@/pages/OrderDetailPage"));
+const ProfilePage       = lazy(() => import("@/pages/ProfilePage"));
 const NotFound          = lazy(() => import("@/pages/NotFound"));
 const PrivacyPage       = lazy(() => import("@/pages/PrivacyPage"));
 const TermsPage         = lazy(() => import("@/pages/TermsPage"));
@@ -91,6 +92,7 @@ const App = () => (
                 <Route path="/checkout"         element={<CheckoutPage />} />
                 <Route path="/orders"           element={<OrdersPage />} />
                 <Route path="/orders/:id"       element={<OrderDetailPage />} />
+                <Route path="/profile"          element={<ProfilePage />} />
                 <Route path="/about"            element={<AboutPage />} />
                 <Route path="/contact"          element={<ContactPage />} />
                 <Route path="/privacy"          element={<PrivacyPage />} />
