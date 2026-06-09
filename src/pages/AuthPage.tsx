@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Lock, User, ArrowRight } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, Eye, EyeOff } from "lucide-react";
 
 /* Defined OUTSIDE the page component so it isn't remounted on every keystroke
    (that was causing the input to lose focus after each character). */
@@ -14,6 +14,7 @@ const InputField = ({
   value,
   onChange,
   autoComplete,
+  rightSlot,
 }: {
   label: string;
   icon: any;
@@ -21,6 +22,7 @@ const InputField = ({
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   autoComplete?: string;
+  rightSlot?: React.ReactNode;
 }) => (
   <div className="relative group mb-6">
     <label className="block text-[9px] font-body uppercase tracking-[0.25em] mb-2 text-ink-soft transition-colors group-focus-within:text-emerald">
@@ -36,8 +38,11 @@ const InputField = ({
         value={value}
         onChange={onChange}
         autoComplete={autoComplete}
-        className="w-full bg-transparent border-b border-gold/30 pl-7 pr-0 py-2 text-ink font-body focus:outline-none focus:border-emerald transition-colors"
+        className={`w-full bg-transparent border-b border-gold/30 pl-7 ${rightSlot ? "pr-9" : "pr-0"} py-2 text-ink font-body focus:outline-none focus:border-emerald transition-colors`}
       />
+      {rightSlot && (
+        <div className="absolute right-0 top-1/2 -translate-y-1/2">{rightSlot}</div>
+      )}
     </div>
   </div>
 );
@@ -50,6 +55,7 @@ const AuthPage = () => {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -128,7 +134,24 @@ const AuthPage = () => {
             </AnimatePresence>
 
             <InputField label="Email Address" icon={Mail} type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
-            <InputField label="Password" icon={Lock} type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={isSignUp ? "new-password" : "current-password"} />
+            <InputField
+              label="Password"
+              icon={Lock}
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete={isSignUp ? "new-password" : "current-password"}
+              rightSlot={
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((s) => !s)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="text-ink-soft hover:text-emerald transition-colors p-1"
+                >
+                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                </button>
+              }
+            />
 
             <button type="submit" disabled={loading} className="btn-liquid btn-emerald w-full py-4 mt-6">
               <span className="relative z-10 flex items-center justify-center gap-2">
