@@ -170,6 +170,13 @@ const Navbar = () => {
                       <Settings size={13} strokeWidth={1.5} aria-hidden="true" /> Admin
                     </Link>
                   )}
+                  <Link
+                    to="/profile"
+                    aria-label="My profile"
+                    className="hidden md:inline-flex items-center justify-center w-8 h-8 rounded-full bg-maroon-deep hover:bg-maroon transition-colors ml-1"
+                  >
+                    <span className="font-heading text-ivory text-sm leading-none">{userInitial}</span>
+                  </Link>
                   <button onClick={handleSignOut} aria-label="Sign out" className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 font-display text-[8px] tracking-[0.25em] uppercase text-ink-soft hover:text-ink">
                     <LogOut size={13} strokeWidth={1.5} aria-hidden="true" />
                   </button>
