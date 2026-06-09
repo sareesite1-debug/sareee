@@ -373,6 +373,8 @@ const Navbar = () => {
                       <span className="font-heading text-[1.35rem] text-ink group-hover:text-maroon leading-none transition-colors">My Profile</span>
                     </button>
                   )}
+
+                  {user && (
                     <button
                       type="button"
                       onClick={() => goTo("/orders")}
