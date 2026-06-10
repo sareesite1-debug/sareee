@@ -4,7 +4,25 @@ import {
   CreditCard, Package, Shield, Calendar,
   MessageSquare, UserCircle, LogOut, Menu, X, ShoppingBag, ShoppingCart, Users
 } from "lucide-react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
+
+/**
+ * Local fallback for admin route transitions.
+ * Keeps the sidebar visible (rendered above this) and shows a soft
+ * shimmer in the main panel instead of the full-screen ivory flash
+ * produced by the outer <Suspense> in App.tsx.
+ */
+const AdminRouteFallback = () => (
+  <div className="space-y-4 animate-in fade-in duration-200">
+    <div className="h-8 w-48 rounded bg-maroon-deep/5 animate-pulse" />
+    <div className="h-4 w-72 rounded bg-maroon-deep/5 animate-pulse" />
+    <div className="mt-6 grid gap-3">
+      <div className="h-24 rounded-lg bg-maroon-deep/5 animate-pulse" />
+      <div className="h-24 rounded-lg bg-maroon-deep/5 animate-pulse" />
+      <div className="h-24 rounded-lg bg-maroon-deep/5 animate-pulse" />
+    </div>
+  </div>
+);
 
 const adminNav = [
   { label: "Dashboard", to: "/admin", icon: LayoutDashboard },
@@ -92,7 +110,9 @@ const AdminLayout = () => {
           <Link to="/" className="text-xs text-warm-white/40 font-body">Site →</Link>
         </header>
         <main className="flex-1 p-6 lg:p-8 overflow-auto">
-          <Outlet />
+          <Suspense fallback={<AdminRouteFallback />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>
