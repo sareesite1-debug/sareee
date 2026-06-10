@@ -110,7 +110,9 @@ const AdminLayout = () => {
           <Link to="/" className="text-xs text-warm-white/40 font-body">Site →</Link>
         </header>
         <main className="flex-1 p-6 lg:p-8 overflow-auto">
-          <Outlet />
+          <Suspense fallback={<AdminRouteFallback />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>
