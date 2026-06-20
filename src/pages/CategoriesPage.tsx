@@ -42,6 +42,7 @@ const ProductCard = ({ product, index }: { product: Product; index: number }) =>
               transition={{ duration: 1.1, ease: [0.23, 1, 0.32, 1] }}
               loading="lazy"
               decoding="async"
+              className="w-full h-full object-cover"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">

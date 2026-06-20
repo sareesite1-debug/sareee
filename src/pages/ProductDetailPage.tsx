@@ -94,6 +94,7 @@ const ProductDetailPage = () => {
                       alt={product.name}
                       whileHover={{ scale: 1.15 }}
                       transition={{ duration: 1.5, ease: [0.23, 1, 0.32, 1] }}
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center text-ink-soft font-body uppercase tracking-widest text-xs">No image</div>
